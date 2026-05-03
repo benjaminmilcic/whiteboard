@@ -5,6 +5,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatMenuModule } from '@angular/material/menu';
 import { Database, ref, onValue, set, push, off, onDisconnect, remove } from '@angular/fire/database';
 import { inject } from '@angular/core';
 
@@ -16,55 +17,89 @@ interface DrawingPoint {
   timestamp: number;
 }
 
-interface DrawingStroke {
+interface StrokeElement {
+  type: 'stroke';
   points: DrawingPoint[];
   color: string;
   lineWidth: number;
 }
 
+interface ImageElement {
+  type: 'image';
+  dataUrl: string;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
+type WhiteboardElement = StrokeElement | ImageElement;
+
+interface ActiveImage {
+  dataUrl: string;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
 @Component({
   selector: 'app-whiteboard',
-  imports: [CommonModule, MatButtonModule, MatFormFieldModule, MatIconModule, MatSelectModule, MatToolbarModule],
+  imports: [CommonModule, MatButtonModule, MatFormFieldModule, MatIconModule, MatMenuModule, MatSelectModule, MatToolbarModule],
   templateUrl: './whiteboard.html',
   styleUrl: './whiteboard.css',
 })
 export class Whiteboard implements AfterViewInit, OnDestroy {
   @ViewChild('canvas', { static: false }) canvasRef!: ElementRef<HTMLCanvasElement>;
+  @ViewChild('cameraInput', { static: false }) cameraInputRef!: ElementRef<HTMLInputElement>;
+  @ViewChild('videoEl', { static: false }) videoRef?: ElementRef<HTMLVideoElement>;
 
   private database = inject(Database);
   private ngZone = inject(NgZone);
   private ctx: CanvasRenderingContext2D | null = null;
   private drawing = false;
   private currentStroke: DrawingPoint[] = [];
-  private dbRef = ref(this.database, 'whiteboard/strokes');
+  private elementsRef = ref(this.database, 'whiteboard/elements');
   private clientId = Math.random().toString(36).slice(2);
   private clientsRef = ref(this.database, 'whiteboard/clients');
   private clientRef = ref(this.database, `whiteboard/clients/${this.clientId}`);
 
-  // Signals für reaktive Zustände
+  private elements: { [key: string]: WhiteboardElement } = {};
+  private loadedImages = new Map<string, HTMLImageElement>();
+  private videoStream: MediaStream | null = null;
+  private dragState: {
+    type: 'move' | 'resize';
+    startMouseX: number;
+    startMouseY: number;
+    startX: number;
+    startY: number;
+    startWidth: number;
+    startHeight: number;
+  } | null = null;
+
   selectedColor = signal('#000000');
   lineWidth = signal(5);
   isDrawing = signal(false);
   viewportBorder = signal<{ width: number; height: number } | null>(null);
+  activeImage = signal<ActiveImage | null>(null);
+  showCameraModal = signal(false);
 
   lineWidths = [1, 2, 3, 5, 8, 12, 16, 20];
 
-  // Verfügbare Farben
   colors = [
-    '#000000', // Schwarz
-    '#FF0000', // Rot
-    '#00FF00', // Grün
-    '#0000FF', // Blau
-    '#FFFF00', // Gelb
-    '#FF00FF', // Magenta
-    '#00FFFF', // Cyan
-    '#FFA500', // Orange
-    '#800080', // Lila
-    '#FFFFFF', // Weiß
+    '#000000',
+    '#FF0000',
+    '#00FF00',
+    '#0000FF',
+    '#FFFF00',
+    '#FF00FF',
+    '#00FFFF',
+    '#FFA500',
+    '#800080',
+    '#FFFFFF',
   ];
 
   constructor() {
-    // Effect für Farbänderungen (optional, für Debugging)
     effect(() => {
       console.log('Selected color:', this.selectedColor());
       console.log('Line width:', this.lineWidth());
@@ -75,16 +110,13 @@ export class Whiteboard implements AfterViewInit, OnDestroy {
     const canvas = this.canvasRef.nativeElement;
     this.ctx = canvas.getContext('2d');
 
-    // Canvas-Größe anpassen
     this.resizeCanvas();
     this.publishCanvasSize();
     window.addEventListener('resize', () => { this.resizeCanvas(); this.publishCanvasSize(); });
     window.visualViewport?.addEventListener('resize', () => { this.resizeCanvas(); this.publishCanvasSize(); });
 
-    // Eigene Viewport-Größe bei Disconnect entfernen
     onDisconnect(this.clientRef).remove();
 
-    // Viewport-Größen aller Instanzen beobachten
     onValue(this.clientsRef, (snapshot) => {
       const clients = snapshot.val();
       const cvs = this.canvasRef.nativeElement;
@@ -101,26 +133,38 @@ export class Whiteboard implements AfterViewInit, OnDestroy {
       });
     });
 
-    // Firebase-Listener für Echtzeit-Updates
-    onValue(this.dbRef, (snapshot) => {
-      const strokes = snapshot.val();
-      if (!this.ctx) return;
-      if (strokes) {
-        this.redrawCanvas(strokes);
-      } else {
-        const canvas = this.canvasRef.nativeElement;
-        this.ctx.clearRect(0, 0, canvas.width, canvas.height);
-      }
+    onValue(this.elementsRef, (snapshot) => {
+      this.ngZone.run(() => {
+        this.elements = snapshot.val() ?? {};
+        const toLoad = Object.entries(this.elements).filter(
+          ([key, el]) => el.type === 'image' && !this.loadedImages.has(key)
+        ) as [string, ImageElement][];
+
+        if (toLoad.length === 0) {
+          this.redrawAll();
+          return;
+        }
+
+        let remaining = toLoad.length;
+        toLoad.forEach(([key, el]) => {
+          const img = new Image();
+          img.onload = () => {
+            this.loadedImages.set(key, img);
+            if (--remaining === 0) this.redrawAll();
+          };
+          img.src = el.dataUrl;
+        });
+      });
     });
 
-    // Touch-Events für Stift-Unterstützung
     canvas.addEventListener('touchstart', (e) => this.handleTouchStart(e), { passive: false });
     canvas.addEventListener('touchmove', (e) => this.handleTouchMove(e), { passive: false });
     canvas.addEventListener('touchend', (e) => this.handleTouchEnd(e), { passive: false });
   }
 
   ngOnDestroy(): void {
-    off(this.dbRef);
+    this.stopVideoStream();
+    off(this.elementsRef);
     off(this.clientsRef);
     remove(this.clientRef);
   }
@@ -131,8 +175,6 @@ export class Whiteboard implements AfterViewInit, OnDestroy {
     if (container) {
       canvas.width = container.clientWidth;
       canvas.height = container.clientHeight;
-
-      // Canvas nach Größenänderung neu zeichnen
       if (this.ctx) {
         this.ctx.lineCap = 'round';
         this.ctx.lineJoin = 'round';
@@ -140,32 +182,30 @@ export class Whiteboard implements AfterViewInit, OnDestroy {
     }
   }
 
-  private redrawCanvas(strokes: any): void {
+  private redrawAll(): void {
     if (!this.ctx) return;
-
     const canvas = this.canvasRef.nativeElement;
     this.ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // Alle Striche neu zeichnen
-    Object.values(strokes).forEach((stroke: any) => {
-      if (stroke.points && stroke.points.length > 0) {
-        this.drawStroke(stroke.points, stroke.color, stroke.lineWidth);
+    for (const [key, el] of Object.entries(this.elements)) {
+      if (el.type === 'stroke' && el.points?.length > 0) {
+        this.drawStroke(el.points, el.color, el.lineWidth);
+      } else if (el.type === 'image') {
+        const img = this.loadedImages.get(key);
+        if (img) this.ctx.drawImage(img, el.x, el.y, el.width, el.height);
       }
-    });
+    }
   }
 
   private drawStroke(points: DrawingPoint[], color: string, lineWidth: number): void {
     if (!this.ctx || points.length === 0) return;
-
     this.ctx.strokeStyle = color;
     this.ctx.lineWidth = lineWidth;
     this.ctx.beginPath();
     this.ctx.moveTo(points[0].x, points[0].y);
-
     for (let i = 1; i < points.length; i++) {
       this.ctx.lineTo(points[i].x, points[i].y);
     }
-
     this.ctx.stroke();
   }
 
@@ -194,25 +234,18 @@ export class Whiteboard implements AfterViewInit, OnDestroy {
     event.preventDefault();
     const touch = event.touches[0];
     const rect = this.canvasRef.nativeElement.getBoundingClientRect();
-    const x = touch.clientX - rect.left;
-    const y = touch.clientY - rect.top;
-
     this.drawing = true;
     this.isDrawing.set(true);
     this.currentStroke = [];
-    this.addPoint(x, y);
+    this.addPoint(touch.clientX - rect.left, touch.clientY - rect.top);
   }
 
   private handleTouchMove(event: TouchEvent): void {
     if (!this.drawing) return;
     event.preventDefault();
-
     const touch = event.touches[0];
     const rect = this.canvasRef.nativeElement.getBoundingClientRect();
-    const x = touch.clientX - rect.left;
-    const y = touch.clientY - rect.top;
-
-    this.addPoint(x, y);
+    this.addPoint(touch.clientX - rect.left, touch.clientY - rect.top);
   }
 
   private handleTouchEnd(event: TouchEvent): void {
@@ -227,37 +260,31 @@ export class Whiteboard implements AfterViewInit, OnDestroy {
 
   private addPoint(x: number, y: number): void {
     const point: DrawingPoint = {
-      x,
-      y,
+      x, y,
       color: this.selectedColor(),
       lineWidth: this.lineWidth(),
       timestamp: Date.now()
     };
-
     this.currentStroke.push(point);
-
-    // Lokal zeichnen für sofortiges Feedback
     if (this.ctx && this.currentStroke.length > 1) {
-      const prevPoint = this.currentStroke[this.currentStroke.length - 2];
+      const prev = this.currentStroke[this.currentStroke.length - 2];
       this.ctx.strokeStyle = this.selectedColor();
       this.ctx.lineWidth = this.lineWidth();
       this.ctx.beginPath();
-      this.ctx.moveTo(prevPoint.x, prevPoint.y);
+      this.ctx.moveTo(prev.x, prev.y);
       this.ctx.lineTo(point.x, point.y);
       this.ctx.stroke();
     }
   }
 
   private saveStroke(): void {
-    const stroke: DrawingStroke = {
+    const el: StrokeElement = {
+      type: 'stroke',
       points: this.currentStroke,
       color: this.selectedColor(),
       lineWidth: this.lineWidth()
     };
-
-    // In Firebase speichern
-    const newStrokeRef = push(this.dbRef);
-    set(newStrokeRef, stroke);
+    set(push(this.elementsRef), el);
   }
 
   selectColor(color: string): void {
@@ -267,6 +294,146 @@ export class Whiteboard implements AfterViewInit, OnDestroy {
   private publishCanvasSize(): void {
     const canvas = this.canvasRef.nativeElement;
     set(this.clientRef, { width: canvas.width, height: canvas.height });
+  }
+
+  onImageUpload(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) return;
+    input.value = '';
+    const reader = new FileReader();
+    reader.onload = (e) => this.placeImageFromDataUrl(e.target?.result as string);
+    reader.readAsDataURL(file);
+  }
+
+  private placeImageFromDataUrl(dataUrl: string): void {
+    const img = new Image();
+    img.onload = () => {
+      const canvas = this.canvasRef.nativeElement;
+      const maxWidth = canvas.width * 0.3;
+      const scale = Math.min(maxWidth / img.width, 1);
+      const width = Math.round(img.width * scale);
+      const height = Math.round(img.height * scale);
+      this.ngZone.run(() => {
+        this.activeImage.set({
+          dataUrl,
+          x: Math.round((canvas.width - width) / 2),
+          y: Math.round((canvas.height - height) / 2),
+          width,
+          height
+        });
+      });
+    };
+    img.src = dataUrl;
+  }
+
+  private isMobile(): boolean {
+    return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  }
+
+  async openCamera(): Promise<void> {
+    if (this.isMobile()) {
+      this.cameraInputRef.nativeElement.click();
+      return;
+    }
+    if (!navigator.mediaDevices?.getUserMedia) {
+      this.cameraInputRef.nativeElement.click();
+      return;
+    }
+    this.showCameraModal.set(true);
+    setTimeout(async () => {
+      const video = this.videoRef?.nativeElement;
+      if (!video) return;
+      try {
+        this.videoStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+        video.srcObject = this.videoStream;
+      } catch {
+        this.ngZone.run(() => this.showCameraModal.set(false));
+      }
+    }, 50);
+  }
+
+  capturePhoto(): void {
+    const video = this.videoRef?.nativeElement;
+    if (!video) return;
+    const tempCanvas = document.createElement('canvas');
+    tempCanvas.width = video.videoWidth;
+    tempCanvas.height = video.videoHeight;
+    tempCanvas.getContext('2d')!.drawImage(video, 0, 0);
+    const dataUrl = tempCanvas.toDataURL('image/jpeg', 0.9);
+    this.closeCameraModal();
+    this.placeImageFromDataUrl(dataUrl);
+  }
+
+  closeCameraModal(): void {
+    this.stopVideoStream();
+    this.showCameraModal.set(false);
+  }
+
+  private stopVideoStream(): void {
+    this.videoStream?.getTracks().forEach(t => t.stop());
+    this.videoStream = null;
+  }
+
+  onImagePointerDown(event: PointerEvent): void {
+    (event.currentTarget as Element).setPointerCapture(event.pointerId);
+    const img = this.activeImage()!;
+    this.dragState = {
+      type: 'move',
+      startMouseX: event.clientX,
+      startMouseY: event.clientY,
+      startX: img.x,
+      startY: img.y,
+      startWidth: img.width,
+      startHeight: img.height
+    };
+  }
+
+  onResizePointerDown(event: PointerEvent): void {
+    event.stopPropagation();
+    (event.currentTarget as Element).setPointerCapture(event.pointerId);
+    const img = this.activeImage()!;
+    this.dragState = {
+      type: 'resize',
+      startMouseX: event.clientX,
+      startMouseY: event.clientY,
+      startX: img.x,
+      startY: img.y,
+      startWidth: img.width,
+      startHeight: img.height
+    };
+  }
+
+  onPointerMove(event: PointerEvent): void {
+    if (!this.dragState) return;
+    const dx = event.clientX - this.dragState.startMouseX;
+    const dy = event.clientY - this.dragState.startMouseY;
+    const current = this.activeImage()!;
+    if (this.dragState.type === 'move') {
+      this.activeImage.set({ ...current, x: this.dragState.startX + dx, y: this.dragState.startY + dy });
+    } else {
+      this.activeImage.set({
+        ...current,
+        width: Math.max(50, this.dragState.startWidth + dx),
+        height: Math.max(50, this.dragState.startHeight + dy)
+      });
+    }
+  }
+
+  onPointerUp(): void {
+    this.dragState = null;
+  }
+
+  commitImage(): void {
+    const active = this.activeImage();
+    if (!active) return;
+    this.activeImage.set(null);
+    const el: ImageElement = { type: 'image', ...active };
+    set(push(this.elementsRef), el);
+  }
+
+  cancelImage(): void {
+    this.activeImage.set(null);
   }
 
   downloadCanvas(): void {
@@ -289,6 +456,8 @@ export class Whiteboard implements AfterViewInit, OnDestroy {
       const canvas = this.canvasRef.nativeElement;
       this.ctx.clearRect(0, 0, canvas.width, canvas.height);
     }
-    set(this.dbRef, null);
+    this.elements = {};
+    this.loadedImages.clear();
+    set(this.elementsRef, null);
   }
 }

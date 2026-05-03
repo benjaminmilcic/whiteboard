@@ -12,7 +12,7 @@
               [class.ring-blue-500]="selectedColor() === color"
               [style.background-color]="color"
               class="w-10 h-10 rounded-full border-2 border-gray-300 cursor-pointer hover:scale-110 transition-transform"
-              [attr.aria-label]="'Farbe ' + color">
+              [attr.aria-label]="'Boja ' + color">
             </button>
           }
         </div>
@@ -36,13 +36,32 @@
         </mat-select>
       </mat-form-field>
 
-      <!-- Download- und Löschen-Button -->
+      <!-- Aktions-Buttons -->
+      <input #fileInput type="file" accept="image/*" class="hidden" (change)="onImageUpload($event)">
+      <input #cameraInput type="file" accept="image/*" capture="environment" class="hidden" (change)="onImageUpload($event)">
+      <mat-menu #imageMenu="matMenu">
+        <button mat-menu-item (click)="fileInput.click()">
+          <mat-icon>folder_open</mat-icon>
+          <span>Učitaj datoteku</span>
+        </button>
+        <button mat-menu-item (click)="openCamera()">
+          <mat-icon>photo_camera</mat-icon>
+          <span>Kamera</span>
+        </button>
+      </mat-menu>
       <div class="flex gap-4 ml-auto">
+        <button
+          mat-mini-fab
+          color="accent"
+          [matMenuTriggerFor]="imageMenu"
+          aria-label="Umetni sliku">
+          <mat-icon>image</mat-icon>
+        </button>
         <button
           mat-mini-fab
           color="primary"
           (click)="downloadCanvas()"
-          aria-label="Als Bild herunterladen">
+          aria-label="Preuzmi kao sliku">
           <mat-icon>download</mat-icon>
         </button>
         <button
@@ -72,12 +91,60 @@
       (mouseleave)="onMouseUp()"
       class="absolute inset-0 bg-white cursor-crosshair touch-none">
     </canvas>
+
+    @if (activeImage()) {
+      <div class="absolute inset-0 z-20">
+        <!-- Bild-Box -->
+        <div class="absolute border-2 border-blue-500 select-none"
+             [style.left.px]="activeImage()!.x"
+             [style.top.px]="activeImage()!.y"
+             [style.width.px]="activeImage()!.width"
+             [style.height.px]="activeImage()!.height"
+             style="cursor: move; touch-action: none;"
+             (pointerdown)="onImagePointerDown($event)"
+             (pointermove)="onPointerMove($event)"
+             (pointerup)="onPointerUp()">
+          <img [src]="activeImage()!.dataUrl"
+               class="w-full h-full block"
+               style="pointer-events: none; object-fit: fill;">
+          <!-- Resize-Griff rechts unten -->
+          <div class="absolute bottom-0 right-0 w-4 h-4 bg-blue-500 border-2 border-white rounded-sm"
+               style="cursor: se-resize; transform: translate(50%, 50%); touch-action: none;"
+               (pointerdown)="onResizePointerDown($event)"
+               (pointermove)="onPointerMove($event)"
+               (pointerup)="onPointerUp()">
+          </div>
+        </div>
+        <!-- Aktions-Buttons -->
+        <div class="absolute bottom-4 right-4 flex gap-2">
+          <button (click)="cancelImage()"
+                  class="bg-gray-500 text-white px-4 py-2 rounded-lg shadow-lg text-sm">
+            Odustani
+          </button>
+          <button (click)="commitImage()"
+                  class="bg-blue-500 text-white px-4 py-2 rounded-lg shadow-lg text-sm font-medium">
+            Umetni
+          </button>
+        </div>
+      </div>
+    }
   </div>
 
-  <!-- Status-Anzeige -->
-  <!-- @if (isDrawing()) {
-    <div class="absolute bottom-4 left-4 bg-blue-500 text-white px-4 py-2 rounded-lg shadow-lg">
-      Zeichnen...
+  @if (showCameraModal()) {
+    <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
+      <div class="bg-white rounded-xl shadow-2xl p-4 flex flex-col gap-4 w-full max-w-lg mx-4">
+        <video #videoEl autoplay playsinline class="w-full rounded-lg bg-black"></video>
+        <div class="flex gap-2 justify-end">
+          <button (click)="closeCameraModal()"
+                  class="bg-gray-500 text-white px-4 py-2 rounded-lg text-sm">
+            Odustani
+          </button>
+          <button (click)="capturePhoto()"
+                  class="bg-blue-500 text-white px-4 py-2 rounded-lg text-sm font-medium">
+            Snimi
+          </button>
+        </div>
+      </div>
     </div>
-  } -->
+  }
 </div>
