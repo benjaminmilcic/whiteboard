@@ -269,6 +269,21 @@ export class Whiteboard implements AfterViewInit, OnDestroy {
     set(this.clientRef, { width: canvas.width, height: canvas.height });
   }
 
+  downloadCanvas(): void {
+    const canvas = this.canvasRef.nativeElement;
+    const tempCanvas = document.createElement('canvas');
+    tempCanvas.width = canvas.width;
+    tempCanvas.height = canvas.height;
+    const tempCtx = tempCanvas.getContext('2d')!;
+    tempCtx.fillStyle = '#ffffff';
+    tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+    tempCtx.drawImage(canvas, 0, 0);
+    const link = document.createElement('a');
+    link.download = `whiteboard-${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.png`;
+    link.href = tempCanvas.toDataURL('image/png');
+    link.click();
+  }
+
   clearCanvas(): void {
     if (this.ctx) {
       const canvas = this.canvasRef.nativeElement;

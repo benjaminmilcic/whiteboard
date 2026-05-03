@@ -36,14 +36,22 @@
         </mat-select>
       </mat-form-field>
 
-      <!-- Löschen-Button -->
-      <button
-        mat-mini-fab
-        color="warn"
-        (click)="clearCanvas()"
-        class="ml-auto">
-        <mat-icon>delete</mat-icon>
-      </button>
+      <!-- Download- und Löschen-Button -->
+      <div class="flex gap-4 ml-auto">
+        <button
+          mat-mini-fab
+          color="primary"
+          (click)="downloadCanvas()"
+          aria-label="Als Bild herunterladen">
+          <mat-icon>download</mat-icon>
+        </button>
+        <button
+          mat-mini-fab
+          color="warn"
+          (click)="clearCanvas()">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </div>
     </div>
   </mat-toolbar>
 
