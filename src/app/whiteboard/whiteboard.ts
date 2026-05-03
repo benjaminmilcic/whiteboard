@@ -79,6 +79,7 @@ export class Whiteboard implements AfterViewInit, OnDestroy {
     this.resizeCanvas();
     this.publishCanvasSize();
     window.addEventListener('resize', () => { this.resizeCanvas(); this.publishCanvasSize(); });
+    window.visualViewport?.addEventListener('resize', () => { this.resizeCanvas(); this.publishCanvasSize(); });
 
     // Eigene Viewport-Größe bei Disconnect entfernen
     onDisconnect(this.clientRef).remove();
