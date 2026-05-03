@@ -1,4 +1,4 @@
-import { Component, signal, effect, ViewChild, ElementRef, AfterViewInit, OnDestroy } from '@angular/core';
+import { Component, signal, effect, ViewChild, ElementRef, AfterViewInit, OnDestroy, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -32,6 +32,7 @@ export class Whiteboard implements AfterViewInit, OnDestroy {
   @ViewChild('canvas', { static: false }) canvasRef!: ElementRef<HTMLCanvasElement>;
 
   private database = inject(Database);
+  private ngZone = inject(NgZone);
   private ctx: CanvasRenderingContext2D | null = null;
   private drawing = false;
   private currentStroke: DrawingPoint[] = [];
@@ -86,15 +87,17 @@ export class Whiteboard implements AfterViewInit, OnDestroy {
     onValue(this.clientsRef, (snapshot) => {
       const clients = snapshot.val();
       const cvs = this.canvasRef.nativeElement;
-      if (!clients) { this.viewportBorder.set(null); return; }
-      const sizes = Object.values(clients) as { width: number; height: number }[];
-      const minW = Math.min(...sizes.map(s => s.width));
-      const minH = Math.min(...sizes.map(s => s.height));
-      if (minW < cvs.width || minH < cvs.height) {
-        this.viewportBorder.set({ width: minW, height: minH });
-      } else {
-        this.viewportBorder.set(null);
-      }
+      this.ngZone.run(() => {
+        if (!clients) { this.viewportBorder.set(null); return; }
+        const sizes = Object.values(clients) as { width: number; height: number }[];
+        const minW = Math.min(...sizes.map(s => s.width));
+        const minH = Math.min(...sizes.map(s => s.height));
+        if (minW < cvs.width || minH < cvs.height) {
+          this.viewportBorder.set({ width: minW, height: minH });
+        } else {
+          this.viewportBorder.set(null);
+        }
+      });
     });
 
     // Firebase-Listener für Echtzeit-Updates

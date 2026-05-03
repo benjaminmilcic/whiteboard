@@ -1,0 +1,8 @@
+{
+  "rules": {
+    "whiteboard": {
+      ".read": true,
+      ".write": true
+    }
+  }
+}
