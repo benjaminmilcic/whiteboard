@@ -4,7 +4,9 @@
       "Bash(node --version)",
       "Bash(npm --version:*)",
       "Bash(npx:*)",
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "Bash(firebase logout:*)",
+      "Bash(firebase login:*)"
     ],
     "deny": [],
     "ask": []
