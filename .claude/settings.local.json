@@ -6,7 +6,8 @@
       "Bash(npx:*)",
       "Bash(npm install:*)",
       "Bash(firebase logout:*)",
-      "Bash(firebase login:*)"
+      "Bash(firebase login:*)",
+      "Bash(npm view *)"
     ],
     "deny": [],
     "ask": []
