@@ -2,7 +2,8 @@ import { Component, signal, effect, ViewChild, ElementRef, AfterViewInit, OnDest
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { MatSliderModule } from '@angular/material/slider';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatSelectModule } from '@angular/material/select';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { Database, ref, onValue, set, push, off } from '@angular/fire/database';
 import { inject } from '@angular/core';
@@ -23,7 +24,7 @@ interface DrawingStroke {
 
 @Component({
   selector: 'app-whiteboard',
-  imports: [CommonModule, MatButtonModule, MatIconModule, MatSliderModule, MatToolbarModule],
+  imports: [CommonModule, MatButtonModule, MatFormFieldModule, MatIconModule, MatSelectModule, MatToolbarModule],
   templateUrl: './whiteboard.html',
   styleUrl: './whiteboard.css',
 })
@@ -40,6 +41,8 @@ export class Whiteboard implements AfterViewInit, OnDestroy {
   selectedColor = signal('#000000');
   lineWidth = signal(5);
   isDrawing = signal(false);
+
+  lineWidths = [1, 2, 3, 5, 8, 12, 16, 20];
 
   // Verfügbare Farben
   colors = [
@@ -229,21 +232,11 @@ export class Whiteboard implements AfterViewInit, OnDestroy {
     this.selectedColor.set(color);
   }
 
-  onLineWidthChange(event: Event): void {
-    const target = event.target as HTMLInputElement;
-    this.lineWidth.set(Number(target.value));
-  }
-
   clearCanvas(): void {
-    if (confirm('Möchtest du wirklich das gesamte Whiteboard löschen?')) {
-      // Canvas lokal leeren
-      if (this.ctx) {
-        const canvas = this.canvasRef.nativeElement;
-        this.ctx.clearRect(0, 0, canvas.width, canvas.height);
-      }
-
-      // Firebase-Daten löschen
-      set(this.dbRef, null);
+    if (this.ctx) {
+      const canvas = this.canvasRef.nativeElement;
+      this.ctx.clearRect(0, 0, canvas.width, canvas.height);
     }
+    set(this.dbRef, null);
   }
 }

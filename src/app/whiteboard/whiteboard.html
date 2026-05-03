@@ -1,11 +1,10 @@
 <div class="h-screen flex flex-col bg-gray-100">
   <!-- Toolbar -->
-  <mat-toolbar class="bg-white shadow-md">
-    <div class="flex items-center justify-between w-full gap-4">
+  <mat-toolbar class="bg-white shadow-md" style="height: auto; min-height: 64px;">
+    <div class="flex flex-wrap items-center justify-between w-full gap-4 py-2">
       <!-- Farben -->
-      <div class="flex items-center gap-2">
-        <span class="text-sm font-medium mr-2">Farbe:</span>
-        <div class="flex gap-2">
+      <div class="flex flex-wrap items-center gap-2">
+        <div class="flex flex-wrap gap-2">
           @for (color of colors; track color) {
             <button
               (click)="selectColor(color)"
@@ -20,26 +19,30 @@
       </div>
 
       <!-- Strichstärke -->
-      <div class="flex items-center gap-4 flex-1 max-w-xs">
-        <span class="text-sm font-medium">Strichstärke:</span>
-        <mat-slider
-          min="1"
-          max="20"
-          step="1"
-          class="flex-1">
-          <input matSliderThumb [value]="lineWidth()" (input)="onLineWidthChange($event)">
-        </mat-slider>
-        <span class="text-sm font-medium w-8">{{ lineWidth() }}</span>
-      </div>
+      <mat-form-field appearance="outline" subscriptSizing="dynamic" style="width: 110px;">
+        <mat-select [value]="lineWidth()" (selectionChange)="lineWidth.set($event.value)">
+          <mat-select-trigger>
+            <div class="flex items-center h-full">
+              <div [style.height.px]="lineWidth()" style="width: 48px; background: black; border-radius: 9999px;"></div>
+            </div>
+          </mat-select-trigger>
+          @for (width of lineWidths; track width) {
+            <mat-option [value]="width">
+              <div class="flex items-center h-full">
+                <div [style.height.px]="width" style="width: 48px; background: black; border-radius: 9999px;"></div>
+              </div>
+            </mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
 
       <!-- Löschen-Button -->
       <button
-        mat-raised-button
+        mat-mini-fab
         color="warn"
         (click)="clearCanvas()"
         class="ml-auto">
         <mat-icon>delete</mat-icon>
-        Löschen
       </button>
     </div>
   </mat-toolbar>
