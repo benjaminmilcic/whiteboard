@@ -1,0 +1,65 @@
+<div class="h-screen flex flex-col bg-gray-100">
+  <!-- Toolbar -->
+  <mat-toolbar class="bg-white shadow-md">
+    <div class="flex items-center justify-between w-full gap-4">
+      <!-- Farben -->
+      <div class="flex items-center gap-2">
+        <span class="text-sm font-medium mr-2">Farbe:</span>
+        <div class="flex gap-2">
+          @for (color of colors; track color) {
+            <button
+              (click)="selectColor(color)"
+              [class.ring-4]="selectedColor() === color"
+              [class.ring-blue-500]="selectedColor() === color"
+              [style.background-color]="color"
+              class="w-10 h-10 rounded-full border-2 border-gray-300 cursor-pointer hover:scale-110 transition-transform"
+              [attr.aria-label]="'Farbe ' + color">
+            </button>
+          }
+        </div>
+      </div>
+
+      <!-- Strichstärke -->
+      <div class="flex items-center gap-4 flex-1 max-w-xs">
+        <span class="text-sm font-medium">Strichstärke:</span>
+        <mat-slider
+          min="1"
+          max="20"
+          step="1"
+          class="flex-1">
+          <input matSliderThumb [value]="lineWidth()" (input)="onLineWidthChange($event)">
+        </mat-slider>
+        <span class="text-sm font-medium w-8">{{ lineWidth() }}</span>
+      </div>
+
+      <!-- Löschen-Button -->
+      <button
+        mat-raised-button
+        color="warn"
+        (click)="clearCanvas()"
+        class="ml-auto">
+        <mat-icon>delete</mat-icon>
+        Löschen
+      </button>
+    </div>
+  </mat-toolbar>
+
+  <!-- Canvas-Container -->
+  <div class="flex-1 relative overflow-hidden">
+    <canvas
+      #canvas
+      (mousedown)="onMouseDown($event)"
+      (mousemove)="onMouseMove($event)"
+      (mouseup)="onMouseUp()"
+      (mouseleave)="onMouseUp()"
+      class="absolute inset-0 bg-white cursor-crosshair touch-none">
+    </canvas>
+  </div>
+
+  <!-- Status-Anzeige -->
+  @if (isDrawing()) {
+    <div class="absolute bottom-4 left-4 bg-blue-500 text-white px-4 py-2 rounded-lg shadow-lg">
+      Zeichnen...
+    </div>
+  }
+</div>
