@@ -1,6 +1,6 @@
 {
   "hosting": {
-    "public": "dist\\whiteboard-app\\browser",
+    "public": "dist/whiteboard-app/browser",
     "ignore": [
       "firebase.json",
       "**/.*",
