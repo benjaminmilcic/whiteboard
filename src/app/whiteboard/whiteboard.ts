@@ -77,8 +77,12 @@ export class Whiteboard implements AfterViewInit, OnDestroy {
     // Firebase-Listener für Echtzeit-Updates
     onValue(this.dbRef, (snapshot) => {
       const strokes = snapshot.val();
-      if (strokes && this.ctx) {
+      if (!this.ctx) return;
+      if (strokes) {
         this.redrawCanvas(strokes);
+      } else {
+        const canvas = this.canvasRef.nativeElement;
+        this.ctx.clearRect(0, 0, canvas.width, canvas.height);
       }
     });
 
