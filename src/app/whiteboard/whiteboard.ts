@@ -5,7 +5,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { MatToolbarModule } from '@angular/material/toolbar';
-import { Database, ref, onValue, set, push, off } from '@angular/fire/database';
+import { Database, ref, onValue, set, push, off, onDisconnect, remove } from '@angular/fire/database';
 import { inject } from '@angular/core';
 
 interface DrawingPoint {
@@ -36,11 +36,15 @@ export class Whiteboard implements AfterViewInit, OnDestroy {
   private drawing = false;
   private currentStroke: DrawingPoint[] = [];
   private dbRef = ref(this.database, 'whiteboard/strokes');
+  private clientId = Math.random().toString(36).slice(2);
+  private clientsRef = ref(this.database, 'whiteboard/clients');
+  private clientRef = ref(this.database, `whiteboard/clients/${this.clientId}`);
 
   // Signals für reaktive Zustände
   selectedColor = signal('#000000');
   lineWidth = signal(5);
   isDrawing = signal(false);
+  viewportBorder = signal<{ width: number; height: number } | null>(null);
 
   lineWidths = [1, 2, 3, 5, 8, 12, 16, 20];
 
@@ -72,7 +76,26 @@ export class Whiteboard implements AfterViewInit, OnDestroy {
 
     // Canvas-Größe anpassen
     this.resizeCanvas();
-    window.addEventListener('resize', () => this.resizeCanvas());
+    this.publishCanvasSize();
+    window.addEventListener('resize', () => { this.resizeCanvas(); this.publishCanvasSize(); });
+
+    // Eigene Viewport-Größe bei Disconnect entfernen
+    onDisconnect(this.clientRef).remove();
+
+    // Viewport-Größen aller Instanzen beobachten
+    onValue(this.clientsRef, (snapshot) => {
+      const clients = snapshot.val();
+      const cvs = this.canvasRef.nativeElement;
+      if (!clients) { this.viewportBorder.set(null); return; }
+      const sizes = Object.values(clients) as { width: number; height: number }[];
+      const minW = Math.min(...sizes.map(s => s.width));
+      const minH = Math.min(...sizes.map(s => s.height));
+      if (minW < cvs.width || minH < cvs.height) {
+        this.viewportBorder.set({ width: minW, height: minH });
+      } else {
+        this.viewportBorder.set(null);
+      }
+    });
 
     // Firebase-Listener für Echtzeit-Updates
     onValue(this.dbRef, (snapshot) => {
@@ -94,7 +117,8 @@ export class Whiteboard implements AfterViewInit, OnDestroy {
 
   ngOnDestroy(): void {
     off(this.dbRef);
-    window.removeEventListener('resize', () => this.resizeCanvas());
+    off(this.clientsRef);
+    remove(this.clientRef);
   }
 
   private resizeCanvas(): void {
@@ -234,6 +258,11 @@ export class Whiteboard implements AfterViewInit, OnDestroy {
 
   selectColor(color: string): void {
     this.selectedColor.set(color);
+  }
+
+  private publishCanvasSize(): void {
+    const canvas = this.canvasRef.nativeElement;
+    set(this.clientRef, { width: canvas.width, height: canvas.height });
   }
 
   clearCanvas(): void {

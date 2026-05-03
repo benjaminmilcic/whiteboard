@@ -49,6 +49,13 @@
 
   <!-- Canvas-Container -->
   <div class="flex-1 relative overflow-hidden">
+    @if (viewportBorder()) {
+      <div
+        class="absolute top-0 left-0 pointer-events-none border-2 border-dashed border-blue-400 opacity-60 z-10"
+        [style.width.px]="viewportBorder()!.width"
+        [style.height.px]="viewportBorder()!.height">
+      </div>
+    }
     <canvas
       #canvas
       (mousedown)="onMouseDown($event)"
