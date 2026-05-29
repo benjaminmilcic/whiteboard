@@ -7,7 +7,13 @@
       "Bash(npm install:*)",
       "Bash(firebase logout:*)",
       "Bash(firebase login:*)",
-      "Bash(npm view *)"
+      "Bash(npm view *)",
+      "Bash(magick --version)",
+      "Bash(where magick *)",
+      "Bash(where convert *)",
+      "Bash(where ffmpeg *)",
+      "Bash(node -e \"const fs=require\\('fs'\\);const b=fs.readFileSync\\('public/favicon.png'\\);if\\(b[0]===0x89&&b[1]===0x50\\){const w=b.readUInt32BE\\(16\\);const h=b.readUInt32BE\\(20\\);console.log\\('PNG dimensions:',w,'x',h\\);console.log\\('File size:',b.length,'bytes'\\);}else{console.log\\('Not a PNG'\\);}\")",
+      "Bash(node -e ' *)"
     ],
     "deny": [],
     "ask": []
