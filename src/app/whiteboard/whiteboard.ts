@@ -6,6 +6,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatMenuModule } from '@angular/material/menu';
+import { ColorPickerDirective } from 'ngx-color-picker';
 import { Database, ref, onValue, set, push, off, onDisconnect, remove } from '@angular/fire/database';
 import { inject } from '@angular/core';
 
@@ -45,7 +46,7 @@ interface ActiveImage {
 
 @Component({
   selector: 'app-whiteboard',
-  imports: [CommonModule, MatButtonModule, MatFormFieldModule, MatIconModule, MatMenuModule, MatSelectModule, MatToolbarModule],
+  imports: [CommonModule, MatButtonModule, MatFormFieldModule, MatIconModule, MatMenuModule, MatSelectModule, MatToolbarModule, ColorPickerDirective],
   templateUrl: './whiteboard.html',
   styleUrl: './whiteboard.scss',
 })
