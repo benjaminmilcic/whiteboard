@@ -1,6 +1,6 @@
 <div class="h-dvh flex flex-col bg-gray-100">
   <!-- Toolbar -->
-  <mat-toolbar class="bg-white shadow-md" style="height: auto; min-height: 64px;">
+  <mat-toolbar class="bg-white shadow-md" style="height: auto; min-height: 64px">
     <div class="flex flex-wrap items-center justify-between w-full gap-4 py-2">
       <!-- Farben -->
       <div class="flex flex-wrap items-center gap-2">
@@ -12,24 +12,32 @@
               [class.ring-blue-500]="selectedColor() === color"
               [style.background-color]="color"
               class="w-10 h-10 rounded-full border-2 border-gray-300 cursor-pointer hover:scale-110 transition-transform"
-              [attr.aria-label]="'Boja ' + color">
-            </button>
+              [attr.aria-label]="'Boja ' + color"
+            ></button>
           }
         </div>
       </div>
 
       <!-- Strichstärke -->
-      <mat-form-field appearance="outline" subscriptSizing="dynamic" style="width: 110px;">
-        <mat-select [value]="lineWidth()" (selectionChange)="lineWidth.set($event.value)">
+      <mat-form-field appearance="outline" subscriptSizing="dynamic" style="width: 110px">
+        <mat-select [value]="lineWidth()" (selectionChange)="lineWidth.set($event.value)" class="gray-bg">
           <mat-select-trigger>
             <div class="flex items-center h-full">
-              <div [style.height.px]="lineWidth()" style="width: 48px; background: black; border-radius: 9999px;"></div>
+              <div
+                [style.height.px]="lineWidth()"
+                style="width: 48px; border-radius: 9999px"
+                [style.background]="selectedColor()"
+              ></div>
             </div>
           </mat-select-trigger>
           @for (width of lineWidths; track width) {
             <mat-option [value]="width">
               <div class="flex items-center h-full">
-                <div [style.height.px]="width" style="width: 48px; background: black; border-radius: 9999px;"></div>
+                <div
+                  [style.height.px]="width"
+                  style="width: 48px; border-radius: 9999px"
+                  [style.background]="selectedColor()"
+                ></div>
               </div>
             </mat-option>
           }
@@ -37,8 +45,21 @@
       </mat-form-field>
 
       <!-- Aktions-Buttons -->
-      <input #fileInput type="file" accept="image/*" class="hidden" (change)="onImageUpload($event)">
-      <input #cameraInput type="file" accept="image/*" capture="environment" class="hidden" (change)="onImageUpload($event)">
+      <input
+        #fileInput
+        type="file"
+        accept="image/*"
+        class="hidden"
+        (change)="onImageUpload($event)"
+      />
+      <input
+        #cameraInput
+        type="file"
+        accept="image/*"
+        capture="environment"
+        class="hidden"
+        (change)="onImageUpload($event)"
+      />
       <mat-menu #imageMenu="matMenu">
         <button mat-menu-item (click)="fileInput.click()">
           <mat-icon>folder_open</mat-icon>
@@ -54,20 +75,19 @@
           mat-mini-fab
           color="accent"
           [matMenuTriggerFor]="imageMenu"
-          aria-label="Umetni sliku">
+          aria-label="Umetni sliku"
+        >
           <mat-icon>image</mat-icon>
         </button>
         <button
           mat-mini-fab
           color="primary"
           (click)="downloadCanvas()"
-          aria-label="Preuzmi kao sliku">
+          aria-label="Preuzmi kao sliku"
+        >
           <mat-icon>download</mat-icon>
         </button>
-        <button
-          mat-mini-fab
-          color="warn"
-          (click)="clearCanvas()">
+        <button mat-mini-fab color="warn" (click)="clearCanvas()">
           <mat-icon>delete</mat-icon>
         </button>
       </div>
@@ -80,8 +100,8 @@
       <div
         class="absolute top-0 left-0 pointer-events-none border-2 border-dashed border-blue-400 opacity-60 z-10"
         [style.width.px]="viewportBorder()!.width"
-        [style.height.px]="viewportBorder()!.height">
-      </div>
+        [style.height.px]="viewportBorder()!.height"
+      ></div>
     }
     <canvas
       #canvas
@@ -89,40 +109,50 @@
       (mousemove)="onMouseMove($event)"
       (mouseup)="onMouseUp()"
       (mouseleave)="onMouseUp()"
-      class="absolute inset-0 bg-white cursor-crosshair touch-none">
+      class="absolute inset-0 bg-white cursor-crosshair touch-none"
+    >
     </canvas>
 
     @if (activeImage()) {
       <div class="absolute inset-0 z-20">
         <!-- Bild-Box -->
-        <div class="absolute border-2 border-blue-500 select-none"
-             [style.left.px]="activeImage()!.x"
-             [style.top.px]="activeImage()!.y"
-             [style.width.px]="activeImage()!.width"
-             [style.height.px]="activeImage()!.height"
-             style="cursor: move; touch-action: none;"
-             (pointerdown)="onImagePointerDown($event)"
-             (pointermove)="onPointerMove($event)"
-             (pointerup)="onPointerUp()">
-          <img [src]="activeImage()!.dataUrl"
-               class="w-full h-full block"
-               style="pointer-events: none; object-fit: fill;">
+        <div
+          class="absolute border-2 border-blue-500 select-none"
+          [style.left.px]="activeImage()!.x"
+          [style.top.px]="activeImage()!.y"
+          [style.width.px]="activeImage()!.width"
+          [style.height.px]="activeImage()!.height"
+          style="cursor: move; touch-action: none"
+          (pointerdown)="onImagePointerDown($event)"
+          (pointermove)="onPointerMove($event)"
+          (pointerup)="onPointerUp()"
+        >
+          <img
+            [src]="activeImage()!.dataUrl"
+            class="w-full h-full block"
+            style="pointer-events: none; object-fit: fill"
+          />
           <!-- Resize-Griff rechts unten -->
-          <div class="absolute bottom-0 right-0 w-4 h-4 bg-blue-500 border-2 border-white rounded-sm"
-               style="cursor: se-resize; transform: translate(50%, 50%); touch-action: none;"
-               (pointerdown)="onResizePointerDown($event)"
-               (pointermove)="onPointerMove($event)"
-               (pointerup)="onPointerUp()">
-          </div>
+          <div
+            class="absolute bottom-0 right-0 w-4 h-4 bg-blue-500 border-2 border-white rounded-sm"
+            style="cursor: se-resize; transform: translate(50%, 50%); touch-action: none"
+            (pointerdown)="onResizePointerDown($event)"
+            (pointermove)="onPointerMove($event)"
+            (pointerup)="onPointerUp()"
+          ></div>
         </div>
         <!-- Aktions-Buttons -->
         <div class="absolute bottom-4 right-4 flex gap-2">
-          <button (click)="cancelImage()"
-                  class="bg-gray-500 text-white px-4 py-2 rounded-lg shadow-lg text-sm">
+          <button
+            (click)="cancelImage()"
+            class="bg-gray-500 text-white px-4 py-2 rounded-lg shadow-lg text-sm"
+          >
             Odustani
           </button>
-          <button (click)="commitImage()"
-                  class="bg-blue-500 text-white px-4 py-2 rounded-lg shadow-lg text-sm font-medium">
+          <button
+            (click)="commitImage()"
+            class="bg-blue-500 text-white px-4 py-2 rounded-lg shadow-lg text-sm font-medium"
+          >
             Umetni
           </button>
         </div>
@@ -135,12 +165,16 @@
       <div class="bg-white rounded-xl shadow-2xl p-4 flex flex-col gap-4 w-full max-w-lg mx-4">
         <video #videoEl autoplay playsinline class="w-full rounded-lg bg-black"></video>
         <div class="flex gap-2 justify-end">
-          <button (click)="closeCameraModal()"
-                  class="bg-gray-500 text-white px-4 py-2 rounded-lg text-sm">
+          <button
+            (click)="closeCameraModal()"
+            class="bg-gray-500 text-white px-4 py-2 rounded-lg text-sm"
+          >
             Odustani
           </button>
-          <button (click)="capturePhoto()"
-                  class="bg-blue-500 text-white px-4 py-2 rounded-lg text-sm font-medium">
+          <button
+            (click)="capturePhoto()"
+            class="bg-blue-500 text-white px-4 py-2 rounded-lg text-sm font-medium"
+          >
             Snimi
           </button>
         </div>

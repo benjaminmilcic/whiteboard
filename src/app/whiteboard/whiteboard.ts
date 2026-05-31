@@ -47,7 +47,7 @@ interface ActiveImage {
   selector: 'app-whiteboard',
   imports: [CommonModule, MatButtonModule, MatFormFieldModule, MatIconModule, MatMenuModule, MatSelectModule, MatToolbarModule],
   templateUrl: './whiteboard.html',
-  styleUrl: './whiteboard.css',
+  styleUrl: './whiteboard.scss',
 })
 export class Whiteboard implements AfterViewInit, OnDestroy {
   @ViewChild('canvas', { static: false }) canvasRef!: ElementRef<HTMLCanvasElement>;
