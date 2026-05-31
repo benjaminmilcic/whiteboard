@@ -15,6 +15,23 @@
               [attr.aria-label]="'Boja ' + color"
             ></button>
           }
+
+          <!-- Eigener Farbwähler (nativer input type=color) -->
+          <label
+            [class.ring-4]="selectedColor() === customColor()"
+            [class.ring-blue-500]="selectedColor() === customColor()"
+            [style.background-color]="customColor()"
+            class="w-10 h-10 rounded-full border-2 border-gray-300 cursor-pointer hover:scale-110 transition-transform flex items-center justify-center relative overflow-hidden"
+            aria-label="Vlastita boja"
+          >
+            <mat-icon class="!w-4 !h-4 !text-base !leading-4 text-white mix-blend-difference flex items-center justify-center">colorize</mat-icon>
+            <input
+              type="color"
+              [value]="customColor()"
+              (input)="selectCustomColor($any($event.target).value)"
+              class="absolute inset-0 opacity-0 cursor-pointer"
+            />
+          </label>
         </div>
       </div>
 

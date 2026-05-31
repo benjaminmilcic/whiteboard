@@ -78,6 +78,7 @@ export class Whiteboard implements AfterViewInit, OnDestroy {
   } | null = null;
 
   selectedColor = signal('#000000');
+  customColor = signal('#FF8800');
   lineWidth = signal(5);
   isDrawing = signal(false);
   viewportBorder = signal<{ width: number; height: number } | null>(null);
@@ -288,6 +289,11 @@ export class Whiteboard implements AfterViewInit, OnDestroy {
   }
 
   selectColor(color: string): void {
+    this.selectedColor.set(color);
+  }
+
+  selectCustomColor(color: string): void {
+    this.customColor.set(color);
     this.selectedColor.set(color);
   }
 
