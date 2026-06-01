@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ViewContainerRef } from '@angular/core';
 import { Whiteboard } from './whiteboard/whiteboard';
 
 @Component({
@@ -7,4 +7,8 @@ import { Whiteboard } from './whiteboard/whiteboard';
   templateUrl: './app.html',
   styleUrl: './app.css',
 })
-export class App {}
+export class App {
+  // Von ngx-color-picker genutzt (cpUseRootViewContainer), damit der Picker
+  // an den Root gehängt und nicht von überlaufenden Containern abgeschnitten wird.
+  constructor(public vcRef: ViewContainerRef) {}
+}

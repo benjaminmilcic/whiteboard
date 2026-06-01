@@ -3,3 +3,59 @@
         @apply bg-[#CDCBCF] #{'!important'};
     }
 }
+
+// Herzförmige Farbwähl-Buttons.
+// Wichtig: Eine CSS-`mask` schneidet im Rendering NACH dem `filter`/`drop-shadow`,
+// d.h. eine Kontur per drop-shadow würde wieder weggeschnitten. Deshalb wird der
+// Button selbst NICHT maskiert. Stattdessen rendern zwei Pseudo-Elemente jeweils
+// mit eigener Maske: ::before = farbige Herzfüllung, ::after = (größeres) Herz als
+// Kontur dahinter. So bleibt die blaue Umrandung sichtbar.
+.heart-btn {
+    $heart: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 29.6'%3E%3Cpath d='M23.6,0c-3.4,0-6.3,2.7-7.6,5.6C14.7,2.7,11.8,0,8.4,0C3.8,0,0,3.8,0,8.4c0,9.4,9.5,11.9,16,21.2c6.1-8.8,16-12.1,16-21.2C32,3.8,28.2,0,23.6,0z'/%3E%3C/svg%3E";
+
+    position: relative;
+    z-index: 0; // eigener Stacking-Kontext, damit ::after (z-index:-1) nicht hinter der Toolbar verschwindet
+    border: 0;
+    background: transparent;
+    transition: transform 0.15s ease;
+
+    &::before,
+    &::after {
+        content: "";
+        position: absolute;
+        -webkit-mask: url($heart) center / contain no-repeat;
+        mask: url($heart) center / contain no-repeat;
+        pointer-events: none;
+    }
+
+    // farbige Herzfüllung
+    &::before {
+        inset: 0;
+        background: var(--heart-color, #000);
+        z-index: 0;
+    }
+
+    // Kontur-Herz dahinter: standardmäßig dünner grauer Rand (ersetzt den früheren border),
+    // bei Auswahl größer und blau.
+    &::after {
+        inset: -3px;
+        background: #d1d5db;
+        z-index: -1;
+        transition: background 0.15s ease, inset 0.15s ease;
+    }
+
+    // Icon o.ä. im Button über der Füllung halten
+    > * {
+        position: relative;
+        z-index: 1;
+    }
+
+    &:hover {
+        transform: scale(1.12);
+    }
+
+    &--selected::after {
+        inset: -6px;
+        background: #3b82f6;
+    }
+}
