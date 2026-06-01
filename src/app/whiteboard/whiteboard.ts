@@ -123,8 +123,8 @@ export class Whiteboard implements AfterViewInit, OnDestroy {
 
     this.resizeCanvas();
     this.publishCanvasSize();
-    window.addEventListener('resize', () => { this.resizeCanvas(); this.publishCanvasSize(); });
-    window.visualViewport?.addEventListener('resize', () => { this.resizeCanvas(); this.publishCanvasSize(); });
+    window.addEventListener('resize', () => { this.resizeCanvas(); this.redrawAll(); this.publishCanvasSize(); });
+    window.visualViewport?.addEventListener('resize', () => { this.resizeCanvas(); this.redrawAll(); this.publishCanvasSize(); });
 
     onDisconnect(this.clientRef).remove();
 
