@@ -35,7 +35,32 @@
           >
             <mat-icon class="!w-4 !h-4 !text-base !leading-4 text-white mix-blend-difference flex items-center justify-center">colorize</mat-icon>
           </button>
+
+          <!-- Emoji-Herz: öffnet Auswahl, Emoji wird wie ein Bild eingefügt -->
+          <button
+            [style.--heart-color]="'#FF4081'"
+            [matMenuTriggerFor]="emojiMenu"
+            #emojiTrigger="matMenuTrigger"
+            class="heart-btn w-9 h-9 cursor-pointer flex items-center justify-center"
+            aria-label="Umetni emoji"
+          >
+            <mat-icon class="!w-4 !h-4 !text-base !leading-4 text-white flex items-center justify-center">mood</mat-icon>
+          </button>
         </div>
+
+        <mat-menu #emojiMenu="matMenu" class="emoji-menu">
+          <div class="grid grid-cols-6 gap-1 p-1" (click)="$event.stopPropagation()">
+            @for (emoji of emojis; track emoji) {
+              <button
+                type="button"
+                (click)="insertEmoji(emoji); emojiTrigger.closeMenu()"
+                class="w-9 h-9 text-xl leading-none rounded hover:bg-gray-100 flex items-center justify-center"
+              >
+                {{ emoji }}
+              </button>
+            }
+          </div>
+        </mat-menu>
       </div>
 
       <!-- Strichstärke -->

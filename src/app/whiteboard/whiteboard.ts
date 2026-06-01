@@ -88,6 +88,15 @@ export class Whiteboard implements AfterViewInit, OnDestroy {
 
   lineWidths = [1, 2, 3, 5, 8, 12, 16, 20];
 
+  emojis = [
+    '😀', '😂', '😍', '😎', '🤩', '😢', '😡', '👍',
+    '👎', '👏', '🙌', '💪', '🙏', '❤️', '🧡', '💛',
+    '💚', '💙', '💜', '⭐', '🔥', '✨', '🎉', '🎈',
+    '🎁', '✅', '❌', '❓', '❗', '💡', '📌', '🏆',
+    '🌟', '🌈', '☀️', '🌙', '⚡', '❄️', '🌸', '🍀',
+    '🐶', '🐱', '🦄', '🍎', '🍕', '⚽', '🚗', '🚀',
+  ];
+
   colors = [
     '#000000',
     '#FF0000',
@@ -311,6 +320,21 @@ export class Whiteboard implements AfterViewInit, OnDestroy {
     const reader = new FileReader();
     reader.onload = (e) => this.placeImageFromDataUrl(e.target?.result as string);
     reader.readAsDataURL(file);
+  }
+
+  insertEmoji(emoji: string): void {
+    const size = 256;
+    const canvas = document.createElement('canvas');
+    canvas.width = size;
+    canvas.height = size;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    ctx.font = `${Math.floor(size * 0.8)}px "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    // leichter vertikaler Versatz, damit Emojis optisch zentriert wirken
+    ctx.fillText(emoji, size / 2, size / 2 + size * 0.05);
+    this.placeImageFromDataUrl(canvas.toDataURL('image/png'));
   }
 
   private placeImageFromDataUrl(dataUrl: string): void {
