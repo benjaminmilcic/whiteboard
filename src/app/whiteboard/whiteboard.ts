@@ -1,4 +1,4 @@
-import { Component, signal, effect, ViewChild, ElementRef, AfterViewInit, OnDestroy, NgZone } from '@angular/core';
+import { Component, signal, computed, effect, ViewChild, ElementRef, AfterViewInit, OnDestroy, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -41,7 +41,22 @@ interface FillElement {
   height: number;
 }
 
-type WhiteboardElement = StrokeElement | ImageElement | FillElement;
+type GradientDirection = 'vertical' | 'horizontal' | 'diagonal';
+
+interface GradientFillElement {
+  type: 'gradientFill';
+  colors: string[];
+  direction: GradientDirection;
+  width: number;
+  height: number;
+}
+
+type WhiteboardElement = StrokeElement | ImageElement | FillElement | GradientFillElement;
+
+interface GradientPreset {
+  name: string;
+  colors: string[];
+}
 
 interface ActiveImage {
   dataUrl: string;
@@ -92,6 +107,34 @@ export class Whiteboard implements AfterViewInit, OnDestroy {
   viewportBorder = signal<{ width: number; height: number } | null>(null);
   activeImage = signal<ActiveImage | null>(null);
   showCameraModal = signal(false);
+
+  showGradientModal = signal(false);
+  gradientColors = signal<string[]>([]);
+  gradientDirection = signal<GradientDirection>('vertical');
+
+  gradientCss = computed(() => {
+    const dirMap: Record<GradientDirection, string> = {
+      vertical: 'to bottom',
+      horizontal: 'to right',
+      diagonal: 'to bottom right',
+    };
+    return `linear-gradient(${dirMap[this.gradientDirection()]}, ${this.gradientColors().join(', ')})`;
+  });
+
+  gradientPresets: GradientPreset[] = [
+    { name: 'Duga', colors: ['#FF0000', '#FFA500', '#FFFF00', '#00FF00', '#0000FF', '#800080'] },
+    { name: 'Zalazak sunca', colors: ['#FF0000', '#FF7F00', '#FFE000', '#FF00AA'] },
+    { name: 'More', colors: ['#00FFD0', '#00A2FF', '#0033FF', '#001A66'] },
+    { name: 'Livada', colors: ['#FFE000', '#7CFF00', '#00B140', '#005522'] },
+    { name: 'Sladoled', colors: ['#FF1FA0', '#FF61D2', '#7B2FF7', '#00D2FF'] },
+    { name: 'Noćno nebo', colors: ['#FF7A00', '#C400FF', '#1B1B8F', '#000022'] },
+  ];
+
+  gradientDirections: { value: GradientDirection; icon: string; label: string }[] = [
+    { value: 'vertical', icon: '⬇️', label: 'Prema dolje' },
+    { value: 'horizontal', icon: '➡️', label: 'Udesno' },
+    { value: 'diagonal', icon: '↘️', label: 'Koso' },
+  ];
 
   lineWidths = [1, 2, 3, 5, 8, 12, 16, 20];
 
@@ -214,6 +257,9 @@ export class Whiteboard implements AfterViewInit, OnDestroy {
       } else if (el.type === 'fill') {
         this.ctx.fillStyle = el.color;
         this.ctx.fillRect(0, 0, el.width, el.height);
+      } else if (el.type === 'gradientFill') {
+        this.ctx.fillStyle = this.makeGradient(el.direction, el.width, el.height, el.colors);
+        this.ctx.fillRect(0, 0, el.width, el.height);
       }
     }
   }
@@ -324,6 +370,58 @@ export class Whiteboard implements AfterViewInit, OnDestroy {
       height
     };
     set(push(this.elementsRef), el);
+  }
+
+  private makeGradient(direction: GradientDirection, width: number, height: number, colors: string[]): CanvasGradient {
+    const ctx = this.ctx!;
+    let grad: CanvasGradient;
+    if (direction === 'horizontal') {
+      grad = ctx.createLinearGradient(0, 0, width, 0);
+    } else if (direction === 'diagonal') {
+      grad = ctx.createLinearGradient(0, 0, width, height);
+    } else {
+      grad = ctx.createLinearGradient(0, 0, 0, height);
+    }
+    colors.forEach((color, i) => {
+      const stop = colors.length === 1 ? 0 : i / (colors.length - 1);
+      grad.addColorStop(stop, color);
+    });
+    return grad;
+  }
+
+  presetCss(preset: GradientPreset): string {
+    return `linear-gradient(135deg, ${preset.colors.join(', ')})`;
+  }
+
+  openGradientModal(): void {
+    this.gradientColors.set(this.gradientPresets[0].colors);
+    this.gradientDirection.set('vertical');
+    this.showGradientModal.set(true);
+  }
+
+  closeGradientModal(): void {
+    this.showGradientModal.set(false);
+  }
+
+  selectGradientPreset(preset: GradientPreset): void {
+    this.gradientColors.set(preset.colors);
+  }
+
+  applyGradientFill(): void {
+    if (this.gradientColors().length === 0) return;
+    const canvas = this.canvasRef.nativeElement;
+    const border = this.viewportBorder();
+    const width = border ? border.width : canvas.width;
+    const height = border ? border.height : canvas.height;
+    const el: GradientFillElement = {
+      type: 'gradientFill',
+      colors: this.gradientColors(),
+      direction: this.gradientDirection(),
+      width,
+      height
+    };
+    set(push(this.elementsRef), el);
+    this.showGradientModal.set(false);
   }
 
   selectCustomColor(color: string): void {

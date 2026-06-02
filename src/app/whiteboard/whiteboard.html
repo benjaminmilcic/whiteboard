@@ -56,6 +56,16 @@
           >
             <mat-icon class="!w-4 !h-4 !text-base !leading-4 text-white mix-blend-difference flex items-center justify-center">format_color_fill</mat-icon>
           </button>
+
+          <!-- Farbverlauf-Button: öffnet das kindgerechte Verlauf-Popup -->
+          <button
+            (click)="openGradientModal()"
+            [style.--heart-color]="'linear-gradient(135deg, #FF0000, #FFA500, #FFFF00, #00FF00, #0000FF, #800080)'"
+            class="heart-btn w-8 h-8 cursor-pointer flex items-center justify-center"
+            aria-label="Šareni prijelaz"
+          >
+            <mat-icon class="!w-4 !h-4 !text-base !leading-4 text-white mix-blend-difference flex items-center justify-center">gradient</mat-icon>
+          </button>
         </div>
 
         <mat-menu #emojiMenu="matMenu" class="emoji-menu">
@@ -231,6 +241,65 @@
             class="bg-blue-500 text-white px-4 py-2 rounded-lg text-sm font-medium"
           >
             Snimi
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  @if (showGradientModal()) {
+    <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
+      <div class="bg-white rounded-3xl shadow-2xl p-6 flex flex-col gap-5 w-full max-w-md">
+        <h2 class="text-2xl font-bold text-center text-gray-800">🌈 Šareni prijelaz</h2>
+
+        <!-- Große Vorschau -->
+        <div
+          class="h-28 rounded-2xl border-4 border-gray-200 shadow-inner"
+          [style.background]="gradientCss()"
+        ></div>
+
+        <!-- Fertige Verläufe als große Kacheln -->
+        <div class="grid grid-cols-3 gap-3">
+          @for (preset of gradientPresets; track preset.name) {
+            <button
+              type="button"
+              (click)="selectGradientPreset(preset)"
+              [class.ring-4]="gradientColors() === preset.colors"
+              [class.ring-blue-500]="gradientColors() === preset.colors"
+              class="h-16 rounded-2xl shadow-md ring-offset-2 transition active:scale-95"
+              [style.background]="presetCss(preset)"
+              [attr.aria-label]="preset.name"
+            ></button>
+          }
+        </div>
+
+        <!-- Richtung mit großen Pfeilen -->
+        <div class="flex justify-center gap-3">
+          @for (dir of gradientDirections; track dir.value) {
+            <button
+              type="button"
+              (click)="gradientDirection.set(dir.value)"
+              [class.bg-blue-500]="gradientDirection() === dir.value"
+              [class.bg-gray-100]="gradientDirection() !== dir.value"
+              class="w-14 h-14 rounded-2xl flex items-center justify-center text-3xl shadow transition active:scale-95"
+              [attr.aria-label]="dir.label"
+            >{{ dir.icon }}</button>
+          }
+        </div>
+
+        <!-- Aktionen -->
+        <div class="flex gap-3">
+          <button
+            (click)="closeGradientModal()"
+            class="flex-1 bg-gray-400 text-white text-lg font-bold py-3 rounded-2xl shadow transition active:scale-95"
+          >
+            Odustani
+          </button>
+          <button
+            (click)="applyGradientFill()"
+            class="flex-1 bg-green-500 text-white text-lg font-bold py-3 rounded-2xl shadow transition active:scale-95"
+          >
+            Ispuni! 🎨
           </button>
         </div>
       </div>
