@@ -34,7 +34,14 @@ interface ImageElement {
   height: number;
 }
 
-type WhiteboardElement = StrokeElement | ImageElement;
+interface FillElement {
+  type: 'fill';
+  color: string;
+  width: number;
+  height: number;
+}
+
+type WhiteboardElement = StrokeElement | ImageElement | FillElement;
 
 interface ActiveImage {
   dataUrl: string;
@@ -204,6 +211,9 @@ export class Whiteboard implements AfterViewInit, OnDestroy {
       } else if (el.type === 'image') {
         const img = this.loadedImages.get(key);
         if (img) this.ctx.drawImage(img, el.x, el.y, el.width, el.height);
+      } else if (el.type === 'fill') {
+        this.ctx.fillStyle = el.color;
+        this.ctx.fillRect(0, 0, el.width, el.height);
       }
     }
   }
@@ -300,6 +310,20 @@ export class Whiteboard implements AfterViewInit, OnDestroy {
 
   selectColor(color: string): void {
     this.selectedColor.set(color);
+  }
+
+  fillArea(): void {
+    const canvas = this.canvasRef.nativeElement;
+    const border = this.viewportBorder();
+    const width = border ? border.width : canvas.width;
+    const height = border ? border.height : canvas.height;
+    const el: FillElement = {
+      type: 'fill',
+      color: this.selectedColor(),
+      width,
+      height
+    };
+    set(push(this.elementsRef), el);
   }
 
   selectCustomColor(color: string): void {

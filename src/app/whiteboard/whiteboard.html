@@ -10,7 +10,7 @@
               (click)="selectColor(color)"
               [class.heart-btn--selected]="selectedColor() === color"
               [style.--heart-color]="color"
-              class="heart-btn w-9 h-9 cursor-pointer"
+              class="heart-btn w-8 h-8 cursor-pointer"
               [attr.aria-label]="'Boja ' + color"
             ></button>
           }
@@ -24,13 +24,13 @@
             [cpPosition]="'auto'"
             [cpUseRootViewContainer]="true"
             [cpAlphaChannel]="'disabled'"
-            [cpOKButton]="true"
-            [cpOKButtonText]="'U redu'"
-            [cpCancelButton]="true"
-            [cpCancelButtonText]="'Odustani'"
+            [cpDisableInput]="true"
+            [cpOKButton]="false"
+            [cpCancelButton]="false"
             (colorPickerChange)="selectCustomColor($event)"
+            (click)="selectColor(customColor())"
             (mousedown)="$event.preventDefault()"
-            class="heart-btn w-9 h-9 cursor-pointer flex items-center justify-center"
+            class="heart-btn w-8 h-8 cursor-pointer flex items-center justify-center"
             aria-label="Vlastita boja"
           >
             <mat-icon class="!w-4 !h-4 !text-base !leading-4 text-white mix-blend-difference flex items-center justify-center">colorize</mat-icon>
@@ -41,10 +41,20 @@
             [style.--heart-color]="'#FF4081'"
             [matMenuTriggerFor]="emojiMenu"
             #emojiTrigger="matMenuTrigger"
-            class="heart-btn w-9 h-9 cursor-pointer flex items-center justify-center"
+            class="heart-btn w-8 h-8 cursor-pointer flex items-center justify-center"
             aria-label="Umetni emoji"
           >
             <mat-icon class="!w-4 !h-4 !text-base !leading-4 text-white flex items-center justify-center">mood</mat-icon>
+          </button>
+
+          <!-- Füll-Button: füllt den markierten (blau gestrichelten) Bereich mit der aktuellen Farbe -->
+          <button
+            (click)="fillArea()"
+            [style.--heart-color]="selectedColor()"
+            class="heart-btn w-8 h-8 cursor-pointer flex items-center justify-center"
+            aria-label="Ispuni područje"
+          >
+            <mat-icon class="!w-4 !h-4 !text-base !leading-4 text-white mix-blend-difference flex items-center justify-center">format_color_fill</mat-icon>
           </button>
         </div>
 
