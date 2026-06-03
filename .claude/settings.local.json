@@ -25,7 +25,12 @@
       "Bash(cat .firebaserc)",
       "Bash(ls apphosting.yaml)",
       "Bash(grep -i \"serviceWorker\\\\|ngsw\" angular.json)",
-      "Bash(ls public/manifest* src/manifest*)"
+      "Bash(ls public/manifest* src/manifest*)",
+      "Bash(curl -sI https://whiteboard-32486.web.app/index.html)",
+      "Bash(curl -sI https://whiteboard-32486.web.app/)",
+      "Bash(curl -s https://whiteboard-32486.web.app/index.html)",
+      "Bash(curl -s https://whiteboard-32486.web.app/main-Y4BGI5GR.js)",
+      "Bash(curl -s https://whiteboard-32486.web.app/manifest.webmanifest)"
     ],
     "deny": [],
     "ask": []
