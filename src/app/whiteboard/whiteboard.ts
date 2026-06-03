@@ -7,7 +7,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatMenuModule } from '@angular/material/menu';
 import { ColorPickerDirective } from 'ngx-color-picker';
-import { Database, ref, onValue, set, push, off, onDisconnect, remove } from '@angular/fire/database';
+import { Database, ref, onValue, set, push, off, onDisconnect, remove, serverTimestamp } from '@angular/fire/database';
 import { inject } from '@angular/core';
 
 interface DrawingPoint {
@@ -90,6 +90,12 @@ export class Whiteboard implements AfterViewInit, OnDestroy {
   private elements: { [key: string]: WhiteboardElement } = {};
   private loadedImages = new Map<string, HTMLImageElement>();
   private videoStream: MediaStream | null = null;
+
+  private serverTimeOffset = 0;
+  private heartbeatTimer: ReturnType<typeof setInterval> | null = null;
+  private readonly HEARTBEAT_MS = 5000;
+  private readonly STALE_MS = 15000;
+
   private dragState: {
     type: 'move' | 'resize';
     startMouseX: number;
@@ -172,18 +178,27 @@ export class Whiteboard implements AfterViewInit, OnDestroy {
     this.ctx = canvas.getContext('2d');
 
     this.resizeCanvas();
-    this.publishCanvasSize();
     window.addEventListener('resize', () => { this.resizeCanvas(); this.redrawAll(); this.publishCanvasSize(); });
     window.visualViewport?.addEventListener('resize', () => { this.resizeCanvas(); this.redrawAll(); this.publishCanvasSize(); });
 
     onDisconnect(this.clientRef).remove();
+
+    onValue(ref(this.database, '.info/serverTimeOffset'), (snap) => {
+      this.serverTimeOffset = snap.val() ?? 0;
+    });
+
+    document.addEventListener('visibilitychange', this.onVisibilityChange);
+    this.startHeartbeat();
 
     onValue(this.clientsRef, (snapshot) => {
       const clients = snapshot.val();
       const cvs = this.canvasRef.nativeElement;
       this.ngZone.run(() => {
         if (!clients) { this.viewportBorder.set(null); return; }
-        const sizes = Object.values(clients) as { width: number; height: number }[];
+        const now = this.serverNow();
+        const sizes = (Object.values(clients) as { width: number; height: number; lastSeen?: number }[])
+          .filter(s => typeof s.lastSeen === 'number' && now - s.lastSeen < this.STALE_MS);
+        if (sizes.length === 0) { this.viewportBorder.set(null); return; }
         const minW = Math.min(...sizes.map(s => s.width));
         const minH = Math.min(...sizes.map(s => s.height));
         if (minW < cvs.width || minH < cvs.height) {
@@ -225,9 +240,37 @@ export class Whiteboard implements AfterViewInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.stopVideoStream();
+    this.stopHeartbeat();
+    document.removeEventListener('visibilitychange', this.onVisibilityChange);
     off(this.elementsRef);
     off(this.clientsRef);
     remove(this.clientRef);
+  }
+
+  private serverNow(): number {
+    return Date.now() + this.serverTimeOffset;
+  }
+
+  private onVisibilityChange = (): void => {
+    if (document.visibilityState === 'hidden') {
+      this.stopHeartbeat();
+      remove(this.clientRef);
+    } else {
+      this.startHeartbeat();
+    }
+  };
+
+  private startHeartbeat(): void {
+    this.stopHeartbeat();
+    this.publishCanvasSize();
+    this.heartbeatTimer = setInterval(() => this.publishCanvasSize(), this.HEARTBEAT_MS);
+  }
+
+  private stopHeartbeat(): void {
+    if (this.heartbeatTimer) {
+      clearInterval(this.heartbeatTimer);
+      this.heartbeatTimer = null;
+    }
   }
 
   private resizeCanvas(): void {
@@ -431,7 +474,11 @@ export class Whiteboard implements AfterViewInit, OnDestroy {
 
   private publishCanvasSize(): void {
     const canvas = this.canvasRef.nativeElement;
-    set(this.clientRef, { width: canvas.width, height: canvas.height });
+    set(this.clientRef, {
+      width: canvas.width,
+      height: canvas.height,
+      lastSeen: serverTimestamp(),
+    });
   }
 
   onImageUpload(event: Event): void {

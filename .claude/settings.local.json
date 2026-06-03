@@ -19,7 +19,8 @@
       "PowerShell(npm run *)",
       "PowerShell(npm uninstall *)",
       "Bash(awk 'NR>=900 && NR<=1080' \"C:/eigene Projekte/whiteboard/node_modules/ngx-color-picker/fesm2022/ngx-color-picker.mjs\")",
-      "mcp__ide__getDiagnostics"
+      "mcp__ide__getDiagnostics",
+      "PowerShell(npx tsc --noEmit -p tsconfig.app.json)"
     ],
     "deny": [],
     "ask": []
