@@ -20,7 +20,12 @@
       "PowerShell(npm uninstall *)",
       "Bash(awk 'NR>=900 && NR<=1080' \"C:/eigene Projekte/whiteboard/node_modules/ngx-color-picker/fesm2022/ngx-color-picker.mjs\")",
       "mcp__ide__getDiagnostics",
-      "PowerShell(npx tsc --noEmit -p tsconfig.app.json)"
+      "PowerShell(npx tsc --noEmit -p tsconfig.app.json)",
+      "Bash(cat firebase.json)",
+      "Bash(cat .firebaserc)",
+      "Bash(ls apphosting.yaml)",
+      "Bash(grep -i \"serviceWorker\\\\|ngsw\" angular.json)",
+      "Bash(ls public/manifest* src/manifest*)"
     ],
     "deny": [],
     "ask": []
