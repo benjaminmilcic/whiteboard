@@ -53,6 +53,8 @@ interface GradientFillElement {
 
 type WhiteboardElement = StrokeElement | ImageElement | FillElement | GradientFillElement;
 
+type ElementsMap = { [key: string]: WhiteboardElement };
+
 interface GradientPreset {
   name: string;
   colors: string[];
@@ -87,8 +89,14 @@ export class Whiteboard implements AfterViewInit, OnDestroy {
   private clientsRef = ref(this.database, 'whiteboard/clients');
   private clientRef = ref(this.database, `whiteboard/clients/${this.clientId}`);
 
-  private elements: { [key: string]: WhiteboardElement } = {};
+  private elements: ElementsMap = {};
   private loadedImages = new Map<string, HTMLImageElement>();
+
+  private undoStack = signal<ElementsMap[]>([]);
+  private redoStack = signal<ElementsMap[]>([]);
+  private readonly HISTORY_LIMIT = 50;
+  canUndo = computed(() => this.undoStack().length > 0);
+  canRedo = computed(() => this.redoStack().length > 0);
   private videoStream: MediaStream | null = null;
 
   private serverTimeOffset = 0;
@@ -161,8 +169,6 @@ export class Whiteboard implements AfterViewInit, OnDestroy {
     '#FFFF00',
     '#FF00FF',
     '#00FFFF',
-    '#FFA500',
-    '#800080',
     '#FFFFFF',
   ];
 
@@ -388,6 +394,7 @@ export class Whiteboard implements AfterViewInit, OnDestroy {
   }
 
   private saveStroke(): void {
+    this.pushHistory();
     const el: StrokeElement = {
       type: 'stroke',
       points: this.currentStroke,
@@ -406,6 +413,7 @@ export class Whiteboard implements AfterViewInit, OnDestroy {
     const border = this.viewportBorder();
     const width = border ? border.width : canvas.width;
     const height = border ? border.height : canvas.height;
+    this.pushHistory();
     const el: FillElement = {
       type: 'fill',
       color: this.selectedColor(),
@@ -456,6 +464,7 @@ export class Whiteboard implements AfterViewInit, OnDestroy {
     const border = this.viewportBorder();
     const width = border ? border.width : canvas.width;
     const height = border ? border.height : canvas.height;
+    this.pushHistory();
     const el: GradientFillElement = {
       type: 'gradientFill',
       colors: this.gradientColors(),
@@ -628,6 +637,7 @@ export class Whiteboard implements AfterViewInit, OnDestroy {
     const active = this.activeImage();
     if (!active) return;
     this.activeImage.set(null);
+    this.pushHistory();
     const el: ImageElement = { type: 'image', ...active };
     set(push(this.elementsRef), el);
   }
@@ -652,6 +662,7 @@ export class Whiteboard implements AfterViewInit, OnDestroy {
   }
 
   clearCanvas(): void {
+    this.pushHistory();
     if (this.ctx) {
       const canvas = this.canvasRef.nativeElement;
       this.ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -659,5 +670,37 @@ export class Whiteboard implements AfterViewInit, OnDestroy {
     this.elements = {};
     this.loadedImages.clear();
     set(this.elementsRef, null);
+  }
+
+  private cloneElements(map: ElementsMap): ElementsMap {
+    return structuredClone(map);
+  }
+
+  // Aktuellen Zustand vor einer Änderung sichern und Redo-Verlauf verwerfen
+  private pushHistory(): void {
+    this.undoStack.update(stack => [...stack, this.cloneElements(this.elements)].slice(-this.HISTORY_LIMIT));
+    this.redoStack.set([]);
+  }
+
+  private applySnapshot(snapshot: ElementsMap): void {
+    set(this.elementsRef, Object.keys(snapshot).length === 0 ? null : snapshot);
+  }
+
+  undo(): void {
+    const stack = this.undoStack();
+    if (stack.length === 0) return;
+    const previous = stack[stack.length - 1];
+    this.redoStack.update(s => [...s, this.cloneElements(this.elements)].slice(-this.HISTORY_LIMIT));
+    this.undoStack.set(stack.slice(0, -1));
+    this.applySnapshot(previous);
+  }
+
+  redo(): void {
+    const stack = this.redoStack();
+    if (stack.length === 0) return;
+    const next = stack[stack.length - 1];
+    this.undoStack.update(s => [...s, this.cloneElements(this.elements)].slice(-this.HISTORY_LIMIT));
+    this.redoStack.set(stack.slice(0, -1));
+    this.applySnapshot(next);
   }
 }
