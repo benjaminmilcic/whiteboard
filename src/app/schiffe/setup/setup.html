@@ -1,0 +1,67 @@
+<div class="w-full max-w-md mx-auto text-center" *transloco="let t">
+  <h2 class="text-2xl font-extrabold text-white drop-shadow mb-1">
+    {{ game.me()?.emoji }} {{ t('setup.title') }}
+  </h2>
+
+  @if (nextSpec(); as next) {
+    <p class="text-sky-100 mb-3">
+      {{ t('setup.next', { emoji: next.emoji, name: t(next.nameKey), size: next.size }) }}
+    </p>
+  } @else {
+    <p class="text-emerald-200 font-bold mb-3">{{ t('setup.allPlaced') }}</p>
+  }
+
+  <div class="bg-white/95 rounded-3xl shadow-xl p-4 w-full max-w-sm mx-auto">
+    <app-board [rows]="rows()" [interactive]="true" (cellClick)="onCell($event)" />
+  </div>
+
+  @if (flash()) {
+    <p class="mt-2 text-rose-100 font-bold animate-wackeln">{{ t(flash()!) }}</p>
+  }
+
+  <!-- Steuerung -->
+  <div class="mt-4 grid grid-cols-3 gap-2">
+    <button
+      type="button"
+      (click)="toggleOrient()"
+      class="bg-white/90 hover:bg-white rounded-2xl py-3 font-bold shadow active:scale-95 transition"
+    >
+      {{ orient() === 'h' ? t('setup.horizontal') : t('setup.vertical') }}
+    </button>
+    <button
+      type="button"
+      (click)="randomize()"
+      class="bg-white/90 hover:bg-white rounded-2xl py-3 font-bold shadow active:scale-95 transition"
+    >
+      {{ t('setup.random') }}
+    </button>
+    <button
+      type="button"
+      (click)="clear()"
+      class="bg-white/90 hover:bg-white rounded-2xl py-3 font-bold shadow active:scale-95 transition"
+    >
+      {{ t('setup.clear') }}
+    </button>
+  </div>
+
+  <button
+    type="button"
+    (click)="ready()"
+    [disabled]="!allPlaced()"
+    class="mt-3 w-full bg-emerald-500 hover:bg-emerald-600 disabled:opacity-40
+           text-white text-xl font-bold rounded-2xl py-4 shadow active:scale-95 transition"
+  >
+    {{ t('setup.ready') }}
+  </button>
+
+  <p class="mt-2 text-sky-100 text-sm">{{ t('setup.tip') }}</p>
+
+  <button
+    type="button"
+    (click)="leave()"
+    class="mt-4 text-sky-50 hover:text-white text-sm font-bold bg-white/15 hover:bg-white/25
+           rounded-full px-4 py-1.5 active:scale-95 transition"
+  >
+    {{ t('setup.cancel') }}
+  </button>
+</div>

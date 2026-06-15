@@ -1,0 +1,84 @@
+<main
+  class="min-h-screen w-full bg-gradient-to-b from-sky-400 via-ozean to-ozean-deep
+         flex flex-col overflow-x-hidden"
+>
+  <!-- Kopfzeile mit Sprachumschalter (eigene Zeile, überlappt nichts) -->
+  <header class="w-full flex justify-end items-center gap-4 px-3 pt-3 shrink-0">
+    <app-language-switcher />
+    <!-- Zurück zur Start-Auswahl (mit etwas Abstand zum Sprachmenü) -->
+    <button
+      type="button"
+      (click)="goHome()"
+      title="Natrag na izbornik"
+      aria-label="Natrag na izbornik"
+      class="w-12 h-12 rounded-full overflow-hidden ring-2 ring-white shadow-lg
+             bg-white/40 hover:scale-110 active:scale-95 transition shrink-0"
+    >
+      <img src="/familie.jpg" alt="Natrag na izbornik" class="w-full h-full object-cover" />
+    </button>
+  </header>
+
+  <div class="flex-1 w-full flex items-start justify-center px-3 pb-6 pt-2">
+    @switch (view()) {
+    @case ('loading') {
+      <div class="mt-20 text-center">
+        <div class="text-white text-2xl font-bold animate-pulse">
+          ⚓ {{ 'app.loading' | transloco }}
+        </div>
+        @if (game.error()) {
+          <p class="mt-4 max-w-sm mx-auto bg-rose-100 text-rose-700 rounded-xl px-4 py-3 font-semibold">
+            {{ game.error() }}<br />
+            <span class="font-normal text-sm">{{ 'app.configHint' | transloco }}</span>
+          </p>
+        }
+      </div>
+    }
+
+    @case ('lobby') {
+      <app-lobby />
+    }
+
+    @case ('waiting') {
+      <div class="w-full max-w-md mx-auto text-center bg-white/95 rounded-3xl shadow-xl p-8">
+        <div class="text-6xl mb-3 animate-wackeln">⛵</div>
+        <h2 class="text-2xl font-extrabold text-slate-700 mb-2">{{ 'waiting.title' | transloco }}</h2>
+        <p class="text-slate-500 mb-4">{{ 'waiting.shareCode' | transloco }}</p>
+        <div class="text-5xl font-extrabold tracking-[0.3em] text-ozean-deep bg-sky-100
+                    rounded-2xl py-4 mb-4">
+          {{ game.game()?.code }}
+        </div>
+        <button type="button" (click)="game.leaveGame()" class="text-slate-500 underline">
+          {{ 'waiting.cancel' | transloco }}
+        </button>
+      </div>
+    }
+
+    @case ('setup') {
+      <app-setup />
+    }
+
+    @case ('waitOpponent') {
+      <div class="w-full max-w-md mx-auto text-center bg-white/95 rounded-3xl shadow-xl p-8">
+        <div class="text-6xl mb-3 animate-wackeln">⏳</div>
+        <h2 class="text-2xl font-extrabold text-slate-700 mb-2">{{ 'waitOpponent.title' | transloco }}</h2>
+        <p class="text-slate-500 mb-4">
+          {{ 'waitOpponent.text' | transloco: { name: game.opponent()?.name } }}
+        </p>
+        <button type="button" (click)="game.leaveGame()" class="text-slate-500 underline">
+          {{ 'waitOpponent.cancel' | transloco }}
+        </button>
+      </div>
+    }
+
+    @case ('battle') {
+      <app-battle />
+    }
+
+    @case ('finished') {
+      <app-result />
+    }
+    }
+  </div>
+
+  <app-confirm-dialog />
+</main>

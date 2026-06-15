@@ -1,0 +1,8 @@
+/* Wichtig: Das <app-board>-Element ist sonst inline und würde auf die
+   Inhaltsbreite zusammenschrumpfen – dann sind leere Zellen schmaler als
+   Zellen mit Icon. Als Block mit voller Breite verteilen sich die Spalten
+   gleichmäßig. */
+:host {
+  display: block;
+  width: 100%;
+}

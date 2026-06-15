@@ -1,0 +1,42 @@
+<main
+  class="min-h-dvh w-full bg-gradient-to-b from-sky-300 via-sky-400 to-indigo-500
+         flex flex-col items-center justify-center gap-8 px-4 py-10"
+>
+  <h1 class="text-4xl sm:text-5xl font-extrabold text-white drop-shadow-lg text-center">
+    Što želiš igrati?
+  </h1>
+
+  <div class="flex flex-col sm:flex-row items-stretch justify-center gap-6 w-full max-w-3xl">
+    <!-- Whiteboard -->
+    <button
+      type="button"
+      (click)="go('whiteboard')"
+      class="flex-1 bg-white/95 rounded-[2rem] shadow-2xl p-6 flex flex-col items-center gap-4
+             hover:scale-105 active:scale-95 transition focus:outline-none focus:ring-4 focus:ring-white"
+    >
+      <img
+        src="/whiteboard-icon-512.png"
+        alt="Ploča za crtanje"
+        class="w-40 h-40 sm:w-48 sm:h-48 rounded-[1.6rem] shadow-lg"
+      />
+      <span class="text-2xl sm:text-3xl font-extrabold text-slate-700">Crtanje</span>
+      <span class="text-base text-slate-500 -mt-2">Ploča za crtanje</span>
+    </button>
+
+    <!-- Schiffe versenken -->
+    <button
+      type="button"
+      (click)="go('schiffe')"
+      class="flex-1 bg-white/95 rounded-[2rem] shadow-2xl p-6 flex flex-col items-center gap-4
+             hover:scale-105 active:scale-95 transition focus:outline-none focus:ring-4 focus:ring-white"
+    >
+      <img
+        src="/schiffe-icon-512.png"
+        alt="Potapanje brodova"
+        class="w-40 h-40 sm:w-48 sm:h-48 rounded-[1.6rem] shadow-lg"
+      />
+      <span class="text-2xl sm:text-3xl font-extrabold text-slate-700">Brodovi</span>
+      <span class="text-base text-slate-500 -mt-2">Potapanje brodova</span>
+    </button>
+  </div>
+</main>

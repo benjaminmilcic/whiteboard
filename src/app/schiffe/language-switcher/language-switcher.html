@@ -1,0 +1,16 @@
+<div class="flex gap-1 bg-white/20 rounded-full p-1 backdrop-blur-sm">
+  @for (l of langs; track l.code) {
+    <button
+      type="button"
+      (click)="setLang(l.code)"
+      [class]="active() === l.code
+        ? 'ring-2 ring-white scale-110 shadow'
+        : 'opacity-40 hover:opacity-100'"
+      class="w-9 h-9 rounded-full overflow-hidden transition flex items-center justify-center bg-white/40"
+      [attr.aria-label]="l.label"
+      [title]="l.label"
+    >
+      <img [src]="l.img" [alt]="l.label" class="w-full h-full object-cover" />
+    </button>
+  }
+</div>

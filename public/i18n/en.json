@@ -1,0 +1,71 @@
+{
+  "app": {
+    "loading": "Loading …",
+    "configHint": "Did you enter your values in firebase-config.ts and enable anonymous sign-in in Firebase?"
+  },
+  "lobby": {
+    "title": "Battleship",
+    "subtitle": "Play together on two devices!",
+    "nameLabel": "What's your name?",
+    "namePlaceholder": "Your name",
+    "nameHint": "Enter your name first – whether you start a game or join one.",
+    "chooseAnimal": "Choose your animal",
+    "newGame": "🚀 Start new game",
+    "or": "or",
+    "joinLabel": "Join a game (enter code)",
+    "codePlaceholder": "e.g. KQTM",
+    "join": "🤝 Join"
+  },
+  "waiting": {
+    "title": "Waiting for a player …",
+    "shareCode": "Tell this code to the other person:",
+    "cancel": "Cancel"
+  },
+  "waitOpponent": {
+    "title": "Well done!",
+    "text": "Your ships are ready. We're still waiting for {{name}} …",
+    "cancel": "Quit game"
+  },
+  "setup": {
+    "title": "Place your ships!",
+    "next": "Next: {{emoji}} {{name}} ({{size}} cells) – tap the water.",
+    "allPlaced": "All ships are placed! 🎉",
+    "horizontal": "↔️ Across",
+    "vertical": "↕️ Up",
+    "random": "🎲 Random",
+    "clear": "🧹 Reset",
+    "ready": "✅ Ready!",
+    "tip": "Tip: Tap a placed ship to take it away again.",
+    "cancel": "✕ Quit game",
+    "warnAllPlaced": "All ships are already placed!",
+    "warnNoFit": "The ship doesn't fit there!"
+  },
+  "ships": {
+    "battleship": "Battleship",
+    "cruiser": "Cruiser",
+    "boat": "Boat"
+  },
+  "battle": {
+    "cancel": "✕ Quit game",
+    "yourTurn": "🎯 It's your turn! Fire!",
+    "opponentTurn": "⏳ {{emoji}} {{name}} is playing …",
+    "enemySea": "🎯 {{name}}'s sea",
+    "sunk": "Sunk: {{n}} / {{total}} ships",
+    "yourSea": "Your sea",
+    "alive": "Still afloat: {{n}} / {{total}} ships"
+  },
+  "result": {
+    "won": "You won!",
+    "wonText": "Great job, {{name}}! You sank all the ships. 🎉",
+    "lost": "You lost this time",
+    "lostText": "{{emoji}} {{name}} was faster. No worries – try again!",
+    "again": "🔁 Play again",
+    "home": "🏠 Back to start"
+  },
+  "confirm": {
+    "leaveTitle": "Quit?",
+    "leaveMessage": "Do you really want to quit the game and go back to the start?",
+    "leaveYes": "Yes, quit",
+    "leaveNo": "Keep playing"
+  }
+}

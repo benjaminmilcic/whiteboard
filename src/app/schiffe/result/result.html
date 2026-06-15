@@ -1,0 +1,37 @@
+<div class="w-full max-w-md mx-auto text-center bg-white/95 rounded-3xl shadow-xl p-8" *transloco="let t">
+  @if (game.amWinner()) {
+    <div class="text-7xl mb-3 animate-bumm">🏆</div>
+    <h2 class="text-3xl font-extrabold text-emerald-600 mb-2">{{ t('result.won') }}</h2>
+    <p class="text-slate-600 mb-6">{{ t('result.wonText', { name: game.me()?.name }) }}</p>
+  } @else {
+    <!-- Sinkendes Schiff mit aufsteigenden Luftblasen über schwappenden Wellen. -->
+    <div class="relative mx-auto mb-3 h-28 w-32 overflow-hidden">
+      <div class="absolute inset-x-0 top-1 flex justify-center text-7xl animate-sinken">🚢</div>
+      <div class="absolute left-7 bottom-7 text-lg animate-blubbern" style="animation-delay: 0.2s">🫧</div>
+      <div class="absolute right-8 bottom-6 text-base animate-blubbern" style="animation-delay: 0.9s">🫧</div>
+      <div class="absolute left-1/2 bottom-9 text-sm animate-blubbern" style="animation-delay: 1.5s">🫧</div>
+      <div class="absolute inset-x-0 bottom-0 text-4xl animate-schwappen">🌊🌊🌊</div>
+    </div>
+    <h2 class="text-3xl font-extrabold text-ozean-deep mb-2">{{ t('result.lost') }}</h2>
+    <p class="text-slate-600 mb-6">
+      {{ t('result.lostText', { emoji: game.opponent()?.emoji, name: game.opponent()?.name }) }}
+    </p>
+  }
+
+  <button
+    type="button"
+    (click)="game.rematch()"
+    class="w-full bg-emerald-500 hover:bg-emerald-600 text-white text-xl font-bold
+           rounded-2xl py-4 shadow active:scale-95 transition mb-3"
+  >
+    {{ t('result.again') }}
+  </button>
+  <button
+    type="button"
+    (click)="game.leaveGame()"
+    class="w-full bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold
+           rounded-2xl py-3 active:scale-95 transition"
+  >
+    {{ t('result.home') }}
+  </button>
+</div>

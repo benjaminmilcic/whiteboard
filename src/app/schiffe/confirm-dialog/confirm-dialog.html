@@ -1,0 +1,33 @@
+@if (game.confirmDialog(); as d) {
+  <div
+    class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm"
+    (click)="game.confirmNo()"
+    *transloco="let t"
+  >
+    <div
+      class="bg-white rounded-3xl shadow-2xl w-full max-w-sm p-6 text-center animate-bumm"
+      (click)="$event.stopPropagation()"
+    >
+      <div class="text-6xl mb-3">{{ d.emoji }}</div>
+      <h2 class="text-2xl font-extrabold text-slate-800 mb-1">{{ t(d.titleKey) }}</h2>
+      <p class="text-slate-500 mb-6">{{ t(d.messageKey) }}</p>
+
+      <button
+        type="button"
+        (click)="game.confirmNo()"
+        class="w-full bg-emerald-500 hover:bg-emerald-600 text-white text-xl font-bold
+               rounded-2xl py-4 shadow active:scale-95 transition mb-3"
+      >
+        😀 {{ t(d.noKey) }}
+      </button>
+      <button
+        type="button"
+        (click)="game.confirmYes()"
+        class="w-full bg-slate-100 hover:bg-rose-100 text-rose-600 font-bold
+               rounded-2xl py-3 active:scale-95 transition"
+      >
+        {{ t(d.yesKey) }}
+      </button>
+    </div>
+  </div>
+}

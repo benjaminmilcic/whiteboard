@@ -1,4 +1,32 @@
 /* You can add global styles to this file, and also import other style files */
+@import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Verspielte, kindgerechte Schrift für die Start-Auswahl und das Schiffe-Spiel.
+   Das Whiteboard bleibt bei der Material-/Roboto-Schrift. */
+app-home,
+app-schiffe {
+  @apply font-spiel text-slate-800;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Buttons werden auf dem Tablet nicht aus Versehen markiert */
+app-home button,
+app-schiffe button {
+  user-select: none;
+}
+
+/* Komponenten-Hosts sind sonst inline und schrumpfen auf ihren Inhalt –
+   dadurch werden die Spielfelder zu klein. Als Block füllen sie die
+   verfügbare Breite, und das innere mx-auto/max-w zentriert den Inhalt. */
+app-schiffe,
+app-lobby,
+app-setup,
+app-battle,
+app-result {
+  display: block;
+  width: 100%;
+}

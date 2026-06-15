@@ -1,0 +1,35 @@
+<div class="w-full select-none">
+  <!-- Buchstaben oben -->
+  <div
+    class="grid gap-[3px] mb-[3px]"
+    [style.grid-template-columns]="'1.4rem repeat(' + size + ', 1fr)'"
+  >
+    <div></div>
+    @for (c of letters; track c) {
+      <div class="text-center text-xs font-bold text-slate-500">{{ c }}</div>
+    }
+  </div>
+
+  @for (row of rows(); track rowIdx; let rowIdx = $index) {
+    <div
+      class="grid gap-[3px] mb-[3px]"
+      [style.grid-template-columns]="'1.4rem repeat(' + size + ', 1fr)'"
+    >
+      <div class="flex items-center justify-center text-xs font-bold text-slate-500">
+        {{ rowIdx + 1 }}
+      </div>
+      @for (cell of row; track colIdx; let colIdx = $index) {
+        <button
+          type="button"
+          [disabled]="!interactive() || locked(cell)"
+          (click)="cellClick.emit({ x: colIdx, y: rowIdx })"
+          [class]="cellClass(cell)"
+          class="aspect-square rounded-md flex items-center justify-center
+                 leading-none overflow-hidden text-base sm:text-lg transition-colors duration-100"
+        >
+          {{ content(cell) }}
+        </button>
+      }
+    </div>
+  }
+</div>
