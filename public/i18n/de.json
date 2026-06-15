@@ -46,7 +46,7 @@
     "boat": "Boot"
   },
   "battle": {
-    "cancel": "✕ Spiel abbrechen",
+    "cancel": "🚪 Spiel beenden",
     "yourTurn": "🎯 Du bist dran! Schieße!",
     "opponentTurn": "⏳ {{emoji}} {{name}} ist dran …",
     "enemySea": "🎯 {{name}}s Meer",

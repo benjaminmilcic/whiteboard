@@ -1,16 +1,4 @@
 <div class="w-full max-w-5xl mx-auto" *transloco="let t">
-  <!-- Abbrechen -->
-  <div class="flex justify-end mb-2">
-    <button
-      type="button"
-      (click)="leave()"
-      class="text-sky-50 hover:text-white text-sm font-bold bg-white/15 hover:bg-white/25
-             rounded-full px-4 py-1.5 active:scale-95 transition"
-    >
-      {{ t('battle.cancel') }}
-    </button>
-  </div>
-
   <!-- Zug-Anzeige -->
   <div class="text-center mb-3">
     @if (game.isMyTurn()) {

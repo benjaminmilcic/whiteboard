@@ -102,11 +102,9 @@ async function png(svg, size, name) {
 
 console.log('Icons werden erzeugt …');
 
-// Whiteboard
-writeFileSync(join(outDir, 'whiteboard-icon.svg'), wbRounded);
-await png(wbRounded, 192, 'whiteboard-icon-192.png');
-await png(wbRounded, 512, 'whiteboard-icon-512.png');
-await png(wbMaskable, 512, 'whiteboard-icon-maskable-512.png');
+// Hinweis: Das Whiteboard bringt sein eigenes Icon mit (public/icon-512.png),
+// das auf der Auswahl-Kachel verwendet wird. Hier wird nur das kombinierte
+// Start-/Launcher-Icon der Gesamt-App erzeugt.
 
 // Kombiniertes App-/Launcher-Icon
 writeFileSync(join(outDir, 'favicon.svg'), launcherRounded);

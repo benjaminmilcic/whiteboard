@@ -9,6 +9,7 @@ import { MatMenuModule } from '@angular/material/menu';
 import { ColorPickerDirective } from 'ngx-color-picker';
 import { Database, ref, onValue, set, push, off, onDisconnect, remove, serverTimestamp } from '@angular/fire/database';
 import { inject } from '@angular/core';
+import { Router } from '@angular/router';
 
 interface DrawingPoint {
   x: number;
@@ -81,6 +82,7 @@ export class Whiteboard implements AfterViewInit, OnDestroy {
 
   private database = inject(Database);
   private ngZone = inject(NgZone);
+  private router = inject(Router);
   private ctx: CanvasRenderingContext2D | null = null;
   private drawing = false;
   private currentStroke: DrawingPoint[] = [];
@@ -659,6 +661,10 @@ export class Whiteboard implements AfterViewInit, OnDestroy {
     link.download = `whiteboard-${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.png`;
     link.href = tempCanvas.toDataURL('image/png');
     link.click();
+  }
+
+  goHome(): void {
+    this.router.navigate(['/']);
   }
 
   clearCanvas(): void {

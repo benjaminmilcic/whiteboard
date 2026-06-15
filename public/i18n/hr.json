@@ -46,7 +46,7 @@
     "boat": "Čamac"
   },
   "battle": {
-    "cancel": "✕ Prekini igru",
+    "cancel": "🚪 Prekini igru",
     "yourTurn": "🎯 Ti si na redu! Pucaj!",
     "opponentTurn": "⏳ {{emoji}} {{name}} je na redu …",
     "enemySea": "🎯 More igrača {{name}}",

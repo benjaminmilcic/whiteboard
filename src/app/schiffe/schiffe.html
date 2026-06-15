@@ -4,6 +4,17 @@
 >
   <!-- Kopfzeile mit Sprachumschalter (eigene Zeile, überlappt nichts) -->
   <header class="w-full flex justify-end items-center gap-4 px-3 pt-3 shrink-0">
+    <!-- Spiel beenden (nur im Kampf) – links neben dem Sprachmenü, kindgerecht -->
+    @if (view() === 'battle') {
+      <button
+        type="button"
+        (click)="game.askLeave()"
+        class="bg-rose-400 hover:bg-rose-500 text-white text-base font-extrabold
+               rounded-full px-4 py-2 shadow-lg active:scale-95 transition shrink-0"
+      >
+        {{ 'battle.cancel' | transloco }}
+      </button>
+    }
     <app-language-switcher />
     <!-- Zurück zur Start-Auswahl (mit etwas Abstand zum Sprachmenü) -->
     <button

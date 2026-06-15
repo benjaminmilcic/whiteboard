@@ -173,6 +173,17 @@
         <button mat-mini-fab color="warn" (click)="clearCanvas()">
           <mat-icon>delete</mat-icon>
         </button>
+        <!-- Zurück zur Start-Auswahl (ganz rechts, mit etwas Abstand zum Löschen-Button) -->
+        <button
+          type="button"
+          (click)="goHome()"
+          title="Natrag na izbornik"
+          aria-label="Natrag na izbornik"
+          class="ml-4 w-10 h-10 rounded-full overflow-hidden ring-2 ring-gray-300 shadow
+                 hover:scale-110 active:scale-95 transition shrink-0"
+        >
+          <img src="/familie.jpg" alt="Natrag na izbornik" class="w-full h-full object-cover" />
+        </button>
       </div>
     </div>
   </mat-toolbar>

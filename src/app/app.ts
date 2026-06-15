@@ -1,9 +1,9 @@
 import { Component, ViewContainerRef } from '@angular/core';
-import { Whiteboard } from './whiteboard/whiteboard';
+import { RouterOutlet } from '@angular/router';
 
 @Component({
   selector: 'app-root',
-  imports: [Whiteboard],
+  imports: [RouterOutlet],
   templateUrl: './app.html',
   styleUrl: './app.css',
 })
