@@ -22,7 +22,8 @@
       "Bash(git ls-tree *)",
       "Bash(git checkout *)",
       "Bash(git rm *)",
-      "Bash(rm -f public/whiteboard-icon-192.png public/whiteboard-icon-512.png public/whiteboard-icon-maskable-512.png public/whiteboard-icon.svg)"
+      "Bash(rm -f public/whiteboard-icon-192.png public/whiteboard-icon-512.png public/whiteboard-icon-maskable-512.png public/whiteboard-icon.svg)",
+      "Bash(grep *)"
     ],
     "deny": [],
     "ask": []

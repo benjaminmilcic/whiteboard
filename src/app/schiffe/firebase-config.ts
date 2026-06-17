@@ -10,12 +10,16 @@
 // Firestore-Sicherheitsregeln (siehe firestore.rules).
 // =============================================================
 
+// Schiffe liegt jetzt im gemeinsamen Whiteboard-Firebase-Projekt
+// (whiteboard-32486) und nutzt dessen Firestore-Datenbank (Sammlung
+// "games") + anonyme Anmeldung – siehe firestore.rules.
 export const firebaseConfig = {
-  apiKey: 'AIzaSyDCTkrmL6baKxQlDl8rNnZRbuFkwqjfD-I',
-  authDomain: 'battleship-4d2de.firebaseapp.com',
-  projectId: 'battleship-4d2de',
-  storageBucket: 'battleship-4d2de.firebasestorage.app',
-  messagingSenderId: '108869220024',
-  appId: '1:108869220024:web:eaf834bcc8c7046635e64d',
-  measurementId: 'G-N74XC20FWH',
+  apiKey: 'AIzaSyBY_UOdWb45qbnm8QWyoGqryVJhccGw3Hs',
+  authDomain: 'whiteboard-32486.firebaseapp.com',
+  databaseURL: 'https://whiteboard-32486-default-rtdb.europe-west1.firebasedatabase.app',
+  projectId: 'whiteboard-32486',
+  storageBucket: 'whiteboard-32486.firebasestorage.app',
+  messagingSenderId: '542282633974',
+  appId: '1:542282633974:web:b1362d9803caac8ae292d7',
+  measurementId: 'G-F8D4WSG0XS',
 };

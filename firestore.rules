@@ -1,0 +1,22 @@
+rules_version = '2';
+
+// Firestore wird nur vom Spiel "Schiffe versenken" genutzt
+// (Sammlung "games"). Whiteboard und Memory nutzen die Realtime
+// Database (siehe database.rules.json).
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Spielrunden von Schiffe versenken.
+    // Es muss eine (anonyme) Anmeldung vorliegen – die App meldet sich
+    // beim Start automatisch anonym an. Wer das Spiel kennt, darf mitspielen
+    // (kindgerechte Familien-App, keine sensiblen Daten).
+    match /games/{code} {
+      allow read, write: if request.auth != null;
+    }
+
+    // Alles andere ist gesperrt.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

@@ -105,7 +105,7 @@ export class GameService {
         createdAt: Date.now(),
         updatedAt: Date.now(),
       };
-      await this.withTimeout(set(ref(db, `games/${code}`), state));
+      await this.withTimeout(set(ref(db, `memory/games/${code}`), state));
       this.subscribe(code);
       return code;
     } catch (e) {
@@ -123,7 +123,7 @@ export class GameService {
     this.error.set(null);
     try {
       this.assertConfig();
-      const snap = await this.withTimeout(get(ref(db, `games/${code}`)));
+      const snap = await this.withTimeout(get(ref(db, `memory/games/${code}`)));
       if (!snap.exists()) {
         throw new Error('Kein Spiel mit diesem Code gefunden.');
       }
@@ -138,7 +138,7 @@ export class GameService {
         state.status = 'playing';
         state.currentTurn = state.order[0];
         state.updatedAt = Date.now();
-        await this.withTimeout(set(ref(db, `games/${code}`), state));
+        await this.withTimeout(set(ref(db, `memory/games/${code}`), state));
       }
       this.subscribe(code);
     } catch (e) {
@@ -161,7 +161,7 @@ export class GameService {
     const flipped = [...g.flipped, index];
 
     if (flipped.length < 2) {
-      await update(ref(db, `games/${g.code}`), { flipped, updatedAt: Date.now() });
+      await update(ref(db, `memory/games/${g.code}`), { flipped, updatedAt: Date.now() });
       return;
     }
 
@@ -177,7 +177,7 @@ export class GameService {
       players[this.playerId] = { ...mine, score: mine.score + 1 };
       const finished = board.every((c) => c.matchedBy);
 
-      await update(ref(db, `games/${g.code}`), {
+      await update(ref(db, `memory/games/${g.code}`), {
         board,
         players,
         flipped: [],
@@ -189,14 +189,14 @@ export class GameService {
       });
     } else {
       // Beide Karten kurz zeigen, dann umdrehen und Gegner ist dran.
-      await update(ref(db, `games/${g.code}`), {
+      await update(ref(db, `memory/games/${g.code}`), {
         flipped,
         resolving: true,
         updatedAt: Date.now(),
       });
       const next = this.nextPlayer(g);
       this.mismatchTimer = setTimeout(() => {
-        update(ref(db, `games/${g.code}`), {
+        update(ref(db, `memory/games/${g.code}`), {
           flipped: [],
           resolving: false,
           currentTurn: next,
@@ -219,7 +219,7 @@ export class GameService {
       g.winnerId && g.winnerId !== 'tie'
         ? g.order.find((id) => id !== g.winnerId) ?? g.order[0]
         : g.order[0];
-    await update(ref(db, `games/${g.code}`), {
+    await update(ref(db, `memory/games/${g.code}`), {
       board: this.buildBoard(g.pairs),
       flipped: [],
       resolving: false,
@@ -244,7 +244,7 @@ export class GameService {
   subscribeScores(): void {
     if (this.scoresSubscribed) return;
     this.scoresSubscribed = true;
-    const q = query(ref(db, 'scores'), orderByChild('finishedAt'), limitToLast(12));
+    const q = query(ref(db, 'memory/scores'), orderByChild('finishedAt'), limitToLast(12));
     onValue(
       q,
       (snap) => {
@@ -263,7 +263,7 @@ export class GameService {
   private subscribe(code: string): void {
     this.gameUnsub?.();
     this.lastRecordedFinish = 0;
-    const gameRef = ref(db, `games/${code}`);
+    const gameRef = ref(db, `memory/games/${code}`);
     this.gameUnsub = onValue(
       gameRef,
       (snap) => {
@@ -298,7 +298,7 @@ export class GameService {
       finishedAt: g.updatedAt,
     };
     try {
-      await set(push(ref(db, 'scores')), entry);
+      await set(push(ref(db, 'memory/scores')), entry);
     } catch (e) {
       this.error.set(this.toMessage(e));
     }
@@ -356,7 +356,7 @@ export class GameService {
   private async uniqueCode(): Promise<string> {
     for (let attempt = 0; attempt < 8; attempt++) {
       const code = this.randomCode();
-      const snap = await this.withTimeout(get(ref(db, `games/${code}`)));
+      const snap = await this.withTimeout(get(ref(db, `memory/games/${code}`)));
       if (!snap.exists()) return code;
     }
     return this.randomCode();

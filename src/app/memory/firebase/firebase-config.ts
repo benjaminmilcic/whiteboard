@@ -8,13 +8,16 @@
  * Die Werte hier sind keine Geheimnisse – sie dürfen öffentlich im Browser stehen.
  * Der Schutz kommt über die Datenbank-Regeln (siehe database.rules.json).
  */
+// Memory liegt jetzt im gemeinsamen Whiteboard-Firebase-Projekt
+// (whiteboard-32486) und nutzt dessen Realtime Database unter dem
+// Pfad "memory/..." – siehe database.rules.json.
 export const firebaseConfig = {
-  apiKey: 'AIzaSyCT93oZO54sR22X0Q55u4D0H1PF6l0EF3s',
-  authDomain: 'memory-a3801.firebaseapp.com',
-  databaseURL: 'https://memory-a3801-default-rtdb.europe-west1.firebasedatabase.app',
-  projectId: 'memory-a3801',
-  storageBucket: 'memory-a3801.firebasestorage.app',
-  messagingSenderId: '100081705117',
-  appId: '1:100081705117:web:75ae1806a7879694ddb474',
-  measurementId: 'G-HQZYD3CPEB',
+  apiKey: 'AIzaSyBY_UOdWb45qbnm8QWyoGqryVJhccGw3Hs',
+  authDomain: 'whiteboard-32486.firebaseapp.com',
+  databaseURL: 'https://whiteboard-32486-default-rtdb.europe-west1.firebasedatabase.app',
+  projectId: 'whiteboard-32486',
+  storageBucket: 'whiteboard-32486.firebasestorage.app',
+  messagingSenderId: '542282633974',
+  appId: '1:542282633974:web:b1362d9803caac8ae292d7',
+  measurementId: 'G-F8D4WSG0XS',
 };

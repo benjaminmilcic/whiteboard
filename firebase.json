@@ -3,6 +3,9 @@
     "rules": "database.rules.json",
     "instance": "whiteboard-32486-default-rtdb"
   },
+  "firestore": {
+    "rules": "firestore.rules"
+  },
   "hosting": {
     "public": "dist/whiteboard-app/browser",
     "ignore": [

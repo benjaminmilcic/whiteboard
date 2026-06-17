@@ -3,6 +3,21 @@
     "whiteboard": {
       ".read": true,
       ".write": true
+    },
+    "memory": {
+      "games": {
+        "$code": {
+          ".read": true,
+          ".write": true
+        }
+      },
+      "scores": {
+        ".read": true,
+        ".write": true,
+        "$id": {
+          ".validate": "newData.hasChildren(['winnerName', 'finishedAt'])"
+        }
+      }
     }
   }
 }
