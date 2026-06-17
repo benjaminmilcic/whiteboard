@@ -1,0 +1,16 @@
+:host {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.motif {
+  width: 100%;
+  height: 100%;
+}
+
+.motif ::ng-deep svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}

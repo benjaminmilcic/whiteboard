@@ -1,0 +1,135 @@
+@if (game(); as g) {
+  <div class="board-screen">
+    <!-- Kopfzeile (ohne Beenden-Button – der ist in der Buttonleiste oben) -->
+    <header class="bar">
+      <div class="players">
+        <div class="player" [class.player--active]="g.currentTurn === svc.me()?.id">
+          <span class="player-ava"><app-motif [motifId]="svc.me()?.avatar ?? ''" /></span>
+          <span class="player-name">{{ svc.me()?.name }}</span>
+          <span class="player-score">{{ svc.me()?.score ?? 0 }}</span>
+        </div>
+
+        <span class="vs">:</span>
+
+        @if (svc.opponent(); as opp) {
+          <div class="player" [class.player--active]="g.currentTurn === opp.id">
+            <span class="player-ava"><app-motif [motifId]="opp.avatar" /></span>
+            <span class="player-name">{{ opp.name }}</span>
+            <span class="player-score">{{ opp.score }}</span>
+          </div>
+        } @else {
+          <div class="player player--empty">
+            <span class="player-name">{{ 'memory.waitingPlayer' | transloco }}</span>
+          </div>
+        }
+      </div>
+
+      <div class="turn" [class.turn--mine]="g.currentTurn === svc.me()?.id">
+        @if (g.currentTurn === svc.me()?.id) {
+          {{ 'memory.yourTurn' | transloco }}
+        } @else {
+          {{ 'memory.othersTurn' | transloco: { name: currentName() || ('memory.player' | transloco) } }}
+        }
+      </div>
+    </header>
+
+    <!-- Spielfeld -->
+    <main class="field-wrap">
+      <div
+        class="board"
+        [style.--cols]="cols()"
+        [style.--ratio]="ratio()"
+      >
+        @for (card of g.board; track $index) {
+          <app-card
+            [motifId]="card.motifId"
+            [faceUp]="faceUp($index)"
+            [matched]="matched($index)"
+            [mine]="mine($index)"
+            [clickable]="clickable($index)"
+            (flip)="onFlip($index)"
+          />
+        }
+      </div>
+    </main>
+
+    <!-- Warten auf Mitspieler -->
+    @if (g.status === 'waiting') {
+      <div class="overlay">
+        <div class="panel">
+          <h2 class="panel-title">{{ 'memory.codeTitle' | transloco }}</h2>
+          <p class="code">{{ g.code }}</p>
+          <p class="panel-text">{{ 'memory.codeShare' | transloco }}</p>
+          <div class="spinner" aria-hidden="true"></div>
+          <button type="button" class="btn btn-ghost" (click)="leave()">
+            {{ 'memory.cancel' | transloco }}
+          </button>
+        </div>
+      </div>
+    }
+
+    <!-- Spielende -->
+    @if (g.status === 'finished') {
+      <div class="overlay">
+        <div
+          class="panel"
+          [class.panel--win]="outcome() === 'win'"
+          [class.panel--lose]="outcome() === 'lose'"
+          [class.panel--tie]="outcome() === 'tie'"
+        >
+          <!-- Animation je nach Ergebnis -->
+          @switch (outcome()) {
+            @case ('win') {
+              <div class="result-stage">
+                <div class="result-emoji anim-win">🏆</div>
+                <span class="spark spark-1">✨</span>
+                <span class="spark spark-2">⭐</span>
+                <span class="spark spark-3">✨</span>
+              </div>
+            }
+            @case ('lose') {
+              <div class="result-stage">
+                <div class="result-emoji anim-lose">😢</div>
+                <span class="tear tear-1">💧</span>
+                <span class="tear tear-2">💧</span>
+              </div>
+            }
+            @case ('tie') {
+              <div class="result-stage">
+                <div class="result-emoji anim-tie">🤝</div>
+              </div>
+            }
+          }
+
+          <h2 class="result-title">
+            @switch (outcome()) {
+              @case ('win') { {{ 'memory.won' | transloco: { name: svc.me()?.name } }} }
+              @case ('lose') { {{ 'memory.lost' | transloco: { name: svc.me()?.name } }} }
+              @case ('tie') { {{ 'memory.tie' | transloco }} }
+            }
+          </h2>
+
+          <div class="final-scores">
+            <div class="final-player">
+              <span class="player-ava"><app-motif [motifId]="svc.me()?.avatar ?? ''" /></span>
+              <span>{{ svc.me()?.name }}: <b>{{ svc.me()?.score }}</b></span>
+            </div>
+            @if (svc.opponent(); as opp) {
+              <div class="final-player">
+                <span class="player-ava"><app-motif [motifId]="opp.avatar" /></span>
+                <span>{{ opp.name }}: <b>{{ opp.score }}</b></span>
+              </div>
+            }
+          </div>
+
+          <button type="button" class="btn btn-primary" (click)="playAgain()">
+            {{ 'memory.playAgain' | transloco }}
+          </button>
+          <button type="button" class="btn btn-ghost" (click)="leave()">
+            {{ 'memory.home' | transloco }}
+          </button>
+        </div>
+      </div>
+    }
+  </div>
+}

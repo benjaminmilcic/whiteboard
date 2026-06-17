@@ -5,17 +5,19 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Verspielte, kindgerechte Schrift für die Start-Auswahl und das Schiffe-Spiel.
+/* Verspielte, kindgerechte Schrift für die Start-Auswahl und die Spiele.
    Das Whiteboard bleibt bei der Material-/Roboto-Schrift. */
 app-home,
-app-schiffe {
+app-schiffe,
+app-memory {
   @apply font-spiel text-slate-800;
   -webkit-tap-highlight-color: transparent;
 }
 
 /* Buttons werden auf dem Tablet nicht aus Versehen markiert */
 app-home button,
-app-schiffe button {
+app-schiffe button,
+app-memory button {
   user-select: none;
 }
 
@@ -29,4 +31,57 @@ app-battle,
 app-result {
   display: block;
   width: 100%;
+}
+
+/* ============================================================
+   Memory-Spiel: globale Styles, die im eigenständigen Projekt
+   in styles.css lagen. Hier auf app-memory eingegrenzt, damit
+   sie Whiteboard und Schiffe nicht beeinflussen.
+   ============================================================ */
+app-memory,
+app-memory app-home,
+app-memory app-board {
+  display: block;
+  width: 100%;
+}
+
+/* Memory füllt die Höhe unter der Buttonleiste, ohne die Seite zu sprengen.
+   (Im eigenständigen Projekt nutzt .board-screen 100dvh – hier sitzt eine
+   Buttonleiste darüber, deshalb auf die verfügbare Höhe begrenzen.) */
+app-memory app-board {
+  height: 100%;
+  min-height: 0;
+}
+app-memory .board-screen {
+  height: 100%;
+  min-height: 0;
+}
+
+/* Stabile 3D-Flip-Umgebung für die Memory-Karten. */
+app-memory .card-scene {
+  perspective: 1000px;
+}
+app-memory .card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transition: transform 0.45s cubic-bezier(0.4, 0.2, 0.2, 1);
+}
+app-memory .card-inner.is-flipped {
+  transform: rotateY(180deg);
+}
+app-memory .card-face {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 1rem;
+  overflow: hidden;
+}
+app-memory .card-face--back {
+  transform: rotateY(180deg);
 }

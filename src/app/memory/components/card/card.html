@@ -1,0 +1,37 @@
+<button
+  type="button"
+  class="card-scene"
+  [class.is-matched]="matched()"
+  [class.is-clickable]="clickable()"
+  [disabled]="!clickable()"
+  (click)="onClick()"
+>
+  <div class="card-inner" [class.is-flipped]="faceUp()">
+    <!-- Rückseite (verdeckt) -->
+    <div class="card-face card-cover">
+      <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <defs>
+          <linearGradient id="cov" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#4a93ff" />
+            <stop offset="1" stop-color="#0f4ff5" />
+          </linearGradient>
+        </defs>
+        <rect x="4" y="4" width="92" height="92" rx="18" fill="url(#cov)" />
+        <g fill="#ffffff" opacity="0.9">
+          <path d="M50 30 l6 13 14 1 -11 9 4 14 -13 -8 -13 8 4 -14 -11 -9 14 -1 z" />
+        </g>
+        <g fill="#ffffff" opacity="0.35">
+          <circle cx="24" cy="24" r="4" />
+          <circle cx="76" cy="76" r="4" />
+          <circle cx="76" cy="24" r="3" />
+          <circle cx="24" cy="76" r="3" />
+        </g>
+      </svg>
+    </div>
+
+    <!-- Vorderseite (Motiv) -->
+    <div class="card-face card-face--back card-front" [class.front-mine]="mine()">
+      <app-motif [motifId]="motifId()" />
+    </div>
+  </div>
+</button>

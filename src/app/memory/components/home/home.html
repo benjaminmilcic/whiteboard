@@ -1,0 +1,103 @@
+<div class="home">
+  <div class="home-card">
+    <header class="home-head">
+      <h1 class="title">{{ 'memory.title' | transloco }}</h1>
+      <p class="subtitle">{{ 'memory.subtitle' | transloco }}</p>
+    </header>
+
+    @if (game.error()) {
+      <p class="error">{{ game.error() }}</p>
+    }
+
+    <!-- Name -->
+    <label class="field">
+      <span class="field-label">{{ 'memory.nameLabel' | transloco }}</span>
+      <input
+        class="text-input"
+        type="text"
+        maxlength="12"
+        [placeholder]="'memory.namePlaceholder' | transloco"
+        [ngModel]="name()"
+        (ngModelChange)="onName($event)"
+      />
+    </label>
+
+    <!-- Avatar -->
+    <div class="field">
+      <span class="field-label">{{ 'memory.chooseAnimal' | transloco }}</span>
+      <div class="avatar-grid">
+        @for (m of motifs; track m.id) {
+          <button
+            type="button"
+            class="avatar"
+            [class.avatar--active]="avatar() === m.id"
+            (click)="avatar.set(m.id)"
+            [attr.aria-label]="m.name"
+          >
+            <app-motif [motifId]="m.id" />
+          </button>
+        }
+      </div>
+    </div>
+
+    @if (!showJoin()) {
+      <!-- Neues Spiel -->
+      <div class="field">
+        <span class="field-label">{{ 'memory.difficulty' | transloco }}</span>
+        <div class="diff-row">
+          @for (d of difficulties; track d.pairs) {
+            <button
+              type="button"
+              class="diff"
+              [class.diff--active]="pairs() === d.pairs"
+              (click)="pairs.set(d.pairs)"
+            >
+              <span class="diff-label">{{ d.labelKey | transloco }}</span>
+              <span class="diff-hint">{{ d.hintKey | transloco }}</span>
+            </button>
+          }
+        </div>
+      </div>
+
+      <button
+        type="button"
+        class="btn btn-primary"
+        [disabled]="!nameValid() || game.busy()"
+        (click)="create()"
+      >
+        {{ (game.busy() ? 'memory.creating' : 'memory.newGame') | transloco }}
+      </button>
+
+      <button type="button" class="btn btn-ghost" (click)="showJoin.set(true)">
+        {{ 'memory.joinPrompt' | transloco }}
+      </button>
+    } @else {
+      <!-- Spiel beitreten -->
+      <label class="field">
+        <span class="field-label">{{ 'memory.codeLabel' | transloco }}</span>
+        <input
+          class="text-input code-input"
+          type="text"
+          inputmode="text"
+          autocapitalize="characters"
+          [placeholder]="'memory.codePlaceholder' | transloco"
+          [ngModel]="joinCode()"
+          (ngModelChange)="onCode($event)"
+        />
+      </label>
+
+      <button
+        type="button"
+        class="btn btn-primary"
+        [disabled]="!nameValid() || joinCode().length !== 4 || game.busy()"
+        (click)="join()"
+      >
+        {{ (game.busy() ? 'memory.connecting' : 'memory.join') | transloco }}
+      </button>
+
+      <button type="button" class="btn btn-ghost" (click)="showJoin.set(false)">
+        {{ 'memory.back' | transloco }}
+      </button>
+    }
+  </div>
+</div>
