@@ -23,7 +23,10 @@
       "Bash(git checkout *)",
       "Bash(git rm *)",
       "Bash(rm -f public/whiteboard-icon-192.png public/whiteboard-icon-512.png public/whiteboard-icon-maskable-512.png public/whiteboard-icon.svg)",
-      "Bash(grep *)"
+      "Bash(grep *)",
+      "PowerShell(New-Item *)",
+      "PowerShell(Get-ChildItem \"D:\\\\eigene Projekte\\\\whiteboard\\\\dist\\\\whiteboard-app\\\\browser\\\\puzzle\" | Select-Object Name,Length; \"---\"; Test-Path \"D:\\\\eigene Projekte\\\\whiteboard\\\\dist\\\\whiteboard-app\\\\browser\\\\puzzle-icon.svg\")",
+      "Bash(node -e \"const sharp=require\\('sharp'\\);sharp\\('public/puzzle-icon.svg'\\).resize\\(256,256\\).png\\(\\).toFile\\('puzzle-icon-preview.png'\\).then\\(\\(\\)=>console.log\\('ok'\\)\\).catch\\(e=>console.error\\(e.message\\)\\)\")"
     ],
     "deny": [],
     "ask": []

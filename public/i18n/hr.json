@@ -140,6 +140,8 @@
     "memory": "Memorija",
     "memorySub": "Pronađi parove",
     "connect4": "Četiri u nizu",
-    "connect4Sub": "Složi četiri u red"
+    "connect4Sub": "Složi četiri u red",
+    "puzzle": "Slagalica",
+    "puzzleSub": "Složi sličicu"
   }
 }

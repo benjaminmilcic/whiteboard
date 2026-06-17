@@ -140,6 +140,8 @@
     "memory": "Memory",
     "memorySub": "Find the pairs",
     "connect4": "Connect Four",
-    "connect4Sub": "Line up four"
+    "connect4Sub": "Line up four",
+    "puzzle": "Jigsaw",
+    "puzzleSub": "Put the picture together"
   }
 }

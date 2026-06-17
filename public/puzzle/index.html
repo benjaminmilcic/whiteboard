@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="hr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Slagalica</title>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <!-- partial:index.partial.html -->
+    <div id="forPuzzle"></div>
+    <!-- Reihenfolge der <li> NICHT ändern – die Klick-Handler in script.js
+         arbeiten über den Index der Menü-Einträge, nicht über den Text. -->
+    <ul id="menu">
+      <li>&#x2630;</li>
+      <li>🖼️ Slika</li>
+      <li>📷 Moja slika</li>
+      <li class="no-hover">
+        <p>Oblik:</p>
+        <select id="shape">
+          <option value="1" selected>klasično</option>
+          <option value="2">trokut</option>
+          <option value="3">okruglo</option>
+          <option value="4">ravno</option>
+        </select>
+      </li>
+      <li>😀 12 komadića</li>
+      <li>🙂 25 komadića</li>
+      <li>😎 50 komadića</li>
+      <li>🤔 100 komadića</li>
+      <li>🤯 200 komadića</li>
+    </ul>
+    <!-- partial -->
+    <script src="./script.js"></script>
+  </body>
+</html>

@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#e7f3ff"/>
+      <stop offset="1" stop-color="#bcdcff"/>
+    </linearGradient>
+    <linearGradient id="gRed" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ff9a9a"/>
+      <stop offset="1" stop-color="#f0524f"/>
+    </linearGradient>
+    <linearGradient id="gYel" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffe88a"/>
+      <stop offset="1" stop-color="#fbc02d"/>
+    </linearGradient>
+    <linearGradient id="gGrn" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#9ee6a3"/>
+      <stop offset="1" stop-color="#54bd6a"/>
+    </linearGradient>
+    <linearGradient id="gBlu" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#86bbff"/>
+      <stop offset="1" stop-color="#3d83f5"/>
+    </linearGradient>
+    <filter id="soft" x="-25%" y="-25%" width="150%" height="150%">
+      <feDropShadow dx="0" dy="7" stdDeviation="9" flood-color="#16317a" flood-opacity="0.30"/>
+    </filter>
+    <radialGradient id="shine" cx="0.32" cy="0.24" r="0.8">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.5"/>
+      <stop offset="0.55" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect x="32" y="32" width="448" height="448" rx="60" fill="url(#bg)"/>
+
+  <!-- vier ineinandergreifende Puzzleteile (Raster 104..408, Mitte 256, Noppen r=24) -->
+  <g filter="url(#soft)" stroke="#ffffff" stroke-width="12" stroke-linejoin="round" stroke-linecap="round">
+    <!-- oben links (rot) -->
+    <path fill="url(#gRed)"
+      d="M104 104 H256 V156 a24 24 0 0 1 0 48 V256 H200 a24 24 0 0 1 -48 0 H104 Z"/>
+    <!-- oben rechts (gelb) -->
+    <path fill="url(#gYel)"
+      d="M256 104 H408 V256 H360 a24 24 0 0 1 -48 0 H256 V204 a24 24 0 0 0 0 -48 V104 Z"/>
+    <!-- unten links (grün) -->
+    <path fill="url(#gGrn)"
+      d="M104 256 H152 a24 24 0 0 0 48 0 H256 V312 a24 24 0 0 0 0 48 V408 H104 Z"/>
+    <!-- unten rechts (blau) -->
+    <path fill="url(#gBlu)"
+      d="M256 256 H312 a24 24 0 0 0 48 0 H408 V408 H256 V360 a24 24 0 0 1 0 -48 V256 Z"/>
+  </g>
+
+  <!-- sanftes Glanzlicht -->
+  <rect x="32" y="32" width="448" height="448" rx="60" fill="url(#shine)"/>
+</svg>

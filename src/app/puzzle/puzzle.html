@@ -1,0 +1,22 @@
+<div class="puzzle-wrap">
+  <!-- Das Puzzle ist ein eigenständiges JS-Spiel, eingebettet als iframe.
+       Es bringt sein eigenes Menü mit (oben links) – deshalb hier keine
+       Sprachleiste. -->
+  <iframe
+    src="/puzzle/index.html"
+    title="Slagalica"
+    class="puzzle-frame"
+  ></iframe>
+
+  <!-- Zurück zur Start-Auswahl (oben rechts, kollidiert nicht mit dem
+       Puzzle-Menü links). -->
+  <button
+    type="button"
+    (click)="goHome()"
+    title="Natrag na izbornik"
+    aria-label="Natrag na izbornik"
+    class="home-btn"
+  >
+    <img src="/familie.jpg" alt="Natrag na izbornik" />
+  </button>
+</div>

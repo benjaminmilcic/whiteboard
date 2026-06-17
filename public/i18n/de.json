@@ -140,6 +140,8 @@
     "memory": "Memory",
     "memorySub": "Finde die Paare",
     "connect4": "Vier gewinnt",
-    "connect4Sub": "Bring vier in eine Reihe"
+    "connect4Sub": "Bring vier in eine Reihe",
+    "puzzle": "Puzzle",
+    "puzzleSub": "Setz das Bild zusammen"
   }
 }

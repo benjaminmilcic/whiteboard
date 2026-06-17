@@ -1,0 +1,81 @@
+body {
+      font-family: Arial, Helvetica, "Liberation Sans", FreeSans, sans-serif;
+      background-color: transparent;
+      margin: 0;
+      padding: 0;
+      border-width: 0;
+      cursor: pointer;
+    }
+
+    #menu {
+      position: relative;
+      list-style-type: none;
+      padding-left: 5px;
+      z-index: 1000;
+      /* 1 */
+      display: inline-block;
+      text-align: center;
+    }
+
+    #menu li {
+      margin: 4px;
+      padding: 8px 16px;
+      border-radius: 12px;
+      background-color: #ffe34d;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #3a2d00;
+      box-shadow: 0 3px 0 #e0b200;
+      user-select: none;
+    }
+
+    #menu li:not(.no-hover):active {
+      transform: translateY(2px);
+      box-shadow: 0 1px 0 #e0b200;
+    }
+
+    @media (hover: hover) and (pointer: fine) {
+      #menu li:not(.no-hover):hover {
+        background-color: #ffd60a;
+      }
+    }
+
+    #menu li.no-hover {
+      background-color: #fff3b0;
+      box-shadow: none;
+    }
+
+    #shape {
+      font-size: 1rem;
+      padding: 2px 4px;
+      border-radius: 6px;
+    }
+
+    #forPuzzle {
+      position: absolute;
+      width: 95vw;
+      height: 95vh;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: transparent;
+      overflow: hidden;
+    }
+
+    .polypiece {
+      display: block;
+      overflow: hidden;
+      position: absolute;
+    }
+
+    .moving {
+      transition-property: top, left;
+      transition-duration: 1s;
+      transition-timing-function: linear;
+    }
+
+    .gameCanvas {
+      display: none;
+      overflow: hidden;
+      position: absolute;
+    }
