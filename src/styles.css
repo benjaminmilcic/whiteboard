@@ -10,7 +10,8 @@
 app-home,
 app-schiffe,
 app-memory,
-app-connect4 {
+app-connect4,
+app-hangman {
   @apply font-spiel text-slate-800;
   -webkit-tap-highlight-color: transparent;
 }
@@ -19,7 +20,8 @@ app-connect4 {
 app-home button,
 app-schiffe button,
 app-memory button,
-app-connect4 button {
+app-connect4 button,
+app-hangman button {
   user-select: none;
 }
 

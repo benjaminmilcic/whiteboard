@@ -26,7 +26,9 @@
       "Bash(grep *)",
       "PowerShell(New-Item *)",
       "PowerShell(Get-ChildItem \"D:\\\\eigene Projekte\\\\whiteboard\\\\dist\\\\whiteboard-app\\\\browser\\\\puzzle\" | Select-Object Name,Length; \"---\"; Test-Path \"D:\\\\eigene Projekte\\\\whiteboard\\\\dist\\\\whiteboard-app\\\\browser\\\\puzzle-icon.svg\")",
-      "Bash(node -e \"const sharp=require\\('sharp'\\);sharp\\('public/puzzle-icon.svg'\\).resize\\(256,256\\).png\\(\\).toFile\\('puzzle-icon-preview.png'\\).then\\(\\(\\)=>console.log\\('ok'\\)\\).catch\\(e=>console.error\\(e.message\\)\\)\")"
+      "Bash(node -e \"const sharp=require\\('sharp'\\);sharp\\('public/puzzle-icon.svg'\\).resize\\(256,256\\).png\\(\\).toFile\\('puzzle-icon-preview.png'\\).then\\(\\(\\)=>console.log\\('ok'\\)\\).catch\\(e=>console.error\\(e.message\\)\\)\")",
+      "Bash(node -e \"require\\('sharp'\\)\\('public/hangman-icon.svg'\\).resize\\(256,256\\).png\\(\\).toFile\\('hm-preview.png'\\).then\\(\\(\\)=>console.log\\('ok'\\)\\).catch\\(e=>console.error\\(e.message\\)\\)\")",
+      "Bash(node -e \"require\\('sharp'\\)\\('public/hangman-icon.svg'\\).resize\\(256,256\\).png\\(\\).toFile\\('hm2.png'\\).then\\(\\(\\)=>console.log\\('ok'\\)\\).catch\\(e=>console.error\\(e.message\\)\\)\")"
     ],
     "deny": [],
     "ask": []

@@ -13,7 +13,7 @@ import { LanguageSwitcherComponent } from '../schiffe/language-switcher/language
 export class HomeComponent {
   private router = inject(Router);
 
-  go(target: 'whiteboard' | 'schiffe' | 'memory' | 'connect4' | 'puzzle') {
+  go(target: 'whiteboard' | 'schiffe' | 'memory' | 'connect4' | 'puzzle' | 'hangman') {
     this.router.navigate([target]);
   }
 }

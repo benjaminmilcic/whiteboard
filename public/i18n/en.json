@@ -142,6 +142,8 @@
     "connect4": "Connect Four",
     "connect4Sub": "Line up four",
     "puzzle": "Jigsaw",
-    "puzzleSub": "Put the picture together"
+    "puzzleSub": "Put the picture together",
+    "hangman": "Guess the word",
+    "hangmanSub": "Letter by letter"
   }
 }

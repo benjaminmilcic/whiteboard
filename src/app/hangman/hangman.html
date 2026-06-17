@@ -1,0 +1,122 @@
+<main
+  class="min-h-dvh w-full bg-gradient-to-b from-sky-300 via-sky-400 to-indigo-500
+         flex flex-col overflow-x-hidden"
+>
+  <!-- Buttonleiste: Nova riječ · Hauptmenü (Hangman ist immer kroatisch) -->
+  <header class="w-full flex justify-end items-center gap-4 px-3 pt-3 shrink-0">
+    <button
+      type="button"
+      (click)="newWord()"
+      class="bg-emerald-500 hover:bg-emerald-600 text-white text-base font-extrabold
+             rounded-full px-4 py-2 shadow-lg active:scale-95 transition shrink-0"
+    >
+      🔄 Nova riječ
+    </button>
+    <button
+      type="button"
+      (click)="goHome()"
+      title="Natrag na izbornik"
+      aria-label="Natrag na izbornik"
+      class="w-12 h-12 rounded-full overflow-hidden ring-2 ring-white shadow-lg
+             bg-white/40 hover:scale-110 active:scale-95 transition shrink-0"
+    >
+      <img src="/familie.jpg" alt="Natrag na izbornik" class="w-full h-full object-cover" />
+    </button>
+  </header>
+
+  <div class="flex-1 w-full flex flex-col items-center gap-3 px-3 pb-4 pt-1 overflow-y-auto">
+    <!-- Hinweis: großes Emoji + Kategorie -->
+    <div class="hint">
+      <div class="hint-emoji">{{ current().emoji }}</div>
+      <div class="hint-cat">Što je to? <b>{{ current().category }}</b></div>
+    </div>
+
+    <!-- Galgenmännchen + Herzen -->
+    <div class="stage">
+      <svg viewBox="0 0 200 220" class="gallows" aria-hidden="true">
+        <!-- Galgen -->
+        <g stroke="#8a5a2b" stroke-width="8" stroke-linecap="round" fill="none">
+          <line x1="20" y1="212" x2="100" y2="212" />
+          <line x1="40" y1="212" x2="40" y2="20" />
+          <line x1="40" y1="20" x2="132" y2="20" />
+          <line x1="132" y1="20" x2="132" y2="42" stroke="#b9842f" stroke-width="5" />
+        </g>
+        <!-- Männchen (erscheint Stück für Stück) -->
+        <g stroke="#1d4ed8" stroke-width="6" stroke-linecap="round" fill="none">
+          @if (wrong() >= 1) {
+            <circle cx="132" cy="60" r="18" fill="#ffe1b3" />
+            <!-- Gesicht -->
+            <circle cx="126" cy="57" r="2.4" fill="#1d4ed8" stroke="none" />
+            <circle cx="138" cy="57" r="2.4" fill="#1d4ed8" stroke="none" />
+            @if (status() === 'lost') {
+              <path d="M124 70 q8 -7 16 0" stroke="#1d4ed8" stroke-width="3" />
+            } @else {
+              <path d="M124 66 q8 7 16 0" stroke="#1d4ed8" stroke-width="3" />
+            }
+          }
+          @if (wrong() >= 2) { <line x1="132" y1="78" x2="132" y2="132" /> }
+          @if (wrong() >= 3) { <line x1="132" y1="92" x2="110" y2="112" /> }
+          @if (wrong() >= 4) { <line x1="132" y1="92" x2="154" y2="112" /> }
+          @if (wrong() >= 5) { <line x1="132" y1="132" x2="113" y2="162" /> }
+          @if (wrong() >= 6) { <line x1="132" y1="132" x2="151" y2="162" /> }
+        </g>
+      </svg>
+
+      <div class="hearts" aria-label="preostali pokušaji">
+        @for (full of hearts(); track $index) {
+          <span class="heart">{{ full ? '❤️' : '🤍' }}</span>
+        }
+      </div>
+    </div>
+
+    <!-- Gesuchtes Wort -->
+    <div class="word">
+      @for (s of slots(); track $index) {
+        @if (s.char === ' ') {
+          <span class="space"></span>
+        } @else {
+          <span class="slot" [class.slot--missed]="s.missed">{{ s.shown ? s.char : '' }}</span>
+        }
+      }
+    </div>
+
+    <!-- Tastatur -->
+    <div class="keyboard">
+      @for (l of letters; track l) {
+        <button
+          type="button"
+          class="key"
+          [class.key--wrong]="isWrongLetter(l)"
+          [class.key--right]="isUsed(l) && !isWrongLetter(l)"
+          [disabled]="isUsed(l) || status() !== 'playing'"
+          (click)="guess(l)"
+        >
+          {{ l }}
+        </button>
+      }
+    </div>
+  </div>
+
+  <!-- Gewonnen / Verloren -->
+  @if (status() !== 'playing') {
+    <div class="overlay">
+      <div class="panel" [class.panel--win]="status() === 'won'" [class.panel--lose]="status() === 'lost'">
+        @if (status() === 'won') {
+          <div class="result-emoji">🎉</div>
+          <h2 class="result-title">Bravo! Pogodila si!</h2>
+          <p class="result-word">{{ current().emoji }} {{ current().word }}</p>
+        } @else {
+          <div class="result-emoji">🙈</div>
+          <h2 class="result-title">Riječ je bila:</h2>
+          <p class="result-word">{{ current().emoji }} {{ current().word }}</p>
+        }
+        <button type="button" class="btn btn-primary" (click)="newWord()">
+          🔄 Nova riječ
+        </button>
+        <button type="button" class="btn btn-ghost" (click)="goHome()">
+          Natrag na početak
+        </button>
+      </div>
+    </div>
+  }
+</main>

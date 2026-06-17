@@ -142,6 +142,8 @@
     "connect4": "Vier gewinnt",
     "connect4Sub": "Bring vier in eine Reihe",
     "puzzle": "Puzzle",
-    "puzzleSub": "Setz das Bild zusammen"
+    "puzzleSub": "Setz das Bild zusammen",
+    "hangman": "Wörter raten",
+    "hangmanSub": "Buchstabe für Buchstabe"
   }
 }

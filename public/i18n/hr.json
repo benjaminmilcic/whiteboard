@@ -142,6 +142,8 @@
     "connect4": "Četiri u nizu",
     "connect4Sub": "Složi četiri u red",
     "puzzle": "Slagalica",
-    "puzzleSub": "Složi sličicu"
+    "puzzleSub": "Složi sličicu",
+    "hangman": "Pogodi riječ",
+    "hangmanSub": "Slovo po slovo"
   }
 }
