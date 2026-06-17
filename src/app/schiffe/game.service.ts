@@ -26,6 +26,8 @@ import {
 } from './models';
 
 const STORAGE_KEY = 'sv-game-id';
+const NAME_KEY = 'sv-player-name'; // gemerkter Spielername (muss nicht neu eingetippt werden)
+const EMOJI_KEY = 'sv-player-emoji'; // gemerktes Spieler-Emoji
 const CODE_CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZ'; // ohne I, O (Verwechslungsgefahr)
 
 @Injectable({ providedIn: 'root' })
@@ -81,6 +83,23 @@ export class GameService {
     () => !!this.game()?.winner && this.game()!.winner === this.uid(),
   );
 
+  // ---- Spieler-Profil (gemerkt im localStorage) ----------------------
+
+  /** Zuletzt verwendeter Name – damit man ihn nicht neu eintippen muss. */
+  get savedName(): string {
+    return localStorage.getItem(NAME_KEY) ?? '';
+  }
+  /** Zuletzt verwendetes Emoji (leer = Standard nehmen). */
+  get savedEmoji(): string {
+    return localStorage.getItem(EMOJI_KEY) ?? '';
+  }
+
+  private rememberProfile(name: string, emoji: string): void {
+    const trimmed = name.trim();
+    if (trimmed) localStorage.setItem(NAME_KEY, trimmed);
+    if (emoji) localStorage.setItem(EMOJI_KEY, emoji);
+  }
+
   // ---- Initialisierung -----------------------------------------------
 
   async init(): Promise<void> {
@@ -127,6 +146,7 @@ export class GameService {
   async createGame(name: string, emoji: string): Promise<void> {
     const me = this.uid();
     if (!me) return;
+    this.rememberProfile(name, emoji);
     this.busy.set(true);
     this.error.set(null);
     try {
@@ -160,6 +180,7 @@ export class GameService {
       this.error.set('Der Code hat 4 Buchstaben.');
       return;
     }
+    this.rememberProfile(name, emoji);
     this.busy.set(true);
     this.error.set(null);
     try {
