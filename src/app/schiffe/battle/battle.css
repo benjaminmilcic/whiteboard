@@ -1,1 +1,12 @@
 /* Eigene Stile für die Kampf-Phase kommen hier rein. */
+
+/* Nur auf dem Smartphone (< 640px): Die beiden Raster stehen untereinander
+   und werden sonst zu hoch -> man müsste scrollen. Wir begrenzen jedes Raster
+   höhenabhängig (vh), damit beide gleichzeitig auf den Bildschirm passen.
+   Auf Tablet/Desktop (>= 640px) greift diese Regel nicht – dort bleibt es bei
+   max-w-sm wie bisher. */
+@media (max-width: 639px) {
+  .board-card {
+    max-width: min(92vw, 30vh);
+  }
+}

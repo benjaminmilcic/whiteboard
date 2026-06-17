@@ -1,26 +1,26 @@
 <div class="w-full max-w-5xl mx-auto" *transloco="let t">
   <!-- Zug-Anzeige -->
-  <div class="text-center mb-3">
+  <div class="text-center mb-2 sm:mb-3">
     @if (game.isMyTurn()) {
-      <div class="inline-block bg-emerald-500 text-white text-xl font-extrabold
-                  px-6 py-2 rounded-full shadow animate-wackeln">
+      <div class="inline-block bg-emerald-500 text-white text-base sm:text-xl font-extrabold
+                  px-4 sm:px-6 py-1.5 sm:py-2 rounded-full shadow animate-wackeln">
         {{ t('battle.yourTurn') }}
       </div>
     } @else {
-      <div class="inline-block bg-white/90 text-slate-700 text-xl font-bold
-                  px-6 py-2 rounded-full shadow">
+      <div class="inline-block bg-white/90 text-slate-700 text-base sm:text-xl font-bold
+                  px-4 sm:px-6 py-1.5 sm:py-2 rounded-full shadow">
         {{ t('battle.opponentTurn', { emoji: game.opponent()?.emoji, name: game.opponent()?.name }) }}
       </div>
     }
   </div>
 
-  <div class="flex flex-col lg:flex-row gap-5 items-center lg:items-start justify-center">
+  <div class="flex flex-col lg:flex-row gap-3 sm:gap-5 items-center lg:items-start justify-center">
     <!-- Gegnerisches Feld (hier schießt man) -->
-    <div class="bg-white/95 rounded-3xl shadow-xl p-4 w-full max-w-sm">
-      <h3 class="font-extrabold text-center text-slate-700 mb-1">
+    <div class="board-card bg-white/95 rounded-3xl shadow-xl p-2 sm:p-4 w-full max-w-sm">
+      <h3 class="font-extrabold text-center text-slate-700 text-sm sm:text-base mb-0.5 sm:mb-1">
         {{ t('battle.enemySea', { name: game.opponent()?.name }) }}
       </h3>
-      <p class="text-center text-sm text-slate-500 mb-2">
+      <p class="text-center text-xs sm:text-sm text-slate-500 mb-1 sm:mb-2">
         {{ t('battle.sunk', { n: enemySunk(), total: totalShips() }) }}
       </p>
       <app-board
@@ -31,11 +31,11 @@
     </div>
 
     <!-- Eigenes Feld -->
-    <div class="bg-white/80 rounded-3xl shadow-xl p-4 w-full max-w-sm">
-      <h3 class="font-extrabold text-center text-slate-700 mb-1">
+    <div class="board-card bg-white/80 rounded-3xl shadow-xl p-2 sm:p-4 w-full max-w-sm">
+      <h3 class="font-extrabold text-center text-slate-700 text-sm sm:text-base mb-0.5 sm:mb-1">
         {{ game.me()?.emoji }} {{ t('battle.yourSea') }}
       </h3>
-      <p class="text-center text-sm text-slate-500 mb-2">
+      <p class="text-center text-xs sm:text-sm text-slate-500 mb-1 sm:mb-2">
         {{ t('battle.alive', { n: myAlive(), total: totalShips() }) }}
       </p>
       <app-board [rows]="myRows()" [interactive]="false" />
