@@ -9,6 +9,7 @@ import {
 } from '@angular/core';
 import { Router } from '@angular/router';
 import { EffectsService } from '../memory/effects/effects.service';
+import { DraggableDirective } from '../shared/draggable.directive';
 import { WORDS, type HangmanWord } from './words';
 
 // Kroatische Buchstaben-Tastatur (ohne Digrafe dž/lj/nj – einzeln raten).
@@ -20,7 +21,7 @@ type Status = 'playing' | 'won' | 'lost';
 @Component({
   selector: 'app-hangman',
   standalone: true,
-  imports: [],
+  imports: [DraggableDirective],
   templateUrl: './hangman.html',
   styleUrl: './hangman.css',
   changeDetection: ChangeDetectionStrategy.OnPush,

@@ -2,8 +2,9 @@
   class="min-h-dvh w-full bg-gradient-to-b from-sky-300 via-sky-400 to-indigo-500
          flex flex-col overflow-x-hidden"
 >
-  <!-- Buttonleiste: Nova riječ · Hauptmenü (Hangman ist immer kroatisch) -->
-  <header class="w-full flex justify-end items-center gap-4 px-3 pt-3 shrink-0">
+  <!-- Buttonleiste: Nova riječ · Hauptmenü (Hangman ist immer kroatisch).
+       relative z-50 hält sie über dem Ergebnis-Overlay erreichbar. -->
+  <header class="relative z-50 w-full flex justify-end items-center gap-4 px-3 pt-3 shrink-0">
     <button
       type="button"
       (click)="newWord()"
@@ -138,7 +139,7 @@
   <!-- Gewonnen / Verloren -->
   @if (status() !== 'playing') {
     <div class="overlay">
-      <div class="panel" [class.panel--win]="status() === 'won'" [class.panel--lose]="status() === 'lost'">
+      <div class="panel" appDraggable [class.panel--win]="status() === 'won'" [class.panel--lose]="status() === 'lost'">
         @if (status() === 'won') {
           <div class="result-emoji">🎉</div>
           <h2 class="result-title">Bravo! Pogodila si!</h2>

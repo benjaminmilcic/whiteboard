@@ -9,6 +9,7 @@ import {
 import { TranslocoModule } from '@jsverse/transloco';
 import { COLS, GameService, ROWS } from '../../game/game.service';
 import { EffectsService } from '../../../memory/effects/effects.service';
+import { DraggableDirective } from '../../../shared/draggable.directive';
 import type { C4Color } from '../../game/game.types';
 
 type Outcome = 'win' | 'lose' | 'tie';
@@ -16,7 +17,7 @@ type Outcome = 'win' | 'lose' | 'tie';
 @Component({
   selector: 'app-c4-board',
   standalone: true,
-  imports: [TranslocoModule],
+  imports: [TranslocoModule, DraggableDirective],
   templateUrl: './board.html',
   styleUrl: './board.css',
   changeDetection: ChangeDetectionStrategy.OnPush,

@@ -8,6 +8,7 @@ import { LanguageSwitcherComponent } from './language-switcher/language-switcher
 import { LobbyComponent } from './lobby/lobby';
 import { ResultComponent } from './result/result';
 import { SetupComponent } from './setup/setup';
+import { DraggableDirective } from '../shared/draggable.directive';
 
 type View = 'loading' | 'lobby' | 'waiting' | 'setup' | 'waitOpponent' | 'battle' | 'finished';
 
@@ -22,6 +23,7 @@ type View = 'loading' | 'lobby' | 'waiting' | 'setup' | 'waitOpponent' | 'battle
     ConfirmDialogComponent,
     LanguageSwitcherComponent,
     TranslocoModule,
+    DraggableDirective,
   ],
   templateUrl: './schiffe.html',
   styleUrl: './schiffe.css',

@@ -2,8 +2,9 @@
   class="min-h-screen w-full bg-gradient-to-b from-sky-400 via-ozean to-ozean-deep
          flex flex-col overflow-x-hidden"
 >
-  <!-- Kopfzeile mit Sprachumschalter (eigene Zeile, überlappt nichts) -->
-  <header class="w-full flex justify-end items-center gap-4 px-3 pt-3 shrink-0">
+  <!-- Kopfzeile mit Sprachumschalter (eigene Zeile, überlappt nichts).
+       relative z-50 hält sie über dem Ergebnis-Overlay erreichbar. -->
+  <header class="relative z-50 w-full flex justify-end items-center gap-4 px-3 pt-3 shrink-0">
     <!-- Spiel beenden (nur im Kampf) – links neben dem Sprachmenü, kindgerecht -->
     @if (view() === 'battle') {
       <button
@@ -86,10 +87,21 @@
     }
 
     @case ('finished') {
-      <app-result />
+      <!-- Raster bleiben sichtbar – das Ergebnis liegt als Overlay darüber. -->
+      <app-battle />
     }
     }
   </div>
+
+  <!-- Ergebnis-Dialog über dem Spielgeschehen (Raster bleiben mit Backdrop sichtbar).
+       Verschiebbar, damit man den Endstand prüfen kann. -->
+  @if (view() === 'finished') {
+    <div class="fixed inset-0 z-40 flex items-center justify-center p-4 bg-slate-900/40">
+      <div class="w-full max-w-md" appDraggable>
+        <app-result />
+      </div>
+    </div>
+  }
 
   <app-confirm-dialog />
 </main>
