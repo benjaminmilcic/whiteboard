@@ -1,7 +1,7 @@
 {
-  "name": "Crtanje i Brodovi",
-  "short_name": "Igre",
-  "description": "Ploča za crtanje i potapanje brodova - sve u jednoj aplikaciji.",
+  "name": "Igre za Lisu",
+  "short_name": "Igre za Lisu",
+  "description": "Crtanje, brodovi, memorija, četiri u nizu i slagalica - sve u jednoj aplikaciji.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
