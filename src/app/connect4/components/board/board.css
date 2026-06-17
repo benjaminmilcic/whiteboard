@@ -120,8 +120,13 @@
   transition: background 0.12s ease;
 }
 
-.board:not(.board--locked) .column:not(:disabled):hover {
-  background: rgba(255, 255, 255, 0.18);
+/* Hover-Highlight nur auf Geräten mit echtem Zeiger (Maus).
+   Auf Touch-Geräten (Tablet) bleibt der :hover sonst an der zuletzt
+   angetippten Spalte „kleben" und würde sie fälschlich hervorheben. */
+@media (hover: hover) and (pointer: fine) {
+  .board:not(.board--locked) .column:not(:disabled):hover {
+    background: rgba(255, 255, 255, 0.18);
+  }
 }
 
 .column:disabled {
