@@ -130,5 +130,16 @@
     "tie": "Unentschieden!",
     "playAgain": "Nochmal spielen",
     "home": "Zurück zum Start"
+  },
+  "home": {
+    "title": "Was möchtest du spielen?",
+    "whiteboard": "Malen",
+    "whiteboardSub": "Zeichentafel",
+    "schiffe": "Schiffe",
+    "schiffeSub": "Schiffe versenken",
+    "memory": "Memory",
+    "memorySub": "Finde die Paare",
+    "connect4": "Vier gewinnt",
+    "connect4Sub": "Bring vier in eine Reihe"
   }
 }

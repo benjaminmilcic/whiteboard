@@ -1,9 +1,12 @@
 <main
-  class="min-h-dvh w-full bg-gradient-to-b from-sky-300 via-sky-400 to-indigo-500
+  class="relative min-h-dvh w-full bg-gradient-to-b from-sky-300 via-sky-400 to-indigo-500
          flex flex-col items-center justify-center gap-8 px-4 py-10"
 >
+  <!-- Sprachleiste oben rechts -->
+  <app-language-switcher class="absolute top-3 right-3 z-10" />
+
   <h1 class="text-4xl sm:text-5xl font-extrabold text-white drop-shadow-lg text-center">
-    Što želiš igrati?
+    {{ 'home.title' | transloco }}
   </h1>
 
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 w-full max-w-6xl">
@@ -16,11 +19,11 @@
     >
       <img
         src="/icon-512.png"
-        alt="Ploča za crtanje"
+        [alt]="'home.whiteboardSub' | transloco"
         class="w-40 h-40 sm:w-48 sm:h-48 rounded-[1.6rem] shadow-lg"
       />
-      <span class="text-2xl sm:text-3xl font-extrabold text-slate-700">Crtanje</span>
-      <span class="text-base text-slate-500 -mt-2">Ploča za crtanje</span>
+      <span class="text-2xl sm:text-3xl font-extrabold text-slate-700">{{ 'home.whiteboard' | transloco }}</span>
+      <span class="text-base text-slate-500 -mt-2">{{ 'home.whiteboardSub' | transloco }}</span>
     </button>
 
     <!-- Schiffe versenken -->
@@ -32,11 +35,11 @@
     >
       <img
         src="/schiffe-icon-512.png"
-        alt="Potapanje brodova"
+        [alt]="'home.schiffeSub' | transloco"
         class="w-40 h-40 sm:w-48 sm:h-48 rounded-[1.6rem] shadow-lg"
       />
-      <span class="text-2xl sm:text-3xl font-extrabold text-slate-700">Brodovi</span>
-      <span class="text-base text-slate-500 -mt-2">Potapanje brodova</span>
+      <span class="text-2xl sm:text-3xl font-extrabold text-slate-700">{{ 'home.schiffe' | transloco }}</span>
+      <span class="text-base text-slate-500 -mt-2">{{ 'home.schiffeSub' | transloco }}</span>
     </button>
 
     <!-- Memory -->
@@ -48,11 +51,11 @@
     >
       <img
         src="/memory-icon-512.png"
-        alt="Memorija"
+        [alt]="'home.memory' | transloco"
         class="w-40 h-40 sm:w-48 sm:h-48 rounded-[1.6rem] shadow-lg"
       />
-      <span class="text-2xl sm:text-3xl font-extrabold text-slate-700">Memorija</span>
-      <span class="text-base text-slate-500 -mt-2">Pronađi parove</span>
+      <span class="text-2xl sm:text-3xl font-extrabold text-slate-700">{{ 'home.memory' | transloco }}</span>
+      <span class="text-base text-slate-500 -mt-2">{{ 'home.memorySub' | transloco }}</span>
     </button>
 
     <!-- Vier gewinnt -->
@@ -64,11 +67,11 @@
     >
       <img
         src="/connect4-icon.svg"
-        alt="Četiri u nizu"
+        [alt]="'home.connect4' | transloco"
         class="w-40 h-40 sm:w-48 sm:h-48 rounded-[1.6rem] shadow-lg"
       />
-      <span class="text-2xl sm:text-3xl font-extrabold text-slate-700">Četiri u nizu</span>
-      <span class="text-base text-slate-500 -mt-2">Složi četiri u red</span>
+      <span class="text-2xl sm:text-3xl font-extrabold text-slate-700">{{ 'home.connect4' | transloco }}</span>
+      <span class="text-base text-slate-500 -mt-2">{{ 'home.connect4Sub' | transloco }}</span>
     </button>
   </div>
 </main>

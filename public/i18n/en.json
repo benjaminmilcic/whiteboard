@@ -130,5 +130,16 @@
     "tie": "It's a tie!",
     "playAgain": "Play again",
     "home": "Back to start"
+  },
+  "home": {
+    "title": "What do you want to play?",
+    "whiteboard": "Drawing",
+    "whiteboardSub": "Drawing board",
+    "schiffe": "Ships",
+    "schiffeSub": "Battleship",
+    "memory": "Memory",
+    "memorySub": "Find the pairs",
+    "connect4": "Connect Four",
+    "connect4Sub": "Line up four"
   }
 }

@@ -1,10 +1,12 @@
 import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
+import { TranslocoModule } from '@jsverse/transloco';
+import { LanguageSwitcherComponent } from '../schiffe/language-switcher/language-switcher';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [],
+  imports: [TranslocoModule, LanguageSwitcherComponent],
   templateUrl: './home.html',
   styleUrl: './home.css',
 })
