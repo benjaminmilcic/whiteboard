@@ -33,33 +33,71 @@
 
     <!-- Galgenmännchen + Herzen -->
     <div class="stage">
+      <!-- Schneemann, der bei jedem Fehler ein Stück schmilzt
+           (0 Fehler = ganzer Schneemann, 6 Fehler = nur noch eine Pfütze) -->
       <svg viewBox="0 0 200 220" class="gallows" aria-hidden="true">
-        <!-- Galgen -->
-        <g stroke="#8a5a2b" stroke-width="8" stroke-linecap="round" fill="none">
-          <line x1="20" y1="212" x2="100" y2="212" />
-          <line x1="40" y1="212" x2="40" y2="20" />
-          <line x1="40" y1="20" x2="132" y2="20" />
-          <line x1="132" y1="20" x2="132" y2="42" stroke="#b9842f" stroke-width="5" />
+        <!-- Sonne, die den Schneemann schmelzen lässt -->
+        <g>
+          <circle cx="36" cy="34" r="16" fill="#ffd23f" />
+          <g stroke="#ffd23f" stroke-width="3" stroke-linecap="round">
+            <line x1="36" y1="8" x2="36" y2="2" />
+            <line x1="36" y1="60" x2="36" y2="66" />
+            <line x1="10" y1="34" x2="4" y2="34" />
+            <line x1="62" y1="34" x2="68" y2="34" />
+            <line x1="17" y1="15" x2="13" y2="11" />
+            <line x1="55" y1="15" x2="59" y2="11" />
+            <line x1="17" y1="53" x2="13" y2="57" />
+            <line x1="55" y1="53" x2="59" y2="57" />
+          </g>
         </g>
-        <!-- Männchen (erscheint Stück für Stück) -->
-        <g stroke="#1d4ed8" stroke-width="6" stroke-linecap="round" fill="none">
-          @if (wrong() >= 1) {
-            <circle cx="132" cy="60" r="18" fill="#ffe1b3" />
-            <!-- Gesicht -->
-            <circle cx="126" cy="57" r="2.4" fill="#1d4ed8" stroke="none" />
-            <circle cx="138" cy="57" r="2.4" fill="#1d4ed8" stroke="none" />
-            @if (status() === 'lost') {
-              <path d="M124 70 q8 -7 16 0" stroke="#1d4ed8" stroke-width="3" />
-            } @else {
-              <path d="M124 66 q8 7 16 0" stroke="#1d4ed8" stroke-width="3" />
-            }
-          }
-          @if (wrong() >= 2) { <line x1="132" y1="78" x2="132" y2="132" /> }
-          @if (wrong() >= 3) { <line x1="132" y1="92" x2="110" y2="112" /> }
-          @if (wrong() >= 4) { <line x1="132" y1="92" x2="154" y2="112" /> }
-          @if (wrong() >= 5) { <line x1="132" y1="132" x2="113" y2="162" /> }
-          @if (wrong() >= 6) { <line x1="132" y1="132" x2="151" y2="162" /> }
-        </g>
+
+        <!-- Pfütze (wächst, je mehr geschmolzen ist) -->
+        @if (wrong() >= 2) {
+          <ellipse cx="100" cy="206" [attr.rx]="puddleRx()" ry="7" fill="#bfe3ff" />
+        }
+
+        <!-- Unterer Ball / am Ende nur noch ein kleiner Haufen -->
+        @if (wrong() < 5) {
+          <circle cx="100" cy="170" r="32" fill="#ffffff" stroke="#d7e8ff" stroke-width="2" />
+        } @else if (wrong() < 6) {
+          <path d="M70 200 q30 -34 60 0 z" fill="#ffffff" stroke="#d7e8ff" stroke-width="2" />
+        }
+
+        <!-- Mittlerer Ball + Knöpfe -->
+        @if (wrong() < 4) {
+          <circle cx="100" cy="124" r="24" fill="#ffffff" stroke="#d7e8ff" stroke-width="2" />
+          <circle cx="100" cy="116" r="2.4" fill="#3a4a66" />
+          <circle cx="100" cy="126" r="2.4" fill="#3a4a66" />
+          <circle cx="100" cy="136" r="2.4" fill="#3a4a66" />
+        }
+
+        <!-- Arme (Äste) -->
+        @if (wrong() < 2) {
+          <g stroke="#9a5a2b" stroke-width="4" stroke-linecap="round" fill="none">
+            <line x1="78" y1="120" x2="52" y2="106" />
+            <line x1="52" y1="106" x2="46" y2="98" />
+            <line x1="122" y1="120" x2="148" y2="106" />
+            <line x1="148" y1="106" x2="154" y2="98" />
+          </g>
+        }
+
+        <!-- Kopf + Gesicht + Möhrennase -->
+        @if (wrong() < 3) {
+          <circle cx="100" cy="84" r="18" fill="#ffffff" stroke="#d7e8ff" stroke-width="2" />
+          <circle cx="93" cy="80" r="2.6" fill="#3a4a66" />
+          <circle cx="107" cy="80" r="2.6" fill="#3a4a66" />
+          <polygon points="100,86 118,89 100,92" fill="#ff8c2b" />
+          <path d="M92 94 q8 6 16 0" stroke="#3a4a66" stroke-width="2.4" fill="none" stroke-linecap="round" />
+        }
+
+        <!-- Mütze -->
+        @if (wrong() < 1) {
+          <g>
+            <rect x="82" y="66" width="36" height="6" rx="3" fill="#e23b4e" />
+            <rect x="88" y="50" width="24" height="18" rx="4" fill="#e23b4e" />
+            <circle cx="100" cy="49" r="5" fill="#ffffff" />
+          </g>
+        }
       </svg>
 
       <div class="hearts" aria-label="preostali pokušaji">

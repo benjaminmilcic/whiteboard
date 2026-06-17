@@ -47,6 +47,9 @@ export class HangmanComponent implements OnDestroy {
 
   readonly remaining = computed<number>(() => this.maxWrong - this.wrong());
 
+  /** Breite der Schmelz-Pfütze – wächst mit der Zahl der Fehler. */
+  readonly puddleRx = computed<number>(() => 8 + this.wrong() * 8);
+
   readonly won = computed<boolean>(() => {
     const w = this.current().word;
     const g = this.guessed();
