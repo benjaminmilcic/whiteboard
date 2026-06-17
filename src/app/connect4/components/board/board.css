@@ -326,6 +326,6 @@
 
 .btn-ghost {
   background: transparent;
-  color: #16318b;
-  text-decoration: underline;
+  color: #0f4ff5;
+  box-shadow: inset 0 0 0 3px #b9d8ff;
 }
