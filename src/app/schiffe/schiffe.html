@@ -59,7 +59,12 @@
                     rounded-2xl py-4 mb-4">
           {{ game.game()?.code }}
         </div>
-        <button type="button" (click)="game.leaveGame()" class="text-slate-500 underline">
+        <button
+          type="button"
+          (click)="game.leaveGame()"
+          class="w-full bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold
+                 rounded-2xl py-3 active:scale-95 transition"
+        >
           {{ 'waiting.cancel' | transloco }}
         </button>
       </div>
@@ -76,7 +81,12 @@
         <p class="text-slate-500 mb-4">
           {{ 'waitOpponent.text' | transloco: { name: game.opponent()?.name } }}
         </p>
-        <button type="button" (click)="game.leaveGame()" class="text-slate-500 underline">
+        <button
+          type="button"
+          (click)="game.leaveGame()"
+          class="w-full bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold
+                 rounded-2xl py-3 active:scale-95 transition"
+        >
           {{ 'waitOpponent.cancel' | transloco }}
         </button>
       </div>
