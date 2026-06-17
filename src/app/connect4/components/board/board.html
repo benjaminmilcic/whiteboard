@@ -1,0 +1,109 @@
+@if (game(); as g) {
+  <div class="board-screen">
+    <!-- Kopfzeile: beide Spieler + wer dran ist -->
+    <header class="bar">
+      <div class="players">
+        <div class="player" [class.player--active]="g.currentTurn === svc.me()?.id">
+          <span class="disc disc--{{ svc.me()?.color }}">{{ svc.me()?.emoji }}</span>
+          <span class="player-name">{{ svc.me()?.name }}</span>
+        </div>
+
+        <span class="vs">⚔️</span>
+
+        @if (svc.opponent(); as opp) {
+          <div class="player" [class.player--active]="g.currentTurn === opp.id">
+            <span class="disc disc--{{ opp.color }}">{{ opp.emoji }}</span>
+            <span class="player-name">{{ opp.name }}</span>
+          </div>
+        } @else {
+          <div class="player player--empty">
+            <span class="player-name">{{ 'connect4.waitingPlayer' | transloco }}</span>
+          </div>
+        }
+      </div>
+
+      <div class="turn" [class.turn--mine]="g.currentTurn === svc.me()?.id">
+        @if (g.currentTurn === svc.me()?.id) {
+          {{ 'connect4.yourTurn' | transloco }}
+        } @else {
+          {{ 'connect4.othersTurn' | transloco: { name: currentName() || ('connect4.player' | transloco) } }}
+        }
+      </div>
+    </header>
+
+    <!-- Spielfeld: 7 anklickbare Spalten -->
+    <main class="field-wrap">
+      <div class="board" [class.board--locked]="!svc.isMyTurn()">
+        @for (c of cols; track c) {
+          <button
+            type="button"
+            class="column"
+            [disabled]="!canDrop(c)"
+            (click)="drop(c)"
+            [attr.aria-label]="'Spalte ' + (c + 1)"
+          >
+            @for (r of rows; track r) {
+              <span class="hole">
+                @if (colorAt(r, c); as col) {
+                  <span
+                    class="disc disc--{{ col }}"
+                    [class.disc--win]="isWin(r, c)"
+                    [class.disc--last]="isLastMove(r, c)"
+                  >{{ emojiAt(r, c) }}</span>
+                }
+              </span>
+            }
+          </button>
+        }
+      </div>
+    </main>
+
+    <!-- Warten auf Mitspieler -->
+    @if (g.status === 'waiting') {
+      <div class="overlay">
+        <div class="panel">
+          <h2 class="panel-title">{{ 'connect4.codeTitle' | transloco }}</h2>
+          <p class="code">{{ g.code }}</p>
+          <p class="panel-text">{{ 'connect4.codeShare' | transloco }}</p>
+          <div class="spinner" aria-hidden="true"></div>
+          <button type="button" class="btn btn-ghost" (click)="leave()">
+            {{ 'connect4.cancel' | transloco }}
+          </button>
+        </div>
+      </div>
+    }
+
+    <!-- Spielende -->
+    @if (g.status === 'finished') {
+      <div class="overlay">
+        <div
+          class="panel"
+          [class.panel--win]="outcome() === 'win'"
+          [class.panel--lose]="outcome() === 'lose'"
+          [class.panel--tie]="outcome() === 'tie'"
+        >
+          @switch (outcome()) {
+            @case ('win') { <div class="result-emoji anim-win">🏆</div> }
+            @case ('lose') { <div class="result-emoji anim-lose">😢</div> }
+            @case ('tie') { <div class="result-emoji anim-tie">🤝</div> }
+          }
+
+          <h2 class="result-title">
+            @switch (outcome()) {
+              @case ('win') { {{ 'connect4.won' | transloco: { name: svc.me()?.name } }} }
+              @case ('lose') { {{ 'connect4.lost' | transloco: { name: svc.opponent()?.name } }} }
+              @case ('tie') { {{ 'connect4.tie' | transloco }} }
+            }
+          </h2>
+
+          <button type="button" class="btn btn-primary" (click)="playAgain()">
+            {{ 'connect4.playAgain' | transloco }}
+          </button>
+          <button type="button" class="btn btn-ghost" (click)="leave()">
+            {{ 'connect4.home' | transloco }}
+          </button>
+        </div>
+      </div>
+    }
+  </div>
+}

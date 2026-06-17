@@ -11,7 +11,7 @@ import { Router } from '@angular/router';
 export class HomeComponent {
   private router = inject(Router);
 
-  go(target: 'whiteboard' | 'schiffe' | 'memory') {
+  go(target: 'whiteboard' | 'schiffe' | 'memory' | 'connect4') {
     this.router.navigate([target]);
   }
 }

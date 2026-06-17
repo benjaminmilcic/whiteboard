@@ -9,7 +9,8 @@
    Das Whiteboard bleibt bei der Material-/Roboto-Schrift. */
 app-home,
 app-schiffe,
-app-memory {
+app-memory,
+app-connect4 {
   @apply font-spiel text-slate-800;
   -webkit-tap-highlight-color: transparent;
 }
@@ -17,7 +18,8 @@ app-memory {
 /* Buttons werden auf dem Tablet nicht aus Versehen markiert */
 app-home button,
 app-schiffe button,
-app-memory button {
+app-memory button,
+app-connect4 button {
   user-select: none;
 }
 

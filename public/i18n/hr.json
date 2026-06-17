@@ -102,5 +102,33 @@
     "tie": "Neriješeno!",
     "playAgain": "Igraj ponovno",
     "home": "Natrag na početak"
+  },
+  "connect4": {
+    "title": "Četiri u nizu",
+    "subtitle": "Složi četiri svoje pločice u red – vodoravno, okomito ili koso.",
+    "nameLabel": "Kako se zoveš?",
+    "namePlaceholder": "Tvoje ime",
+    "chooseAvatar": "Odaberi svoj znak",
+    "newGame": "Pokreni novu igru",
+    "creating": "Trenutak …",
+    "joinPrompt": "Pridruži se igri",
+    "codeLabel": "Kod igre (4 slova)",
+    "codePlaceholder": "npr. KBHT",
+    "connecting": "Povezivanje …",
+    "join": "Igraj zajedno",
+    "back": "Natrag",
+    "endGame": "🚪 Završi igru",
+    "waitingPlayer": "čeka …",
+    "yourTurn": "Ti si na redu!",
+    "othersTurn": "{{name}} je na redu …",
+    "player": "Suigrač",
+    "codeTitle": "Kod igre",
+    "codeShare": "Upiši ovaj kod na drugom uređaju – i počinjemo!",
+    "cancel": "Odustani",
+    "won": "{{name}} je pobijedio!",
+    "lost": "{{name}} je pobijedio!",
+    "tie": "Neriješeno!",
+    "playAgain": "Igraj ponovno",
+    "home": "Natrag na početak"
   }
 }

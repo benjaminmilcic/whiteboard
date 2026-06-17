@@ -1,0 +1,326 @@
+:host {
+  display: block;
+  height: 100%;
+}
+
+.board-screen {
+  position: relative;
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  box-sizing: border-box;
+}
+
+/* ---- Kopfzeile ---------------------------------------------------------- */
+.bar {
+  flex: 0 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+}
+
+.players {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.player {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.25rem 0.6rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.6);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.player--active {
+  background: #fff;
+  box-shadow: 0 0 0 3px #ffd34d;
+  transform: scale(1.04);
+}
+
+.player-name {
+  font-weight: 800;
+  color: #16318b;
+  max-width: 7rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.player--empty .player-name {
+  color: #5a6b96;
+  font-weight: 600;
+}
+
+.vs {
+  font-size: 1.2rem;
+}
+
+.turn {
+  font-weight: 800;
+  color: #fff;
+  background: rgba(15, 49, 139, 0.45);
+  padding: 0.35rem 0.8rem;
+  border-radius: 999px;
+}
+
+.turn--mine {
+  background: #16a34a;
+}
+
+/* Spieler-Chip im Kopf (kleine Scheibe) */
+.player .disc {
+  width: 2rem;
+  height: 2rem;
+  font-size: 1rem;
+}
+
+/* ---- Spielfeld ---------------------------------------------------------- */
+.field-wrap {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25rem;
+}
+
+.board {
+  width: 100%;
+  max-width: 34rem;
+  max-height: 100%;
+  aspect-ratio: 7 / 6;
+  display: flex;
+  gap: 0.4rem;
+  padding: 0.5rem;
+  box-sizing: border-box;
+  background: linear-gradient(160deg, #2a6cf0, #1647c4);
+  border-radius: 1.2rem;
+  box-shadow: 0 10px 24px rgba(15, 49, 139, 0.35), inset 0 2px 6px rgba(255, 255, 255, 0.25);
+}
+
+.column {
+  flex: 1 1 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  background: transparent;
+  border: 0;
+  padding: 0.15rem;
+  border-radius: 0.7rem;
+  cursor: pointer;
+  transition: background 0.12s ease;
+}
+
+.board:not(.board--locked) .column:not(:disabled):hover {
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.column:disabled {
+  cursor: default;
+}
+
+.hole {
+  flex: 1 1 0;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: #eef4ff;
+  box-shadow: inset 0 4px 7px rgba(8, 30, 86, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.disc {
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.hole .disc {
+  width: 86%;
+  height: 86%;
+  font-size: clamp(0.9rem, 4.2vw, 1.8rem);
+  box-shadow: inset 0 -3px 5px rgba(0, 0, 0, 0.2), 0 2px 3px rgba(0, 0, 0, 0.2);
+}
+
+.disc--red {
+  background: radial-gradient(circle at 35% 30%, #ff8a8a, #e11d1d);
+}
+
+.disc--yellow {
+  background: radial-gradient(circle at 35% 30%, #ffe784, #f5b50a);
+}
+
+/* zuletzt geworfener Stein „fällt" herein */
+.hole .disc--last {
+  animation: c4-drop 0.35s cubic-bezier(0.34, 1.2, 0.5, 1);
+}
+
+@keyframes c4-drop {
+  0% {
+    transform: translateY(-420%);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+/* Gewinn-Steine leuchten */
+.hole .disc--win {
+  box-shadow: 0 0 0 4px #fff, 0 0 16px 5px #fff;
+  animation: c4-pulse 0.8s ease-in-out infinite;
+}
+
+@keyframes c4-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+/* ---- Overlays (Warten / Spielende) ------------------------------------- */
+.overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(8, 24, 66, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  z-index: 5;
+}
+
+.panel {
+  width: 100%;
+  max-width: 22rem;
+  background: #fff;
+  border-radius: 1.4rem;
+  padding: 1.5rem 1.25rem;
+  text-align: center;
+  box-shadow: 0 18px 40px rgba(8, 24, 66, 0.4);
+}
+
+.panel-title {
+  margin: 0 0 0.5rem;
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #16318b;
+}
+
+.panel-text {
+  color: #51618f;
+  margin: 0.5rem 0 1rem;
+}
+
+.code {
+  font-size: 2.8rem;
+  font-weight: 800;
+  letter-spacing: 0.4rem;
+  color: #0f4ff5;
+  background: #eef4ff;
+  border-radius: 1rem;
+  padding: 0.6rem;
+  margin: 0.25rem 0;
+}
+
+.spinner {
+  width: 2.4rem;
+  height: 2.4rem;
+  margin: 0.5rem auto 1rem;
+  border: 4px solid #dbe8ff;
+  border-top-color: #0f4ff5;
+  border-radius: 50%;
+  animation: c4-spin 0.9s linear infinite;
+}
+
+@keyframes c4-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.result-emoji {
+  font-size: 4rem;
+  line-height: 1;
+}
+
+.anim-win {
+  animation: c4-bounce 0.7s ease infinite alternate;
+}
+
+.anim-lose {
+  animation: c4-shake 0.6s ease;
+}
+
+.anim-tie {
+  animation: c4-bounce 0.9s ease infinite alternate;
+}
+
+@keyframes c4-bounce {
+  to {
+    transform: translateY(-12px) scale(1.08);
+  }
+}
+
+@keyframes c4-shake {
+  0%,
+  100% {
+    transform: rotate(0);
+  }
+  25% {
+    transform: rotate(-10deg);
+  }
+  75% {
+    transform: rotate(10deg);
+  }
+}
+
+.result-title {
+  margin: 0.6rem 0 1rem;
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #16318b;
+}
+
+.btn {
+  width: 100%;
+  border: 0;
+  border-radius: 1rem;
+  padding: 0.8rem 1rem;
+  font-size: 1.1rem;
+  font-weight: 800;
+  font-family: inherit;
+  cursor: pointer;
+  margin-top: 0.5rem;
+}
+
+.btn-primary {
+  background: linear-gradient(180deg, #ffb43a, #f6900f);
+  color: #fff;
+  box-shadow: 0 6px 0 #d97706;
+}
+
+.btn-primary:active {
+  transform: translateY(3px);
+  box-shadow: 0 3px 0 #d97706;
+}
+
+.btn-ghost {
+  background: transparent;
+  color: #16318b;
+  text-decoration: underline;
+}

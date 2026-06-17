@@ -6,7 +6,7 @@
     Što želiš igrati?
   </h1>
 
-  <div class="flex flex-col sm:flex-row items-stretch justify-center gap-6 w-full max-w-5xl">
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 w-full max-w-6xl">
     <!-- Whiteboard -->
     <button
       type="button"
@@ -53,6 +53,22 @@
       />
       <span class="text-2xl sm:text-3xl font-extrabold text-slate-700">Memorija</span>
       <span class="text-base text-slate-500 -mt-2">Pronađi parove</span>
+    </button>
+
+    <!-- Vier gewinnt -->
+    <button
+      type="button"
+      (click)="go('connect4')"
+      class="flex-1 bg-white/95 rounded-[2rem] shadow-2xl p-6 flex flex-col items-center gap-4
+             hover:scale-105 active:scale-95 transition focus:outline-none focus:ring-4 focus:ring-white"
+    >
+      <img
+        src="/connect4-icon.svg"
+        alt="Četiri u nizu"
+        class="w-40 h-40 sm:w-48 sm:h-48 rounded-[1.6rem] shadow-lg"
+      />
+      <span class="text-2xl sm:text-3xl font-extrabold text-slate-700">Četiri u nizu</span>
+      <span class="text-base text-slate-500 -mt-2">Složi četiri u red</span>
     </button>
   </div>
 </main>

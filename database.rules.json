@@ -18,6 +18,14 @@
           ".validate": "newData.hasChildren(['winnerName', 'finishedAt'])"
         }
       }
+    },
+    "connect4": {
+      "games": {
+        "$code": {
+          ".read": true,
+          ".write": true
+        }
+      }
     }
   }
 }
