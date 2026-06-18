@@ -26,7 +26,7 @@ export const appConfig: ApplicationConfig = {
     provideDatabase(() => getDatabase()),
     provideTransloco({
       config: {
-        availableLangs: ['hr', 'de', 'en'],
+        availableLangs: ['hr', 'de', 'en', 'zh'],
         defaultLang: 'hr', // Kroatisch ist beim Laden voreingestellt
         fallbackLang: 'de',
         reRenderOnLangChange: true,

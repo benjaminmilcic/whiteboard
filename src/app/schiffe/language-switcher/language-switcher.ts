@@ -14,6 +14,7 @@ export class LanguageSwitcherComponent {
     { code: 'hr', label: 'Hrvatski', img: '/flags/hr.svg' },
     { code: 'de', label: 'Deutsch', img: '/flags/de.svg' },
     { code: 'en', label: 'English', img: '/flags/gb.svg' },
+    { code: 'zh', label: '中文', img: '/flags/cn.svg' },
   ];
 
   readonly active = signal(this.transloco.getActiveLang());
