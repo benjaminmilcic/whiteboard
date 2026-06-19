@@ -42,6 +42,14 @@
           ".write": true
         }
       }
+    },
+    "schach": {
+      "games": {
+        "$code": {
+          ".read": true,
+          ".write": true
+        }
+      }
     }
   }
 }

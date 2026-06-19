@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <rect width="512" height="512" rx="64" fill="#334155"/>
+  <rect x="48" y="48" width="416" height="416" rx="24" fill="#eaeef4"/>
+  <!-- Schachbrettmuster (dunkle Felder) -->
+  <g fill="#7c93ad">
+    <rect x="48" y="48" width="104" height="104"/>
+    <rect x="256" y="48" width="104" height="104"/>
+    <rect x="152" y="152" width="104" height="104"/>
+    <rect x="360" y="152" width="104" height="104"/>
+    <rect x="48" y="256" width="104" height="104"/>
+    <rect x="256" y="256" width="104" height="104"/>
+    <rect x="152" y="360" width="104" height="104"/>
+    <rect x="360" y="360" width="104" height="104"/>
+  </g>
+  <!-- weißer König -->
+  <text x="150" y="404" font-size="170" text-anchor="middle" fill="#fdfdfd"
+        stroke="#1f2937" stroke-width="6" font-family="serif">♚</text>
+  <!-- schwarze Dame -->
+  <text x="356" y="190" font-size="150" text-anchor="middle" fill="#20242c"
+        stroke="#cbd5e1" stroke-width="4" font-family="serif">♛</text>
+</svg>

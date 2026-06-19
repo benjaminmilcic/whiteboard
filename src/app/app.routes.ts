@@ -6,6 +6,7 @@ import { MemoryComponent } from './memory/memory';
 import { Connect4Component } from './connect4/connect4';
 import { BackgammonComponent } from './backgammon/backgammon';
 import { DameComponent } from './dame/dame';
+import { SchachComponent } from './schach/schach';
 import { PuzzleComponent } from './puzzle/puzzle';
 import { HangmanComponent } from './hangman/hangman';
 
@@ -17,6 +18,7 @@ export const routes: Routes = [
   { path: 'connect4', component: Connect4Component },
   { path: 'backgammon', component: BackgammonComponent },
   { path: 'dame', component: DameComponent },
+  { path: 'schach', component: SchachComponent },
   { path: 'puzzle', component: PuzzleComponent },
   { path: 'hangman', component: HangmanComponent },
   { path: '**', redirectTo: '' },

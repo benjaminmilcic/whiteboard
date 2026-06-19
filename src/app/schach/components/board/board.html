@@ -1,0 +1,109 @@
+@if (game(); as g) {
+  <div class="screen">
+    <!-- Kopfzeile: beide Spieler + wer dran ist -->
+    <header class="bar">
+      <div class="players">
+        <div class="player" [class.player--active]="g.currentTurn === svc.me()?.id">
+          <span class="chip chip--{{ svc.me()?.color }}">{{ svc.me()?.emoji }}</span>
+          <span class="pname">{{ svc.me()?.name }}</span>
+        </div>
+
+        <span class="vs">♚</span>
+
+        @if (svc.opponent(); as opp) {
+          <div class="player" [class.player--active]="g.currentTurn === opp.id">
+            <span class="chip chip--{{ opp.color }}">{{ opp.emoji }}</span>
+            <span class="pname">{{ opp.name }}</span>
+          </div>
+        } @else {
+          <div class="player player--empty">
+            <span class="pname">{{ 'schach.waitingPlayer' | transloco }}</span>
+          </div>
+        }
+      </div>
+
+      <div class="turn" [class.turn--mine]="g.currentTurn === svc.me()?.id" [class.turn--check]="g.check">
+        @if (g.check) { ⚠️ {{ 'schach.check' | transloco }} · }
+        @if (g.currentTurn === svc.me()?.id) {
+          {{ 'schach.yourTurn' | transloco }}
+        } @else {
+          {{ 'schach.othersTurn' | transloco: { name: currentName() || ('schach.player' | transloco) } }}
+        }
+      </div>
+    </header>
+
+    <!-- Spielbrett -->
+    <div class="field-wrap">
+      <div class="board" [class.board--locked]="!svc.isMyTurn()">
+        @for (i of view(); track i) {
+          <button
+            type="button"
+            class="cell"
+            [class.cell--dark]="isDark(i)"
+            [class.cell--light]="!isDark(i)"
+            [class.cell--source]="isSource(i)"
+            [class.cell--selected]="isSelected(i)"
+            [class.cell--last]="isLast(i)"
+            [class.cell--check]="isCheck(i)"
+            (click)="tapSquare(i)"
+          >
+            @if (glyph(i); as gl) {
+              <span class="piece piece--{{ pieceColor(i) }}">{{ gl }}</span>
+            }
+            @if (isTarget(i)) {
+              <span class="mark" [class.mark--capture]="isCapture(i)"></span>
+            }
+          </button>
+        }
+      </div>
+    </div>
+
+    <!-- Warten auf Mitspieler -->
+    @if (g.status === 'waiting') {
+      <div class="overlay">
+        <div class="panel">
+          <h2 class="panel-title">{{ 'schach.codeTitle' | transloco }}</h2>
+          <p class="code">{{ g.code }}</p>
+          <p class="panel-text">{{ 'schach.codeShare' | transloco }}</p>
+          <div class="spinner" aria-hidden="true"></div>
+          <button type="button" class="btn btn-ghost" (click)="leave()">
+            {{ 'schach.cancel' | transloco }}
+          </button>
+        </div>
+      </div>
+    }
+
+    <!-- Spielende -->
+    @if (g.status === 'finished') {
+      <div class="overlay">
+        <div
+          class="panel"
+          appDraggable
+          [class.panel--win]="outcome() === 'win'"
+          [class.panel--lose]="outcome() === 'lose'"
+        >
+          @switch (outcome()) {
+            @case ('win') { <div class="result-emoji anim-win">🏆</div> }
+            @case ('lose') { <div class="result-emoji anim-lose">😢</div> }
+            @case ('draw') { <div class="result-emoji anim-win">🤝</div> }
+          }
+
+          <h2 class="result-title">
+            @switch (outcome()) {
+              @case ('win') { {{ 'schach.won' | transloco: { name: svc.me()?.name } }} }
+              @case ('lose') { {{ 'schach.lost' | transloco: { name: svc.opponent()?.name } }} }
+              @case ('draw') { {{ 'schach.draw' | transloco }} }
+            }
+          </h2>
+
+          <button type="button" class="btn btn-primary" (click)="playAgain()">
+            {{ 'schach.playAgain' | transloco }}
+          </button>
+          <button type="button" class="btn btn-ghost" (click)="leave()">
+            {{ 'schach.home' | transloco }}
+          </button>
+        </div>
+      </div>
+    }
+  </div>
+}
