@@ -1,0 +1,110 @@
+@if (game(); as g) {
+  <div class="screen">
+    <!-- Kopfzeile: beide Spieler + wer dran ist -->
+    <header class="bar">
+      <div class="players">
+        <div class="player" [class.player--active]="g.currentTurn === svc.me()?.id">
+          <span class="chip chip--{{ svc.me()?.color }}">{{ svc.me()?.emoji }}</span>
+          <span class="pname">{{ svc.me()?.name }}</span>
+        </div>
+
+        <span class="vs">♟️</span>
+
+        @if (svc.opponent(); as opp) {
+          <div class="player" [class.player--active]="g.currentTurn === opp.id">
+            <span class="chip chip--{{ opp.color }}">{{ opp.emoji }}</span>
+            <span class="pname">{{ opp.name }}</span>
+          </div>
+        } @else {
+          <div class="player player--empty">
+            <span class="pname">{{ 'dame.waitingPlayer' | transloco }}</span>
+          </div>
+        }
+      </div>
+
+      <div class="turn" [class.turn--mine]="g.currentTurn === svc.me()?.id">
+        @if (g.currentTurn === svc.me()?.id) {
+          @if (svc.mustCapture()) {
+            {{ 'dame.mustCapture' | transloco }}
+          } @else {
+            {{ 'dame.yourTurn' | transloco }}
+          }
+        } @else {
+          {{ 'dame.othersTurn' | transloco: { name: currentName() || ('dame.player' | transloco) } }}
+        }
+      </div>
+    </header>
+
+    <!-- Spielbrett -->
+    <div class="field-wrap">
+      <div class="board" [class.board--locked]="!svc.isMyTurn()">
+        @for (i of squares; track i) {
+          <button
+            type="button"
+            class="cell"
+            [class.cell--dark]="isDark(i)"
+            [class.cell--light]="!isDark(i)"
+            [class.cell--source]="isSource(i)"
+            [class.cell--selected]="isSelected(i)"
+            [class.cell--last]="isLast(i)"
+            [disabled]="!isDark(i)"
+            (click)="tapSquare(i)"
+          >
+            @if (pieceColor(i); as col) {
+              <span class="piece piece--{{ col }}" [class.piece--king]="isKing(i)">
+                @if (isKing(i)) { <span class="crown">♛</span> }
+              </span>
+            }
+            @if (isTarget(i)) { <span class="dot"></span> }
+          </button>
+        }
+      </div>
+    </div>
+
+    <!-- Warten auf Mitspieler -->
+    @if (g.status === 'waiting') {
+      <div class="overlay">
+        <div class="panel">
+          <h2 class="panel-title">{{ 'dame.codeTitle' | transloco }}</h2>
+          <p class="code">{{ g.code }}</p>
+          <p class="panel-text">{{ 'dame.codeShare' | transloco }}</p>
+          <div class="spinner" aria-hidden="true"></div>
+          <button type="button" class="btn btn-ghost" (click)="leave()">
+            {{ 'dame.cancel' | transloco }}
+          </button>
+        </div>
+      </div>
+    }
+
+    <!-- Spielende -->
+    @if (g.status === 'finished') {
+      <div class="overlay">
+        <div
+          class="panel"
+          appDraggable
+          [class.panel--win]="outcome() === 'win'"
+          [class.panel--lose]="outcome() === 'lose'"
+        >
+          @switch (outcome()) {
+            @case ('win') { <div class="result-emoji anim-win">🏆</div> }
+            @case ('lose') { <div class="result-emoji anim-lose">😢</div> }
+          }
+
+          <h2 class="result-title">
+            @switch (outcome()) {
+              @case ('win') { {{ 'dame.won' | transloco: { name: svc.me()?.name } }} }
+              @case ('lose') { {{ 'dame.lost' | transloco: { name: svc.opponent()?.name } }} }
+            }
+          </h2>
+
+          <button type="button" class="btn btn-primary" (click)="playAgain()">
+            {{ 'dame.playAgain' | transloco }}
+          </button>
+          <button type="button" class="btn btn-ghost" (click)="leave()">
+            {{ 'dame.home' | transloco }}
+          </button>
+        </div>
+      </div>
+    }
+  </div>
+}

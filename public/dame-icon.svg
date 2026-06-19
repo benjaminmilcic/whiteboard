@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <rect width="512" height="512" rx="64" fill="#0f766e"/>
+  <rect x="48" y="48" width="416" height="416" rx="24" fill="#e7f4ce"/>
+  <!-- Schachbrettmuster (dunkle Felder) -->
+  <g fill="#2f8f7e">
+    <rect x="48" y="48" width="104" height="104"/>
+    <rect x="256" y="48" width="104" height="104"/>
+    <rect x="152" y="152" width="104" height="104"/>
+    <rect x="360" y="152" width="104" height="104"/>
+    <rect x="48" y="256" width="104" height="104"/>
+    <rect x="256" y="256" width="104" height="104"/>
+    <rect x="152" y="360" width="104" height="104"/>
+    <rect x="360" y="360" width="104" height="104"/>
+  </g>
+
+  <!-- weißer Stein -->
+  <circle cx="100" cy="412" r="42" fill="#f7f3ea" stroke="#cbbfa6" stroke-width="4"/>
+  <circle cx="100" cy="412" r="26" fill="none" stroke="#cbbfa6" stroke-width="3"/>
+
+  <!-- schwarze Dame mit Krone -->
+  <circle cx="308" cy="100" r="42" fill="#2b2b36" stroke="#0f0f16" stroke-width="4"/>
+  <circle cx="308" cy="100" r="26" fill="none" stroke="#facc15" stroke-width="4"/>
+  <text x="308" y="116" font-size="42" text-anchor="middle" fill="#fcd34d" font-family="serif">♛</text>
+
+  <!-- weiterer schwarzer Stein -->
+  <circle cx="204" cy="204" r="42" fill="#2b2b36" stroke="#0f0f16" stroke-width="4"/>
+  <circle cx="204" cy="204" r="26" fill="none" stroke="#5a5a66" stroke-width="3"/>
+</svg>
