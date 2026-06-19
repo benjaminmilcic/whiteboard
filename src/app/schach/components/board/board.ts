@@ -128,6 +128,19 @@ export class SchachBoard implements OnDestroy {
     return this.checkSquare() === i;
   }
 
+  /** Reihen-Beschriftung am linken Rand (von oben nach unten), je nach Drehung. */
+  protected readonly ranks = computed<number[]>(() => {
+    const flip = this.svc.myColor() === 'black';
+    return flip ? [1, 2, 3, 4, 5, 6, 7, 8] : [8, 7, 6, 5, 4, 3, 2, 1];
+  });
+
+  /** Linien-Beschriftung am unteren Rand (von links nach rechts), je nach Drehung. */
+  protected readonly files = computed<string[]>(() => {
+    const flip = this.svc.myColor() === 'black';
+    const f = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
+    return flip ? f.slice().reverse() : f;
+  });
+
   /** Steht auf dem Zielfeld eine gegnerische Figur (zum Hervorheben als Schlag)? */
   protected isCapture(i: number): boolean {
     return this.isTarget(i) && !!this.game()?.board[i];

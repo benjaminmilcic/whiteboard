@@ -32,29 +32,43 @@
       </div>
     </header>
 
-    <!-- Spielbrett -->
+    <!-- Spielbrett mit Feldbezeichnungen am Rand -->
     <div class="field-wrap">
-      <div class="board" [class.board--locked]="!svc.isMyTurn()">
-        @for (i of view(); track i) {
-          <button
-            type="button"
-            class="cell"
-            [class.cell--dark]="isDark(i)"
-            [class.cell--light]="!isDark(i)"
-            [class.cell--source]="isSource(i)"
-            [class.cell--selected]="isSelected(i)"
-            [class.cell--last]="isLast(i)"
-            [class.cell--check]="isCheck(i)"
-            (click)="tapSquare(i)"
-          >
-            @if (glyph(i); as gl) {
-              <span class="piece piece--{{ pieceColor(i) }}">{{ gl }}</span>
-            }
-            @if (isTarget(i)) {
-              <span class="mark" [class.mark--capture]="isCapture(i)"></span>
-            }
-          </button>
-        }
+      <div class="board-area">
+        <div class="ranks">
+          @for (r of ranks(); track $index) {
+            <span class="coord">{{ r }}</span>
+          }
+        </div>
+
+        <div class="board" [class.board--locked]="!svc.isMyTurn()">
+          @for (i of view(); track i) {
+            <button
+              type="button"
+              class="cell"
+              [class.cell--dark]="isDark(i)"
+              [class.cell--light]="!isDark(i)"
+              [class.cell--source]="isSource(i)"
+              [class.cell--selected]="isSelected(i)"
+              [class.cell--last]="isLast(i)"
+              [class.cell--check]="isCheck(i)"
+              (click)="tapSquare(i)"
+            >
+              @if (glyph(i); as gl) {
+                <span class="piece piece--{{ pieceColor(i) }}">{{ gl }}</span>
+              }
+              @if (isTarget(i)) {
+                <span class="mark" [class.mark--capture]="isCapture(i)"></span>
+              }
+            </button>
+          }
+        </div>
+
+        <div class="files">
+          @for (f of files(); track $index) {
+            <span class="coord">{{ f }}</span>
+          }
+        </div>
       </div>
     </div>
 
