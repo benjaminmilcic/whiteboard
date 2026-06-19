@@ -78,8 +78,8 @@
         <input
           class="text-input code-input"
           type="text"
-          inputmode="text"
-          autocapitalize="characters"
+          inputmode="numeric"
+          maxlength="4"
           [placeholder]="'memory.codePlaceholder' | transloco"
           [ngModel]="joinCode()"
           (ngModelChange)="onCode($event)"

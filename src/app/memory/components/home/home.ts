@@ -45,7 +45,7 @@ export class Home implements OnInit {
   }
 
   protected onCode(value: string): void {
-    this.joinCode.set(value.toUpperCase().replace(/[^A-Z]/g, '').slice(0, 4));
+    this.joinCode.set(value.replace(/\D/g, '').slice(0, 4));
   }
 
   protected nameValid(): boolean {

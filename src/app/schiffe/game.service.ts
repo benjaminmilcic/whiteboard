@@ -28,7 +28,7 @@ import {
 const STORAGE_KEY = 'sv-game-id';
 const NAME_KEY = 'sv-player-name'; // gemerkter Spielername (muss nicht neu eingetippt werden)
 const EMOJI_KEY = 'sv-player-emoji'; // gemerktes Spieler-Emoji
-const CODE_CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZ'; // ohne I, O (Verwechslungsgefahr)
+const CODE_CHARS = '0123456789'; // vierstelliger Zahlencode
 
 @Injectable({ providedIn: 'root' })
 export class GameService {
@@ -175,9 +175,9 @@ export class GameService {
   async joinGame(rawCode: string, name: string, emoji: string): Promise<void> {
     const me = this.uid();
     if (!me) return;
-    const code = rawCode.trim().toUpperCase();
+    const code = rawCode.trim();
     if (code.length !== 4) {
-      this.error.set('Der Code hat 4 Buchstaben.');
+      this.error.set('Der Code hat 4 Zahlen.');
       return;
     }
     this.rememberProfile(name, emoji);

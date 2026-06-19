@@ -20,7 +20,7 @@ const PLAYER_NAME_KEY = 'memory_player_name';
 const PLAYER_AVATAR_KEY = 'memory_player_avatar';
 const MISMATCH_MS = 1300;
 // Zeichen ohne leicht verwechselbare (kein I/O/0/1) – kindgerecht vorlesbar.
-const CODE_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
+const CODE_ALPHABET = '0123456789';
 
 @Injectable({ providedIn: 'root' })
 export class GameService {
@@ -117,7 +117,7 @@ export class GameService {
   }
 
   async joinGame(rawCode: string, name: string, avatar: string): Promise<void> {
-    const code = rawCode.trim().toUpperCase();
+    const code = rawCode.trim();
     this.rememberProfile(name, avatar);
     this.busy.set(true);
     this.error.set(null);

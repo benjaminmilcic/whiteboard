@@ -7,7 +7,7 @@ const PLAYER_ID_KEY = 'c4_player_id';
 const PLAYER_NAME_KEY = 'c4_player_name';
 const PLAYER_EMOJI_KEY = 'c4_player_emoji';
 // Zeichen ohne leicht verwechselbare (kein I/O/0/1) – kindgerecht vorlesbar.
-const CODE_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
+const CODE_ALPHABET = '0123456789';
 
 export const COLS = 7;
 export const ROWS = 6;
@@ -104,7 +104,7 @@ export class GameService {
   }
 
   async joinGame(rawCode: string, name: string, emoji: string): Promise<void> {
-    const code = rawCode.trim().toUpperCase();
+    const code = rawCode.trim();
     this.rememberProfile(name, emoji);
     this.busy.set(true);
     this.error.set(null);
