@@ -26,6 +26,14 @@
           ".write": true
         }
       }
+    },
+    "backgammon": {
+      "games": {
+        "$code": {
+          ".read": true,
+          ".write": true
+        }
+      }
     }
   }
 }

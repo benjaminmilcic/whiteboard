@@ -1,0 +1,209 @@
+@if (game(); as g) {
+  <div class="screen">
+    <!-- Kopfzeile: beide Spieler + wer dran ist -->
+    <header class="bar">
+      <div class="players">
+        <div class="player" [class.player--active]="g.currentTurn === svc.me()?.id">
+          <span class="chip chip--{{ svc.me()?.color }}">{{ svc.me()?.emoji }}</span>
+          <span class="pname">{{ svc.me()?.name }}</span>
+        </div>
+
+        <span class="vs">🎲</span>
+
+        @if (svc.opponent(); as opp) {
+          <div class="player" [class.player--active]="g.currentTurn === opp.id">
+            <span class="chip chip--{{ opp.color }}">{{ opp.emoji }}</span>
+            <span class="pname">{{ opp.name }}</span>
+          </div>
+        } @else {
+          <div class="player player--empty">
+            <span class="pname">{{ 'backgammon.waitingPlayer' | transloco }}</span>
+          </div>
+        }
+      </div>
+
+      <div class="turn" [class.turn--mine]="g.currentTurn === svc.me()?.id">
+        @if (g.currentTurn === svc.me()?.id) {
+          {{ 'backgammon.yourTurn' | transloco }}
+        } @else {
+          {{ 'backgammon.othersTurn' | transloco: { name: currentName() || ('backgammon.player' | transloco) } }}
+        }
+      </div>
+    </header>
+
+    <!-- Würfel & Aktionen -->
+    <div class="dice-strip">
+      @if (g.diceLeft.length) {
+        <div class="dice">
+          @for (d of g.diceLeft; track $index) {
+            <span class="die">
+              @for (on of pips(d); track $index) {
+                <span class="pip" [class.pip--on]="on"></span>
+              }
+            </span>
+          }
+        </div>
+      }
+
+      @if (svc.canRoll()) {
+        <button type="button" class="action roll" (click)="roll()">
+          🎲 {{ 'backgammon.roll' | transloco }}
+        </button>
+      } @else if (svc.noMoves()) {
+        <button type="button" class="action pass" (click)="pass()">
+          {{ 'backgammon.noMovesPass' | transloco }}
+        </button>
+      } @else if (svc.isMyTurn()) {
+        <span class="hint">{{ 'backgammon.moveHint' | transloco }}</span>
+      }
+    </div>
+
+    <!-- Spielbrett -->
+    <div class="field-wrap">
+      <div class="bgboard" [class.bgboard--locked]="!svc.isMyTurn()">
+        <!-- obere Hälfte -->
+        <div class="half half-top">
+          <div class="quadrant">
+            @for (i of topLeft; track i) {
+              <ng-container [ngTemplateOutlet]="point" [ngTemplateOutletContext]="{ $implicit: i, pos: 'top' }" />
+            }
+          </div>
+
+          <button
+            type="button"
+            class="bar-zone"
+            [class.zone--source]="svc.myColor() === 'black' && barIsSource()"
+            (click)="tapBar()"
+          >
+            @for (n of range(barCount('black')); track n) {
+              <span class="checker checker--black"></span>
+            }
+            @if (barCount('black') > 0) { <span class="bar-count">{{ barCount('black') }}</span> }
+          </button>
+
+          <div class="quadrant">
+            @for (i of topRight; track i) {
+              <ng-container [ngTemplateOutlet]="point" [ngTemplateOutletContext]="{ $implicit: i, pos: 'top' }" />
+            }
+          </div>
+
+          <button
+            type="button"
+            class="off-zone"
+            [class.zone--target]="svc.myColor() === 'black' && offIsTarget()"
+            (click)="tapOff()"
+          >
+            <span class="off-label">{{ 'backgammon.bearOff' | transloco }}</span>
+            <span class="off-count chip chip--black">{{ offCount('black') }}</span>
+          </button>
+        </div>
+
+        <!-- untere Hälfte -->
+        <div class="half half-bottom">
+          <div class="quadrant">
+            @for (i of bottomLeft; track i) {
+              <ng-container [ngTemplateOutlet]="point" [ngTemplateOutletContext]="{ $implicit: i, pos: 'bottom' }" />
+            }
+          </div>
+
+          <button
+            type="button"
+            class="bar-zone"
+            [class.zone--source]="svc.myColor() === 'white' && barIsSource()"
+            (click)="tapBar()"
+          >
+            @for (n of range(barCount('white')); track n) {
+              <span class="checker checker--white"></span>
+            }
+            @if (barCount('white') > 0) { <span class="bar-count">{{ barCount('white') }}</span> }
+          </button>
+
+          <div class="quadrant">
+            @for (i of bottomRight; track i) {
+              <ng-container [ngTemplateOutlet]="point" [ngTemplateOutletContext]="{ $implicit: i, pos: 'bottom' }" />
+            }
+          </div>
+
+          <button
+            type="button"
+            class="off-zone"
+            [class.zone--target]="svc.myColor() === 'white' && offIsTarget()"
+            (click)="tapOff()"
+          >
+            <span class="off-count chip chip--white">{{ offCount('white') }}</span>
+            <span class="off-label">{{ 'backgammon.bearOff' | transloco }}</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Warten auf Mitspieler -->
+    @if (g.status === 'waiting') {
+      <div class="overlay">
+        <div class="panel">
+          <h2 class="panel-title">{{ 'backgammon.codeTitle' | transloco }}</h2>
+          <p class="code">{{ g.code }}</p>
+          <p class="panel-text">{{ 'backgammon.codeShare' | transloco }}</p>
+          <div class="spinner" aria-hidden="true"></div>
+          <button type="button" class="btn btn-ghost" (click)="leave()">
+            {{ 'backgammon.cancel' | transloco }}
+          </button>
+        </div>
+      </div>
+    }
+
+    <!-- Spielende -->
+    @if (g.status === 'finished') {
+      <div class="overlay">
+        <div
+          class="panel"
+          appDraggable
+          [class.panel--win]="outcome() === 'win'"
+          [class.panel--lose]="outcome() === 'lose'"
+        >
+          @switch (outcome()) {
+            @case ('win') { <div class="result-emoji anim-win">🏆</div> }
+            @case ('lose') { <div class="result-emoji anim-lose">😢</div> }
+          }
+
+          <h2 class="result-title">
+            @switch (outcome()) {
+              @case ('win') { {{ 'backgammon.won' | transloco: { name: svc.me()?.name } }} }
+              @case ('lose') { {{ 'backgammon.lost' | transloco: { name: svc.opponent()?.name } }} }
+            }
+          </h2>
+
+          <button type="button" class="btn btn-primary" (click)="playAgain()">
+            {{ 'backgammon.playAgain' | transloco }}
+          </button>
+          <button type="button" class="btn btn-ghost" (click)="leave()">
+            {{ 'backgammon.home' | transloco }}
+          </button>
+        </div>
+      </div>
+    }
+  </div>
+}
+
+<!-- Wiederverwendbares Punkt-Dreieck mit Steinen -->
+<ng-template #point let-i let-pos="pos">
+  <button
+    type="button"
+    class="point point--{{ pos }}"
+    [class.point--dark]="darkTriangle(i)"
+    [class.point--source]="isSource(i)"
+    [class.point--target]="isTarget(i)"
+    [class.point--selected]="isSelected(i)"
+    (click)="tapPoint(i)"
+  >
+    <span class="tri"></span>
+    @if (isTarget(i)) { <span class="dot"></span> }
+    <span class="stack">
+      @for (d of discs(i); track d) {
+        <span class="checker checker--{{ colorAt(i) }}">
+          @if (overflow(i) && d === 4) { <span class="count">{{ overflow(i) }}</span> }
+        </span>
+      }
+    </span>
+  </button>
+</ng-template>
