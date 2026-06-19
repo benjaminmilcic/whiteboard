@@ -51,7 +51,7 @@
         </button>
       } @else if (svc.noMoves()) {
         <button type="button" class="action pass" (click)="pass()">
-          {{ 'backgammon.noMovesPass' | transloco }}
+          {{ 'backgammon.noMovesPass' | transloco }}@if (countdown() > 0) { ({{ countdown() }})}
         </button>
       } @else if (svc.isMyTurn()) {
         <span class="hint">{{ 'backgammon.moveHint' | transloco }}</span>

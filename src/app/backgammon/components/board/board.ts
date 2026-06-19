@@ -55,7 +55,10 @@ export class BgBoard implements OnDestroy {
   protected readonly selectedFrom = signal<number | null>(null);
 
   private effectsShown = false;
-  private passTimer: ReturnType<typeof setTimeout> | null = null;
+  private passTimer: ReturnType<typeof setInterval> | null = null;
+
+  /** Restsekunden, bis automatisch weitergegeben wird (0 = inaktiv). */
+  protected readonly countdown = signal(0);
 
   /** Felder, von denen aus gezogen werden darf. */
   protected readonly sources = computed<Set<number>>(() => new Set(this.svc.legalSources()));
@@ -99,14 +102,20 @@ export class BgBoard implements OnDestroy {
       }
     });
 
-    // Kein Zug möglich → nach 5 Sekunden automatisch an den nächsten Spieler.
+    // Kein Zug möglich → mit Countdown nach 5 Sekunden automatisch weitergeben.
     effect(() => {
       if (this.svc.noMoves()) {
         if (this.passTimer === null) {
-          this.passTimer = setTimeout(() => {
-            this.passTimer = null;
-            this.svc.passTurn();
-          }, 5000);
+          this.countdown.set(5);
+          this.passTimer = setInterval(() => {
+            const next = this.countdown() - 1;
+            if (next <= 0) {
+              this.clearPassTimer();
+              this.svc.passTurn();
+            } else {
+              this.countdown.set(next);
+            }
+          }, 1000);
         }
       } else {
         this.clearPassTimer();
@@ -121,9 +130,10 @@ export class BgBoard implements OnDestroy {
 
   private clearPassTimer(): void {
     if (this.passTimer !== null) {
-      clearTimeout(this.passTimer);
+      clearInterval(this.passTimer);
       this.passTimer = null;
     }
+    this.countdown.set(0);
   }
 
   // ---- Felder lesen --------------------------------------------------------
