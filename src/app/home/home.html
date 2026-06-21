@@ -12,20 +12,20 @@
 
   <!-- Spiele-Auswahl -->
   <div class="flex-1 w-full flex flex-col items-center justify-start sm:justify-center px-4 py-8">
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 w-full max-w-6xl">
+    <div class="grid grid-cols-1 min-[450px]:grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-6 w-full max-w-6xl justify-items-center auto-rows-fr">
     <!-- Whiteboard -->
     <button
       type="button"
       (click)="go('whiteboard')"
       class="flex-1 bg-white/95 rounded-[2rem] shadow-2xl p-6 flex flex-col items-center gap-4
-             hover:scale-105 active:scale-95 transition focus:outline-none focus:ring-4 focus:ring-white"
+             hover:scale-105 active:scale-95 transition focus:outline-none focus:ring-4 focus:ring-white max-w-[250px] w-full"
     >
       <img
         src="/icon-512.png"
         [alt]="'home.whiteboardSub' | transloco"
-        class="w-40 h-40 sm:w-48 sm:h-48 rounded-[1.6rem] shadow-lg"
+        class="w-28 h-28 sm:w-32 sm:h-32 rounded-[1.6rem] shadow-lg"
       />
-      <span class="text-2xl sm:text-3xl font-extrabold text-slate-700">{{ 'home.whiteboard' | transloco }}</span>
+      <span class="text-xl sm:text-2xl font-extrabold text-slate-700">{{ 'home.whiteboard' | transloco }}</span>
       <span class="text-base text-slate-500 -mt-2">{{ 'home.whiteboardSub' | transloco }}</span>
     </button>
 
@@ -34,14 +34,14 @@
       type="button"
       (click)="go('schiffe')"
       class="flex-1 bg-white/95 rounded-[2rem] shadow-2xl p-6 flex flex-col items-center gap-4
-             hover:scale-105 active:scale-95 transition focus:outline-none focus:ring-4 focus:ring-white"
+             hover:scale-105 active:scale-95 transition focus:outline-none focus:ring-4 focus:ring-white max-w-[250px] w-full"
     >
       <img
         src="/schiffe-icon-512.png"
         [alt]="'home.schiffeSub' | transloco"
-        class="w-40 h-40 sm:w-48 sm:h-48 rounded-[1.6rem] shadow-lg"
+        class="w-28 h-28 sm:w-32 sm:h-32 rounded-[1.6rem] shadow-lg"
       />
-      <span class="text-2xl sm:text-3xl font-extrabold text-slate-700">{{ 'home.schiffe' | transloco }}</span>
+      <span class="text-xl sm:text-2xl font-extrabold text-slate-700">{{ 'home.schiffe' | transloco }}</span>
       <span class="text-base text-slate-500 -mt-2">{{ 'home.schiffeSub' | transloco }}</span>
     </button>
 
@@ -50,14 +50,14 @@
       type="button"
       (click)="go('memory')"
       class="flex-1 bg-white/95 rounded-[2rem] shadow-2xl p-6 flex flex-col items-center gap-4
-             hover:scale-105 active:scale-95 transition focus:outline-none focus:ring-4 focus:ring-white"
+             hover:scale-105 active:scale-95 transition focus:outline-none focus:ring-4 focus:ring-white max-w-[250px] w-full"
     >
       <img
         src="/memory-icon-512.png"
         [alt]="'home.memory' | transloco"
-        class="w-40 h-40 sm:w-48 sm:h-48 rounded-[1.6rem] shadow-lg"
+        class="w-28 h-28 sm:w-32 sm:h-32 rounded-[1.6rem] shadow-lg"
       />
-      <span class="text-2xl sm:text-3xl font-extrabold text-slate-700">{{ 'home.memory' | transloco }}</span>
+      <span class="text-xl sm:text-2xl font-extrabold text-slate-700">{{ 'home.memory' | transloco }}</span>
       <span class="text-base text-slate-500 -mt-2">{{ 'home.memorySub' | transloco }}</span>
     </button>
 
@@ -66,14 +66,14 @@
       type="button"
       (click)="go('connect4')"
       class="flex-1 bg-white/95 rounded-[2rem] shadow-2xl p-6 flex flex-col items-center gap-4
-             hover:scale-105 active:scale-95 transition focus:outline-none focus:ring-4 focus:ring-white"
+             hover:scale-105 active:scale-95 transition focus:outline-none focus:ring-4 focus:ring-white max-w-[250px] w-full"
     >
       <img
         src="/connect4-icon.svg"
         [alt]="'home.connect4' | transloco"
-        class="w-40 h-40 sm:w-48 sm:h-48 rounded-[1.6rem] shadow-lg"
+        class="w-28 h-28 sm:w-32 sm:h-32 rounded-[1.6rem] shadow-lg"
       />
-      <span class="text-2xl sm:text-3xl font-extrabold text-slate-700">{{ 'home.connect4' | transloco }}</span>
+      <span class="text-xl sm:text-2xl font-extrabold text-slate-700">{{ 'home.connect4' | transloco }}</span>
       <span class="text-base text-slate-500 -mt-2">{{ 'home.connect4Sub' | transloco }}</span>
     </button>
 
@@ -82,14 +82,14 @@
       type="button"
       (click)="go('backgammon')"
       class="flex-1 bg-white/95 rounded-[2rem] shadow-2xl p-6 flex flex-col items-center gap-4
-             hover:scale-105 active:scale-95 transition focus:outline-none focus:ring-4 focus:ring-white"
+             hover:scale-105 active:scale-95 transition focus:outline-none focus:ring-4 focus:ring-white max-w-[250px] w-full"
     >
       <img
         src="/backgammon-icon.svg"
         [alt]="'home.backgammon' | transloco"
-        class="w-40 h-40 sm:w-48 sm:h-48 rounded-[1.6rem] shadow-lg"
+        class="w-28 h-28 sm:w-32 sm:h-32 rounded-[1.6rem] shadow-lg"
       />
-      <span class="text-2xl sm:text-3xl font-extrabold text-slate-700">{{ 'home.backgammon' | transloco }}</span>
+      <span class="text-xl sm:text-2xl font-extrabold text-slate-700">{{ 'home.backgammon' | transloco }}</span>
       <span class="text-base text-slate-500 -mt-2">{{ 'home.backgammonSub' | transloco }}</span>
     </button>
 
@@ -98,14 +98,14 @@
       type="button"
       (click)="go('dame')"
       class="flex-1 bg-white/95 rounded-[2rem] shadow-2xl p-6 flex flex-col items-center gap-4
-             hover:scale-105 active:scale-95 transition focus:outline-none focus:ring-4 focus:ring-white"
+             hover:scale-105 active:scale-95 transition focus:outline-none focus:ring-4 focus:ring-white max-w-[250px] w-full"
     >
       <img
         src="/dame-icon.svg"
         [alt]="'home.dame' | transloco"
-        class="w-40 h-40 sm:w-48 sm:h-48 rounded-[1.6rem] shadow-lg"
+        class="w-28 h-28 sm:w-32 sm:h-32 rounded-[1.6rem] shadow-lg"
       />
-      <span class="text-2xl sm:text-3xl font-extrabold text-slate-700">{{ 'home.dame' | transloco }}</span>
+      <span class="text-xl sm:text-2xl font-extrabold text-slate-700">{{ 'home.dame' | transloco }}</span>
       <span class="text-base text-slate-500 -mt-2">{{ 'home.dameSub' | transloco }}</span>
     </button>
 
@@ -114,14 +114,14 @@
       type="button"
       (click)="go('schach')"
       class="flex-1 bg-white/95 rounded-[2rem] shadow-2xl p-6 flex flex-col items-center gap-4
-             hover:scale-105 active:scale-95 transition focus:outline-none focus:ring-4 focus:ring-white"
+             hover:scale-105 active:scale-95 transition focus:outline-none focus:ring-4 focus:ring-white max-w-[250px] w-full"
     >
       <img
         src="/schach-icon.svg"
         [alt]="'home.schach' | transloco"
-        class="w-40 h-40 sm:w-48 sm:h-48 rounded-[1.6rem] shadow-lg"
+        class="w-28 h-28 sm:w-32 sm:h-32 rounded-[1.6rem] shadow-lg"
       />
-      <span class="text-2xl sm:text-3xl font-extrabold text-slate-700">{{ 'home.schach' | transloco }}</span>
+      <span class="text-xl sm:text-2xl font-extrabold text-slate-700">{{ 'home.schach' | transloco }}</span>
       <span class="text-base text-slate-500 -mt-2">{{ 'home.schachSub' | transloco }}</span>
     </button>
 
@@ -130,14 +130,14 @@
       type="button"
       (click)="go('puzzle')"
       class="flex-1 bg-white/95 rounded-[2rem] shadow-2xl p-6 flex flex-col items-center gap-4
-             hover:scale-105 active:scale-95 transition focus:outline-none focus:ring-4 focus:ring-white"
+             hover:scale-105 active:scale-95 transition focus:outline-none focus:ring-4 focus:ring-white max-w-[250px] w-full"
     >
       <img
         src="/puzzle-icon.svg"
         [alt]="'home.puzzle' | transloco"
-        class="w-40 h-40 sm:w-48 sm:h-48 rounded-[1.6rem] shadow-lg"
+        class="w-28 h-28 sm:w-32 sm:h-32 rounded-[1.6rem] shadow-lg"
       />
-      <span class="text-2xl sm:text-3xl font-extrabold text-slate-700">{{ 'home.puzzle' | transloco }}</span>
+      <span class="text-xl sm:text-2xl font-extrabold text-slate-700">{{ 'home.puzzle' | transloco }}</span>
       <span class="text-base text-slate-500 -mt-2">{{ 'home.puzzleSub' | transloco }}</span>
     </button>
 
@@ -146,14 +146,14 @@
       type="button"
       (click)="go('hangman')"
       class="flex-1 bg-white/95 rounded-[2rem] shadow-2xl p-6 flex flex-col items-center gap-4
-             hover:scale-105 active:scale-95 transition focus:outline-none focus:ring-4 focus:ring-white"
+             hover:scale-105 active:scale-95 transition focus:outline-none focus:ring-4 focus:ring-white max-w-[250px] w-full"
     >
       <img
         src="/hangman-icon.svg"
         [alt]="'home.hangman' | transloco"
-        class="w-40 h-40 sm:w-48 sm:h-48 rounded-[1.6rem] shadow-lg"
+        class="w-28 h-28 sm:w-32 sm:h-32 rounded-[1.6rem] shadow-lg"
       />
-      <span class="text-2xl sm:text-3xl font-extrabold text-slate-700">{{ 'home.hangman' | transloco }}</span>
+      <span class="text-xl sm:text-2xl font-extrabold text-slate-700">{{ 'home.hangman' | transloco }}</span>
       <span class="text-base text-slate-500 -mt-2">{{ 'home.hangmanSub' | transloco }}</span>
     </button>
     </div>
