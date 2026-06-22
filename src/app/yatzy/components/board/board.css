@@ -1,0 +1,505 @@
+:host {
+  display: block;
+  height: 100%;
+}
+
+.board-screen {
+  position: relative;
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 0.5rem;
+  box-sizing: border-box;
+  margin-top: 20px;
+}
+
+/* Linker Block: Spieler-Leiste + Würfel + Wurf-Button.
+   Auf schmalen Geräten steht er (wie bisher) über dem Sheet. */
+.side {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  min-height: 0;
+}
+
+/* ---- Kopfzeile ---------------------------------------------------------- */
+.bar {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.player {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.25rem 0.6rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.6);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.player--active {
+  background: #fff;
+  box-shadow: 0 0 0 3px #ffd34d;
+  transform: scale(1.04);
+}
+
+.ava {
+  font-size: 1.3rem;
+  line-height: 1;
+}
+
+.pname {
+  font-weight: 800;
+  color: #16318b;
+  max-width: 6rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ptot {
+  font-weight: 800;
+  color: #fff;
+  background: #0f4ff5;
+  border-radius: 999px;
+  min-width: 1.8rem;
+  text-align: center;
+  padding: 0.05rem 0.5rem;
+}
+
+.player--empty .pname {
+  color: #5a6b96;
+  font-weight: 600;
+}
+
+.vs {
+  font-size: 1.1rem;
+}
+
+/* ---- Würfel ------------------------------------------------------------- */
+.dice-area {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.4rem;
+}
+
+.dice-tray {
+  display: flex;
+  gap: 0.5rem;
+}
+
+/* Einfacher flacher 2D-Würfel (keine Animation). */
+.die {
+  --s: clamp(2.6rem, 13vw, 3.4rem);
+  width: var(--s);
+  height: var(--s);
+  box-sizing: border-box;
+  padding: 0.42rem;
+  border: 0;
+  background: #ffffff;
+  border-radius: 0.7rem;
+  box-shadow: inset 0 0 0 1px #e2e8f0, 0 4px 0 #c7d4ef, 0 6px 10px rgba(15, 49, 139, 0.25);
+  cursor: pointer;
+}
+
+.die:disabled {
+  cursor: default;
+}
+
+.die--idle {
+  opacity: 0.5;
+}
+
+.die--held {
+  background: #fff3cd;
+  box-shadow: inset 0 0 0 2px #f0b840, 0 0 0 3px #f6900f, 0 4px 0 #d97706;
+}
+
+.pips {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  gap: 1px;
+}
+
+.pip {
+  display: block;
+  align-self: center;
+  justify-self: center;
+  width: 0.46rem;
+  height: 0.46rem;
+  border-radius: 50%;
+  background: transparent;
+}
+
+.pip--on {
+  background: #1f2937;
+}
+
+.roll-btn {
+  border: 0;
+  border-radius: 1rem;
+  padding: 0.6rem 1.4rem;
+  font-size: 1.15rem;
+  font-weight: 800;
+  font-family: inherit;
+  color: #fff;
+  background: linear-gradient(180deg, #ffb43a, #f6900f);
+  box-shadow: 0 5px 0 #d97706;
+  cursor: pointer;
+}
+
+.roll-btn:active {
+  transform: translateY(3px);
+  box-shadow: 0 2px 0 #d97706;
+}
+
+.roll-btn:disabled {
+  opacity: 0.5;
+  box-shadow: 0 5px 0 #d97706;
+}
+
+.rolls {
+  opacity: 0.85;
+  font-size: 0.95rem;
+}
+
+.hint {
+  margin: 0;
+  font-weight: 700;
+  color: #16318b;
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 999px;
+  padding: 0.2rem 0.8rem;
+  font-size: 0.95rem;
+  text-align: center;
+}
+
+.hint--wait {
+  color: #fff;
+  background: rgba(15, 49, 139, 0.45);
+}
+
+/* ---- Wertungstabelle ---------------------------------------------------- */
+.sheet {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  width: 100%;
+  max-width: 26rem;
+  margin: 0 auto;
+  background: rgba(255, 255, 255, 0.94);
+  border-radius: 1rem;
+  padding: 0.4rem 0.5rem 0.6rem;
+  box-sizing: border-box;
+  box-shadow: 0 8px 20px rgba(15, 49, 139, 0.2);
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 1fr 3rem 3rem;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.1rem 0;
+}
+
+.row--head {
+  position: sticky;
+  top: 0;
+  background: rgba(255, 255, 255, 0.96);
+  z-index: 1;
+}
+
+.section-label {
+  font-weight: 800;
+  color: #6b7aa6;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  margin: 0.35rem 0 0.1rem;
+}
+
+.lbl {
+  font-weight: 700;
+  color: #16318b;
+  font-size: 0.95rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cell {
+  height: 2rem;
+  border: 0;
+  border-radius: 0.55rem;
+  background: #eef4ff;
+  color: #16318b;
+  font-weight: 800;
+  font-size: 1rem;
+  font-family: inherit;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.cell--opp {
+  background: #f3eefe;
+}
+
+.cell--head {
+  background: transparent;
+  font-size: 1.3rem;
+  height: 1.8rem;
+}
+
+.cell--turn {
+  box-shadow: inset 0 0 0 2px #ffd34d;
+  border-radius: 0.55rem;
+  background: #fff7df;
+}
+
+.cell .dot {
+  color: #aab6d6;
+}
+
+.cell--filled {
+  background: #dbe8ff;
+  color: #0b2e8a;
+}
+
+.cell--opp.cell--filled {
+  background: #e7dcff;
+}
+
+/* anklickbarer Vorschlag für den aktiven Spieler */
+.cell--pick {
+  cursor: pointer;
+  background: #bff0c8;
+  color: #0d6b2a;
+  box-shadow: 0 2px 0 #86d79a;
+  animation: y-pick 1.1s ease-in-out infinite;
+}
+
+.cell--pick:active {
+  transform: translateY(2px);
+  box-shadow: none;
+}
+
+.cell--zero {
+  background: #ffe0e0;
+  color: #b3261e;
+  box-shadow: 0 2px 0 #f3b1b1;
+  animation: none;
+}
+
+@keyframes y-pick {
+  0%, 100% { box-shadow: 0 2px 0 #86d79a; }
+  50% { box-shadow: 0 2px 0 #86d79a, 0 0 0 3px rgba(34, 197, 94, 0.35); }
+}
+
+.row--sum {
+  border-top: 2px dashed #d4def2;
+  margin-top: 0.15rem;
+  padding-top: 0.25rem;
+}
+
+.row--sum .cell {
+  background: transparent;
+  font-size: 0.9rem;
+}
+
+.row--sum .cell i {
+  font-style: normal;
+  color: #16a34a;
+  margin-left: 0.15rem;
+}
+
+.row--total {
+  border-top: 3px solid #16318b;
+  margin-top: 0.25rem;
+  padding-top: 0.3rem;
+}
+
+.row--total .lbl {
+  font-size: 1.1rem;
+}
+
+.row--total .cell {
+  background: #16318b;
+  color: #fff;
+  font-size: 1.15rem;
+}
+
+.row--total .cell--opp {
+  background: #5b21b6;
+}
+
+/* ---- Overlays ----------------------------------------------------------- */
+.overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(8, 24, 66, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  z-index: 5;
+}
+
+.panel {
+  width: 100%;
+  max-width: 22rem;
+  background: #fff;
+  border-radius: 1.4rem;
+  padding: 1.5rem 1.25rem;
+  text-align: center;
+  box-shadow: 0 18px 40px rgba(8, 24, 66, 0.4);
+}
+
+.panel-title {
+  margin: 0 0 0.5rem;
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #16318b;
+}
+
+.panel-text {
+  color: #51618f;
+  margin: 0.5rem 0 1rem;
+}
+
+.code {
+  font-size: 2.8rem;
+  font-weight: 800;
+  letter-spacing: 0.4rem;
+  color: #0f4ff5;
+  background: #eef4ff;
+  border-radius: 1rem;
+  padding: 0.6rem;
+  margin: 0.25rem 0;
+}
+
+.spinner {
+  width: 2.4rem;
+  height: 2.4rem;
+  margin: 0.5rem auto 1rem;
+  border: 4px solid #dbe8ff;
+  border-top-color: #0f4ff5;
+  border-radius: 50%;
+  animation: y-spin 0.9s linear infinite;
+}
+
+@keyframes y-spin {
+  to { transform: rotate(360deg); }
+}
+
+.result-emoji {
+  font-size: 4rem;
+  line-height: 1;
+}
+
+.anim-win {
+  animation: y-bounce 0.7s ease infinite alternate;
+}
+
+.anim-lose {
+  animation: y-shake 0.6s ease;
+}
+
+.anim-tie {
+  animation: y-bounce 0.9s ease infinite alternate;
+}
+
+@keyframes y-bounce {
+  to { transform: translateY(-12px) scale(1.08); }
+}
+
+@keyframes y-shake {
+  0%, 100% { transform: rotate(0); }
+  25% { transform: rotate(-10deg); }
+  75% { transform: rotate(10deg); }
+}
+
+.result-title {
+  margin: 0.6rem 0 0.4rem;
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #16318b;
+}
+
+.final-score {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: #0f4ff5;
+  margin: 0 0 0.8rem;
+  letter-spacing: 0.1rem;
+}
+
+.btn {
+  width: 100%;
+  border: 0;
+  border-radius: 1rem;
+  padding: 0.8rem 1rem;
+  font-size: 1.1rem;
+  font-weight: 800;
+  font-family: inherit;
+  cursor: pointer;
+  margin-top: 0.5rem;
+}
+
+.btn-primary {
+  background: linear-gradient(180deg, #ffb43a, #f6900f);
+  color: #fff;
+  box-shadow: 0 6px 0 #d97706;
+}
+
+.btn-primary:active {
+  transform: translateY(3px);
+  box-shadow: 0 3px 0 #d97706;
+}
+
+.btn-ghost {
+  background: transparent;
+  color: #0f4ff5;
+  box-shadow: inset 0 0 0 3px #b9d8ff;
+}
+
+/* ---- Breite Bildschirme: Side NEBEN dem Sheet, als zentrierte Gruppe ----
+   Steht bewusst am Dateiende, damit diese Regeln die Basis-Regeln von
+   .sheet/.side überschreiben (Media-Queries erhöhen die Spezifität nicht).
+   Auf kleinen Smartphones bleibt alles untereinander. */
+@media (min-width: 760px) {
+  .board-screen {
+    flex-direction: row;
+    align-items: stretch;
+    justify-content: center;
+    gap: 2rem;
+  }
+
+  .side {
+    flex: 0 0 auto; /* nur so breit wie nötig */
+    justify-content: center; /* vertikal zentriert neben dem Sheet */
+  }
+
+  .sheet {
+    flex: 0 0 auto; /* nicht wachsen → bildet mit der Side eine Gruppe */
+    width: 24rem;
+    max-width: 24rem;
+    height: 100%;
+    max-height: 100%;
+    margin: 0; /* kein margin:auto, sonst frisst es den freien Platz */
+  }
+}

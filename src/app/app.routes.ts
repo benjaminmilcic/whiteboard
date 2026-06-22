@@ -9,6 +9,7 @@ import { DameComponent } from './dame/dame';
 import { SchachComponent } from './schach/schach';
 import { PuzzleComponent } from './puzzle/puzzle';
 import { HangmanComponent } from './hangman/hangman';
+import { YatzyComponent } from './yatzy/yatzy';
 
 export const routes: Routes = [
   { path: '', component: HomeComponent },
@@ -21,5 +22,6 @@ export const routes: Routes = [
   { path: 'schach', component: SchachComponent },
   { path: 'puzzle', component: PuzzleComponent },
   { path: 'hangman', component: HangmanComponent },
+  { path: 'yatzy', component: YatzyComponent },
   { path: '**', redirectTo: '' },
 ];

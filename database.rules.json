@@ -50,6 +50,14 @@
           ".write": true
         }
       }
+    },
+    "yatzy": {
+      "games": {
+        "$code": {
+          ".read": true,
+          ".write": true
+        }
+      }
     }
   }
 }

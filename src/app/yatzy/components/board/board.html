@@ -1,0 +1,205 @@
+@if (game(); as g) {
+  <div class="board-screen">
+   <div class="side">
+    <!-- Kopfzeile: beide Spieler + Punkte -->
+    <header class="bar">
+      <div class="player" [class.player--active]="g.currentTurn === svc.me()?.id">
+        <span class="ava">{{ svc.me()?.emoji }}</span>
+        <span class="pname">{{ svc.me()?.name }}</span>
+        <span class="ptot">{{ myTotals().total }}</span>
+      </div>
+
+      <span class="vs">⚔️</span>
+
+      @if (svc.opponent(); as opp) {
+        <div class="player" [class.player--active]="g.currentTurn === opp.id">
+          <span class="ava">{{ opp.emoji }}</span>
+          <span class="pname">{{ opp.name }}</span>
+          <span class="ptot">{{ oppTotals().total }}</span>
+        </div>
+      } @else {
+        <div class="player player--empty">
+          <span class="pname">{{ 'yatzy.waitingPlayer' | transloco }}</span>
+        </div>
+      }
+    </header>
+
+    <!-- Würfel + Steuerung -->
+    <section class="dice-area">
+      <div class="dice-tray" aria-label="kocke">
+        @for (i of diceIdx; track i) {
+          <button
+            type="button"
+            class="die"
+            [class.die--held]="isHeld(i)"
+            [class.die--idle]="!rolledThisTurn()"
+            [disabled]="!canHold()"
+            (click)="hold(i)"
+            [attr.aria-label]="'kocka ' + dieValue(i) + (isHeld(i) ? ', zaključana' : '')"
+          >
+            <span class="pips">
+              @for (on of pipsFor(dieValue(i)); track $index) {
+                <span class="pip" [class.pip--on]="on"></span>
+              }
+            </span>
+          </button>
+        }
+      </div>
+
+      @if (svc.isMyTurn()) {
+        <button
+          type="button"
+          class="roll-btn"
+          [disabled]="rollsLeft() === 0"
+          (click)="roll()"
+        >
+          🎲 {{ (rolledThisTurn() ? 'yatzy.rollAgain' : 'yatzy.roll') | transloco }}
+          <span class="rolls">({{ rollsLeft() }})</span>
+        </button>
+        <p class="hint">
+          @if (!rolledThisTurn()) {
+            {{ 'yatzy.startHint' | transloco }}
+          } @else if (rollsLeft() > 0) {
+            {{ 'yatzy.holdHint' | transloco }}
+          } @else {
+            {{ 'yatzy.chooseHint' | transloco }}
+          }
+        </p>
+      } @else {
+        <p class="hint hint--wait">
+          ⏳ {{ 'yatzy.othersTurn' | transloco: { name: currentName() || ('yatzy.player' | transloco) } }}
+        </p>
+      }
+    </section>
+   </div>
+
+    <!-- Wertungstabelle -->
+    <section class="sheet">
+      <div class="row row--head">
+        <span class="lbl"></span>
+        <span class="cell cell--head" [class.cell--turn]="g.currentTurn === svc.me()?.id">
+          {{ svc.me()?.emoji }}
+        </span>
+        <span class="cell cell--head cell--opp" [class.cell--turn]="g.currentTurn === svc.opponent()?.id">
+          {{ svc.opponent()?.emoji || '—' }}
+        </span>
+      </div>
+
+      <div class="section-label">{{ 'yatzy.upper' | transloco }}</div>
+      @for (c of upperCats; track c.key) {
+        <div class="row">
+          <span class="lbl">{{ 'yatzy.cat.' + c.key | transloco }}</span>
+          <button
+            type="button"
+            class="cell"
+            [class.cell--filled]="meFilled(c.key)"
+            [class.cell--pick]="canPick(c.key)"
+            [class.cell--zero]="canPick(c.key) && potential(c.key) === 0"
+            [disabled]="!canPick(c.key)"
+            (click)="choose(c.key)"
+          >
+            @if (meFilled(c.key)) {
+              {{ meValue(c.key) }}
+            } @else if (canPick(c.key)) {
+              {{ potential(c.key) }}
+            } @else {
+              <span class="dot">·</span>
+            }
+          </button>
+          <span class="cell cell--opp" [class.cell--filled]="oppFilled(c.key)">
+            @if (oppFilled(c.key)) { {{ oppValue(c.key) }} } @else { <span class="dot">·</span> }
+          </span>
+        </div>
+      }
+      <div class="row row--sum">
+        <span class="lbl">{{ 'yatzy.bonus' | transloco }}</span>
+        <span class="cell">{{ myTotals().upper }}<i>+{{ myTotals().bonus }}</i></span>
+        <span class="cell cell--opp">{{ oppTotals().upper }}<i>+{{ oppTotals().bonus }}</i></span>
+      </div>
+
+      <div class="section-label">{{ 'yatzy.lower' | transloco }}</div>
+      @for (c of lowerCats; track c.key) {
+        <div class="row">
+          <span class="lbl">{{ 'yatzy.cat.' + c.key | transloco }}</span>
+          <button
+            type="button"
+            class="cell"
+            [class.cell--filled]="meFilled(c.key)"
+            [class.cell--pick]="canPick(c.key)"
+            [class.cell--zero]="canPick(c.key) && potential(c.key) === 0"
+            [disabled]="!canPick(c.key)"
+            (click)="choose(c.key)"
+          >
+            @if (meFilled(c.key)) {
+              {{ meValue(c.key) }}
+            } @else if (canPick(c.key)) {
+              {{ potential(c.key) }}
+            } @else {
+              <span class="dot">·</span>
+            }
+          </button>
+          <span class="cell cell--opp" [class.cell--filled]="oppFilled(c.key)">
+            @if (oppFilled(c.key)) { {{ oppValue(c.key) }} } @else { <span class="dot">·</span> }
+          </span>
+        </div>
+      }
+
+      <div class="row row--total">
+        <span class="lbl">{{ 'yatzy.total' | transloco }}</span>
+        <span class="cell">{{ myTotals().total }}</span>
+        <span class="cell cell--opp">{{ oppTotals().total }}</span>
+      </div>
+    </section>
+
+    <!-- Warten auf Mitspieler -->
+    @if (g.status === 'waiting') {
+      <div class="overlay">
+        <div class="panel">
+          <h2 class="panel-title">{{ 'yatzy.codeTitle' | transloco }}</h2>
+          <p class="code">{{ g.code }}</p>
+          <p class="panel-text">{{ 'yatzy.codeShare' | transloco }}</p>
+          <div class="spinner" aria-hidden="true"></div>
+          <button type="button" class="btn btn-ghost" (click)="leave()">
+            {{ 'yatzy.cancel' | transloco }}
+          </button>
+        </div>
+      </div>
+    }
+
+    <!-- Spielende -->
+    @if (g.status === 'finished') {
+      <div class="overlay">
+        <div
+          class="panel"
+          appDraggable
+          [class.panel--win]="outcome() === 'win'"
+          [class.panel--lose]="outcome() === 'lose'"
+          [class.panel--tie]="outcome() === 'tie'"
+        >
+          @switch (outcome()) {
+            @case ('win') { <div class="result-emoji anim-win">🏆</div> }
+            @case ('lose') { <div class="result-emoji anim-lose">😢</div> }
+            @case ('tie') { <div class="result-emoji anim-tie">🤝</div> }
+          }
+
+          <h2 class="result-title">
+            @switch (outcome()) {
+              @case ('win') { {{ 'yatzy.won' | transloco: { name: svc.me()?.name } }} }
+              @case ('lose') { {{ 'yatzy.lost' | transloco: { name: svc.opponent()?.name } }} }
+              @case ('tie') { {{ 'yatzy.tie' | transloco }} }
+            }
+          </h2>
+
+          <p class="final-score">{{ myTotals().total }} : {{ oppTotals().total }}</p>
+
+          <button type="button" class="btn btn-primary" (click)="playAgain()">
+            {{ 'yatzy.playAgain' | transloco }}
+          </button>
+          <button type="button" class="btn btn-ghost" (click)="leave()">
+            {{ 'yatzy.home' | transloco }}
+          </button>
+        </div>
+      </div>
+    }
+  </div>
+}
