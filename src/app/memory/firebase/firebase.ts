@@ -1,6 +1,7 @@
 import { getApp, getApps, initializeApp, type FirebaseApp } from 'firebase/app';
 import { getDatabase, type Database } from 'firebase/database';
-import { firebaseConfig } from './firebase-config';
+import { firebaseConfig } from '../../shared/firebase-config';
+import { ensureAnonAuth } from '../../shared/firebase-auth';
 
 // Eigene, BENANNTE Firebase-App nur für Memory.
 // In dieser zusammengelegten App laufen mehrere Firebase-Projekte parallel
@@ -30,3 +31,9 @@ if (databaseConfigured) {
 
 // db ist nur gültig, wenn databaseConfigured === true (vorher prüfen!).
 export const db = database as Database;
+
+// Anonyme Anmeldung – die Security Rules verlangen `auth != null`. Erst wenn
+// dieses Promise erfüllt ist, dürfen DB-Zugriffe erfolgen (Services: `await authReady`).
+export const authReady: Promise<void> = databaseConfigured
+  ? ensureAnonAuth(firebaseApp)
+  : Promise.resolve();

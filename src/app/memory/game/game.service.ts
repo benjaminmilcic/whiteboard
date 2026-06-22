@@ -11,7 +11,7 @@ import {
   limitToLast,
   type Unsubscribe,
 } from 'firebase/database';
-import { db, databaseConfigured } from '../firebase/firebase';
+import { authReady, db, databaseConfigured } from '../firebase/firebase';
 import { CARD_MOTIFS } from '../data/card-motifs';
 import type { Card, GameState, Player, ScoreEntry } from './game.types';
 
@@ -88,6 +88,7 @@ export class GameService {
     this.error.set(null);
     try {
       this.assertConfig();
+      await authReady;
       const code = await this.uniqueCode();
       const player: Player = { id: this.playerId, name, avatar, score: 0 };
       const state: GameState = {
@@ -123,6 +124,7 @@ export class GameService {
     this.error.set(null);
     try {
       this.assertConfig();
+      await authReady;
       const snap = await this.withTimeout(get(ref(db, `memory/games/${code}`)));
       if (!snap.exists()) {
         throw new Error('Kein Spiel mit diesem Code gefunden.');
@@ -244,6 +246,9 @@ export class GameService {
   subscribeScores(): void {
     if (this.scoresSubscribed) return;
     this.scoresSubscribed = true;
+    // Die Bestenliste liegt unter `memory/scores` – die Security Rules
+    // verlangen `auth != null`, daher erst nach der anonymen Anmeldung lesen.
+    void authReady.then(() => {
     const q = query(ref(db, 'memory/scores'), orderByChild('finishedAt'), limitToLast(12));
     onValue(
       q,
@@ -257,6 +262,7 @@ export class GameService {
       },
       (err) => this.error.set(this.toMessage(err))
     );
+    });
   }
 
   // ---- Intern --------------------------------------------------------------

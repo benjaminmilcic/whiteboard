@@ -6,6 +6,9 @@
 /out-tsc
 /bazel-out
 
+# Firebase (lokaler Hosting-Cache, keine Geheimnisse – muss nicht ins Repo)
+/.firebase
+
 # Node
 /node_modules
 npm-debug.log

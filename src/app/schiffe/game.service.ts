@@ -16,7 +16,7 @@ import {
   type Firestore,
   type Unsubscribe,
 } from 'firebase/firestore';
-import { firebaseConfig } from './firebase-config';
+import { firebaseConfig } from '../shared/firebase-config';
 import {
   EXTRA_TURN_ON_HIT,
   FLEET,

@@ -1,6 +1,6 @@
 import { Injectable, computed, signal } from '@angular/core';
 import { ref, set, get, update, onValue, type Unsubscribe } from 'firebase/database';
-import { db, databaseConfigured } from '../firebase/firebase';
+import { authReady, db, databaseConfigured } from '../firebase/firebase';
 import type { YatzyGame, YPlayer } from './game.types';
 import {
   CATEGORIES,
@@ -78,6 +78,7 @@ export class GameService {
     this.error.set(null);
     try {
       this.assertConfig();
+      await authReady;
       const code = await this.uniqueCode();
       const player: YPlayer = { id: this.playerId, name: name.trim() || 'Spieler', emoji };
       const state: YatzyGame = {
@@ -114,6 +115,7 @@ export class GameService {
     this.error.set(null);
     try {
       this.assertConfig();
+      await authReady;
       const snap = await this.withTimeout(get(ref(db, `yatzy/games/${code}`)));
       if (!snap.exists()) {
         throw new Error('Kein Spiel mit diesem Code gefunden.');

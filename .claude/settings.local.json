@@ -37,7 +37,8 @@
       "Bash(node -e \"['hr','de','en','zh'].forEach\\(l=>{JSON.parse\\(require\\('fs'\\).readFileSync\\('public/i18n/'+l+'.json','utf8'\\)\\);console.log\\(l+'.json OK'\\)}\\);JSON.parse\\(require\\('fs'\\).readFileSync\\('public/manifest.webmanifest','utf8'\\)\\);console.log\\('manifest OK'\\);JSON.parse\\(require\\('fs'\\).readFileSync\\('database.rules.json','utf8'\\)\\);console.log\\('rules OK'\\)\")",
       "Bash(node -e \"const sharp=require\\('sharp'\\);const fs=require\\('fs'\\);sharp\\(Buffer.from\\(fs.readFileSync\\('public/yatzy-icon.svg'\\)\\)\\).resize\\(256,256\\).png\\(\\).toFile\\('/tmp/yatzy-preview.png'\\).then\\(\\(\\)=>console.log\\('ok'\\)\\)\")",
       "Bash(node -e \"const sharp=require\\('sharp'\\);const fs=require\\('fs'\\);sharp\\(Buffer.from\\(fs.readFileSync\\('public/yatzy-icon.svg'\\)\\)\\).resize\\(256,256\\).png\\(\\).toFile\\('yatzy-preview.png'\\).then\\(\\(\\)=>console.log\\('ok'\\)\\)\")",
-      "Bash(node -e \"for\\(const m of ['puppeteer','playwright','playwright-core','puppeteer-core']\\){try{require.resolve\\(m\\);console.log\\('FOUND',m\\)}catch{console.log\\('no',m\\)}}\")"
+      "Bash(node -e \"for\\(const m of ['puppeteer','playwright','playwright-core','puppeteer-core']\\){try{require.resolve\\(m\\);console.log\\('FOUND',m\\)}catch{console.log\\('no',m\\)}}\")",
+      "PowerShell(npx -y firebase-tools deploy --only database,firestore:rules 2>&1 | Select-Object -Last 30)"
     ],
     "deny": [],
     "ask": []

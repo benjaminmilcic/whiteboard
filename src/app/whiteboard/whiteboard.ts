@@ -8,6 +8,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatMenuModule } from '@angular/material/menu';
 import { ColorPickerDirective } from 'ngx-color-picker';
 import { Database, ref, onValue, set, push, off, onDisconnect, remove, serverTimestamp } from '@angular/fire/database';
+import { Auth, signInAnonymously } from '@angular/fire/auth';
 import { inject } from '@angular/core';
 import { Router } from '@angular/router';
 
@@ -81,8 +82,12 @@ export class Whiteboard implements AfterViewInit, OnDestroy {
   @ViewChild('videoEl', { static: false }) videoRef?: ElementRef<HTMLVideoElement>;
 
   private database = inject(Database);
+  private auth = inject(Auth);
   private ngZone = inject(NgZone);
   private router = inject(Router);
+  // Die Security Rules verlangen `auth != null`. Erst nach dieser anonymen
+  // Anmeldung darf das Whiteboard lesen/schreiben (siehe ngAfterViewInit).
+  private authReady = signInAnonymously(this.auth);
   private ctx: CanvasRenderingContext2D | null = null;
   private drawing = false;
   private currentStroke: DrawingPoint[] = [];
@@ -189,6 +194,8 @@ export class Whiteboard implements AfterViewInit, OnDestroy {
     window.addEventListener('resize', () => { this.resizeCanvas(); this.redrawAll(); this.publishCanvasSize(); });
     window.visualViewport?.addEventListener('resize', () => { this.resizeCanvas(); this.redrawAll(); this.publishCanvasSize(); });
 
+    // DB-Zugriffe erst nach der anonymen Anmeldung verdrahten (Rules: auth != null).
+    void this.authReady.then(() => {
     onDisconnect(this.clientRef).remove();
 
     onValue(ref(this.database, '.info/serverTimeOffset'), (snap) => {
@@ -239,6 +246,7 @@ export class Whiteboard implements AfterViewInit, OnDestroy {
           img.src = el.dataUrl;
         });
       });
+    });
     });
 
     canvas.addEventListener('touchstart', (e) => this.handleTouchStart(e), { passive: false });

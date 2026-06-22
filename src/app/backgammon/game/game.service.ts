@@ -1,6 +1,6 @@
 import { Injectable, computed, signal } from '@angular/core';
 import { ref, set, get, update, onValue, type Unsubscribe } from 'firebase/database';
-import { db, databaseConfigured } from '../firebase/firebase';
+import { authReady, db, databaseConfigured } from '../firebase/firebase';
 import type { BgColor, BgGame, BgMove, BgPlayer } from './game.types';
 
 const PLAYER_ID_KEY = 'bg_player_id';
@@ -95,6 +95,7 @@ export class GameService {
     this.error.set(null);
     try {
       this.assertConfig();
+      await authReady;
       const code = await this.uniqueCode();
       const player: BgPlayer = { id: this.playerId, name: name.trim() || 'Spieler', emoji, color: 'white' };
       const state: BgGame = {
@@ -134,6 +135,7 @@ export class GameService {
     this.error.set(null);
     try {
       this.assertConfig();
+      await authReady;
       const snap = await this.withTimeout(get(ref(db, `backgammon/games/${code}`)));
       if (!snap.exists()) {
         throw new Error('Kein Spiel mit diesem Code gefunden.');

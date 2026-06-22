@@ -1,61 +1,79 @@
 {
+  // Standard: alles gesperrt. Nur die Pfade unten sind offen, und auch die nur
+  // fuer (anonym) angemeldete Clients (auth != null). Das blockt direkte
+  // REST-Zugriffe ohne Token, sobald das Repo oeffentlich ist.
   "rules": {
+    ".read": false,
+    ".write": false,
+
     "whiteboard": {
-      ".read": true,
-      ".write": true
+      ".read": "auth != null",
+      ".write": "auth != null"
     },
+
     "memory": {
       "games": {
         "$code": {
-          ".read": true,
-          ".write": true
+          ".read": "auth != null",
+          ".write": "auth != null",
+          ".validate": "newData.hasChildren()"
         }
       },
       "scores": {
-        ".read": true,
-        ".write": true,
+        ".read": "auth != null",
+        ".write": "auth != null",
         "$id": {
           ".validate": "newData.hasChildren(['winnerName', 'finishedAt'])"
         }
       }
     },
+
     "connect4": {
       "games": {
         "$code": {
-          ".read": true,
-          ".write": true
+          ".read": "auth != null",
+          ".write": "auth != null",
+          ".validate": "newData.hasChildren()"
         }
       }
     },
+
     "backgammon": {
       "games": {
         "$code": {
-          ".read": true,
-          ".write": true
+          ".read": "auth != null",
+          ".write": "auth != null",
+          ".validate": "newData.hasChildren()"
         }
       }
     },
+
     "dame": {
       "games": {
         "$code": {
-          ".read": true,
-          ".write": true
+          ".read": "auth != null",
+          ".write": "auth != null",
+          ".validate": "newData.hasChildren()"
         }
       }
     },
+
     "schach": {
       "games": {
         "$code": {
-          ".read": true,
-          ".write": true
+          ".read": "auth != null",
+          ".write": "auth != null",
+          ".validate": "newData.hasChildren()"
         }
       }
     },
+
     "yatzy": {
       "games": {
         "$code": {
-          ".read": true,
-          ".write": true
+          ".read": "auth != null",
+          ".write": "auth != null",
+          ".validate": "newData.hasChildren()"
         }
       }
     }
