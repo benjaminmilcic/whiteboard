@@ -7,7 +7,8 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatMenuModule } from '@angular/material/menu';
 import { ColorPickerDirective } from 'ngx-color-picker';
-import { Database, ref, onValue, set, push, off, onDisconnect, remove, serverTimestamp } from '@angular/fire/database';
+import { Database, DatabaseReference, ref, onValue, set, get, push, off, onDisconnect, remove, serverTimestamp } from '@angular/fire/database';
+import { FormsModule } from '@angular/forms';
 import { Auth, signInAnonymously } from '@angular/fire/auth';
 import { inject } from '@angular/core';
 import { Router } from '@angular/router';
@@ -72,7 +73,7 @@ interface ActiveImage {
 
 @Component({
   selector: 'app-whiteboard',
-  imports: [CommonModule, MatButtonModule, MatFormFieldModule, MatIconModule, MatMenuModule, MatSelectModule, MatToolbarModule, ColorPickerDirective],
+  imports: [CommonModule, FormsModule, MatButtonModule, MatFormFieldModule, MatIconModule, MatMenuModule, MatSelectModule, MatToolbarModule, ColorPickerDirective],
   templateUrl: './whiteboard.html',
   styleUrl: './whiteboard.scss',
 })
@@ -91,10 +92,15 @@ export class Whiteboard implements AfterViewInit, OnDestroy {
   private ctx: CanvasRenderingContext2D | null = null;
   private drawing = false;
   private currentStroke: DrawingPoint[] = [];
-  private elementsRef = ref(this.database, 'whiteboard/elements');
   private clientId = Math.random().toString(36).slice(2);
-  private clientsRef = ref(this.database, 'whiteboard/clients');
-  private clientRef = ref(this.database, `whiteboard/clients/${this.clientId}`);
+  // Die DB-Pfade haengen vom 4-stelligen Sitzungs-Code ab und werden erst
+  // gesetzt, sobald eine Tafel erstellt oder betreten wurde (connectSession).
+  private elementsRef!: DatabaseReference;
+  private clientsRef!: DatabaseReference;
+  private clientRef!: DatabaseReference;
+  private sessionConnected = false;
+  // Nur Ziffern, damit der Code kindgerecht vorlesbar/eintippbar ist.
+  private readonly CODE_ALPHABET = '0123456789';
 
   private elements: ElementsMap = {};
   private loadedImages = new Map<string, HTMLImageElement>();
@@ -128,6 +134,21 @@ export class Whiteboard implements AfterViewInit, OnDestroy {
   viewportBorder = signal<{ width: number; height: number } | null>(null);
   activeImage = signal<ActiveImage | null>(null);
   showCameraModal = signal(false);
+
+  // ---- Sessions ------------------------------------------------------------
+  // Beim Start wird automatisch eine eigene Session erzeugt; man kann sofort
+  // malen. Ueber die zwei kleinen Buttons in der Toolbar kann man die Session
+  // wechseln (neu/beitreten) oder den Code anzeigen.
+  sessionCode = signal('');
+  joinCode = signal('');
+  lobbyError = signal('');
+  lobbyBusy = signal(false);
+  // Wie viele Maler gerade aktiv (nicht veraltet) in dieser Session sind.
+  participantCount = signal(0);
+  // Overlay: neue Session starten oder per Code beitreten.
+  showSessionMenu = signal(false);
+  // Popup: aktuellen 4-stelligen Code anzeigen.
+  showInfo = signal(false);
 
   showGradientModal = signal(false);
   gradientColors = signal<string[]>([]);
@@ -194,25 +215,121 @@ export class Whiteboard implements AfterViewInit, OnDestroy {
     window.addEventListener('resize', () => { this.resizeCanvas(); this.redrawAll(); this.publishCanvasSize(); });
     window.visualViewport?.addEventListener('resize', () => { this.resizeCanvas(); this.redrawAll(); this.publishCanvasSize(); });
 
-    // DB-Zugriffe erst nach der anonymen Anmeldung verdrahten (Rules: auth != null).
+    canvas.addEventListener('touchstart', (e) => this.handleTouchStart(e), { passive: false });
+    canvas.addEventListener('touchmove', (e) => this.handleTouchMove(e), { passive: false });
+    canvas.addEventListener('touchend', (e) => this.handleTouchEnd(e), { passive: false });
+
+    // Globale Listener + automatische erste Session, erst nach anonymer
+    // Anmeldung (Rules: auth != null). Danach kann sofort gemalt werden.
     void this.authReady.then(() => {
-    onDisconnect(this.clientRef).remove();
-
-    onValue(ref(this.database, '.info/serverTimeOffset'), (snap) => {
-      this.serverTimeOffset = snap.val() ?? 0;
+      onValue(ref(this.database, '.info/serverTimeOffset'), (snap) => {
+        this.serverTimeOffset = snap.val() ?? 0;
+      });
+      document.addEventListener('visibilitychange', this.onVisibilityChange);
+      void this.startNewSession();
     });
+  }
 
-    document.addEventListener('visibilitychange', this.onVisibilityChange);
+  // ---- Sessions: neu starten / beitreten / wechseln ------------------------
+  /** Erzeugt eine frische Session mit eigenem Code und verbindet sie. */
+  async startNewSession(): Promise<void> {
+    if (this.lobbyBusy()) return;
+    this.lobbyBusy.set(true);
+    this.lobbyError.set('');
+    try {
+      await this.authReady;
+      const code = await this.uniqueCode();
+      // Sitzungs-Marker, damit Beitretende die Existenz pruefen koennen.
+      await set(ref(this.database, `whiteboard/sessions/${code}/meta`), {
+        createdAt: serverTimestamp(),
+        hostId: this.clientId,
+      });
+      this.connectSession(code);
+      this.showSessionMenu.set(false);
+      this.joinCode.set('');
+    } catch (e) {
+      this.lobbyError.set(this.toMessage(e));
+    } finally {
+      this.lobbyBusy.set(false);
+    }
+  }
+
+  /** Tritt einer bestehenden Session ueber ihren Code bei. */
+  async joinSession(): Promise<void> {
+    if (this.lobbyBusy()) return;
+    const code = this.joinCode().trim();
+    if (code.length !== 4) return;
+    this.lobbyBusy.set(true);
+    this.lobbyError.set('');
+    try {
+      await this.authReady;
+      const snap = await get(ref(this.database, `whiteboard/sessions/${code}/meta`));
+      if (!snap.exists()) {
+        this.lobbyError.set('Nema ploče s tim kodom.');
+        return;
+      }
+      this.connectSession(code);
+      this.showSessionMenu.set(false);
+      this.joinCode.set('');
+    } catch (e) {
+      this.lobbyError.set(this.toMessage(e));
+    } finally {
+      this.lobbyBusy.set(false);
+    }
+  }
+
+  onJoinCode(value: string): void {
+    this.joinCode.set(value.replace(/\D/g, '').slice(0, 4));
+  }
+
+  /** Oeffnet das Overlay zum Wechseln der Session (neu / beitreten). */
+  openSessionMenu(): void {
+    this.lobbyError.set('');
+    this.joinCode.set('');
+    this.showSessionMenu.set(true);
+  }
+
+  closeSessionMenu(): void {
+    this.showSessionMenu.set(false);
+  }
+
+  toggleInfo(): void {
+    this.showInfo.update((v) => !v);
+  }
+
+  /**
+   * Loest die Listener der bisherigen Session, verbindet die neue und
+   * verwirft den lokalen Zeichen-Zustand (Sessions sind voneinander getrennt).
+   */
+  private connectSession(code: string): void {
+    this.detachSession();
+    this.sessionCode.set(code);
+    this.elementsRef = ref(this.database, `whiteboard/sessions/${code}/elements`);
+    this.clientsRef = ref(this.database, `whiteboard/sessions/${code}/clients`);
+    this.clientRef = ref(this.database, `whiteboard/sessions/${code}/clients/${this.clientId}`);
+    this.sessionConnected = true;
+
+    // Zustand der vorherigen Session vollstaendig verwerfen.
+    this.elements = {};
+    this.loadedImages.clear();
+    this.undoStack.set([]);
+    this.redoStack.set([]);
+    this.viewportBorder.set(null);
+    this.participantCount.set(0);
+    this.redrawAll();
+
+    onDisconnect(this.clientRef).remove();
     this.startHeartbeat();
 
     onValue(this.clientsRef, (snapshot) => {
       const clients = snapshot.val();
       const cvs = this.canvasRef.nativeElement;
       this.ngZone.run(() => {
-        if (!clients) { this.viewportBorder.set(null); return; }
+        if (!clients) { this.viewportBorder.set(null); this.participantCount.set(0); return; }
         const now = this.serverNow();
         const sizes = (Object.values(clients) as { width: number; height: number; lastSeen?: number }[])
           .filter(s => typeof s.lastSeen === 'number' && now - s.lastSeen < this.STALE_MS);
+        this.participantCount.set(sizes.length);
         if (sizes.length === 0) { this.viewportBorder.set(null); return; }
         const minW = Math.min(...sizes.map(s => s.width));
         const minH = Math.min(...sizes.map(s => s.height));
@@ -247,20 +364,47 @@ export class Whiteboard implements AfterViewInit, OnDestroy {
         });
       });
     });
-    });
+  }
 
-    canvas.addEventListener('touchstart', (e) => this.handleTouchStart(e), { passive: false });
-    canvas.addEventListener('touchmove', (e) => this.handleTouchMove(e), { passive: false });
-    canvas.addEventListener('touchend', (e) => this.handleTouchEnd(e), { passive: false });
+  private async uniqueCode(): Promise<string> {
+    for (let attempt = 0; attempt < 8; attempt++) {
+      const code = this.randomCode();
+      const snap = await get(ref(this.database, `whiteboard/sessions/${code}/meta`));
+      if (!snap.exists()) return code;
+    }
+    return this.randomCode();
+  }
+
+  private randomCode(): string {
+    let s = '';
+    for (let i = 0; i < 4; i++) {
+      s += this.CODE_ALPHABET[Math.floor(Math.random() * this.CODE_ALPHABET.length)];
+    }
+    return s;
+  }
+
+  private toMessage(e: unknown): string {
+    const raw = e instanceof Error ? e.message : String(e);
+    if (raw.includes('PERMISSION_DENIED')) {
+      return 'Nema veze s bazom. Jesu li pravila baze za "whiteboard" postavljena?';
+    }
+    return raw;
+  }
+
+  /** Listener der aktuellen Session loesen und Praesenz entfernen. */
+  private detachSession(): void {
+    if (!this.sessionConnected) return;
+    this.stopHeartbeat();
+    off(this.elementsRef);
+    off(this.clientsRef);
+    remove(this.clientRef);
+    this.sessionConnected = false;
   }
 
   ngOnDestroy(): void {
     this.stopVideoStream();
-    this.stopHeartbeat();
+    this.detachSession();
     document.removeEventListener('visibilitychange', this.onVisibilityChange);
-    off(this.elementsRef);
-    off(this.clientsRef);
-    remove(this.clientRef);
   }
 
   private serverNow(): number {
@@ -268,6 +412,7 @@ export class Whiteboard implements AfterViewInit, OnDestroy {
   }
 
   private onVisibilityChange = (): void => {
+    if (!this.sessionConnected) return;
     if (document.visibilityState === 'hidden') {
       this.stopHeartbeat();
       remove(this.clientRef);
@@ -404,6 +549,7 @@ export class Whiteboard implements AfterViewInit, OnDestroy {
   }
 
   private saveStroke(): void {
+    if (!this.sessionConnected) return;
     this.pushHistory();
     const el: StrokeElement = {
       type: 'stroke',
@@ -419,6 +565,7 @@ export class Whiteboard implements AfterViewInit, OnDestroy {
   }
 
   fillArea(): void {
+    if (!this.sessionConnected) return;
     const canvas = this.canvasRef.nativeElement;
     const border = this.viewportBorder();
     const width = border ? border.width : canvas.width;
@@ -469,6 +616,7 @@ export class Whiteboard implements AfterViewInit, OnDestroy {
   }
 
   applyGradientFill(): void {
+    if (!this.sessionConnected) return;
     if (this.gradientColors().length === 0) return;
     const canvas = this.canvasRef.nativeElement;
     const border = this.viewportBorder();
@@ -492,6 +640,7 @@ export class Whiteboard implements AfterViewInit, OnDestroy {
   }
 
   private publishCanvasSize(): void {
+    if (!this.sessionConnected) return;
     const canvas = this.canvasRef.nativeElement;
     set(this.clientRef, {
       width: canvas.width,
@@ -644,6 +793,7 @@ export class Whiteboard implements AfterViewInit, OnDestroy {
   }
 
   commitImage(): void {
+    if (!this.sessionConnected) return;
     const active = this.activeImage();
     if (!active) return;
     this.activeImage.set(null);
@@ -676,6 +826,7 @@ export class Whiteboard implements AfterViewInit, OnDestroy {
   }
 
   clearCanvas(): void {
+    if (!this.sessionConnected) return;
     this.pushHistory();
     if (this.ctx) {
       const canvas = this.canvasRef.nativeElement;
@@ -697,6 +848,7 @@ export class Whiteboard implements AfterViewInit, OnDestroy {
   }
 
   private applySnapshot(snapshot: ElementsMap): void {
+    if (!this.sessionConnected) return;
     set(this.elementsRef, Object.keys(snapshot).length === 0 ? null : snapshot);
   }
 

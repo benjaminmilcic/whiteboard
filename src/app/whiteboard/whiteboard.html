@@ -153,7 +153,7 @@
           <span>Kamera</span>
         </button>
       </mat-menu>
-      <div class="flex flex-wrap gap-4 ml-auto">
+      <div class="flex flex-wrap items-center gap-4 ml-auto">
         <button
           mat-mini-fab
           color="accent"
@@ -173,6 +173,31 @@
         <button mat-mini-fab color="warn" (click)="clearCanvas()">
           <mat-icon>delete</mat-icon>
         </button>
+
+        <!-- Session-Buttons: links neben dem Hauptmenü-Button -->
+        <div class="flex items-center gap-2 ml-2">
+          <!-- Aktuelle Session abbrechen / wechseln (neu oder beitreten) -->
+          <button
+            type="button"
+            (click)="openSessionMenu()"
+            title="Promijeni ploču"
+            aria-label="Promijeni ploču"
+            class="w-9 h-9 rounded-full bg-gray-200 text-gray-700 cursor-pointer flex items-center justify-center hover:bg-gray-300 transition"
+          >
+            <mat-icon class="!w-5 !h-5 !text-xl !leading-5 flex items-center justify-center">swap_horiz</mat-icon>
+          </button>
+          <!-- Info: aktuellen Code anzeigen -->
+          <button
+            type="button"
+            (click)="toggleInfo()"
+            title="Pokaži kod"
+            aria-label="Pokaži kod"
+            class="w-9 h-9 rounded-full bg-gray-200 text-gray-700 cursor-pointer flex items-center justify-center hover:bg-gray-300 transition"
+          >
+            <mat-icon class="!w-5 !h-5 !text-xl !leading-5 flex items-center justify-center">info</mat-icon>
+          </button>
+        </div>
+
         <!-- Zurück zur Start-Auswahl (ganz rechts, mit etwas Abstand zum Löschen-Button) -->
         <button
           type="button"
@@ -253,6 +278,86 @@
       </div>
     }
   </div>
+
+  @if (showInfo()) {
+    <div class="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 p-4" (click)="showInfo.set(false)">
+      <div class="bg-white rounded-3xl shadow-2xl p-6 sm:p-8 flex flex-col gap-4 w-full max-w-sm text-center" (click)="$event.stopPropagation()">
+        <h2 class="text-2xl font-bold text-gray-800">🔑 Kod ploče</h2>
+        <p class="text-gray-500">Reci ovaj kod prijateljima da se pridruže.</p>
+        <div class="text-6xl font-black tracking-[0.3em] text-indigo-600 bg-indigo-50 rounded-2xl py-6">
+          {{ sessionCode() }}
+        </div>
+        @if (participantCount() > 0) {
+          <p class="text-gray-400">👥 Crta nas: {{ participantCount() }}</p>
+        }
+        <button
+          type="button"
+          (click)="showInfo.set(false)"
+          class="bg-indigo-500 text-white text-lg font-bold py-3 rounded-2xl shadow transition active:scale-95"
+        >
+          U redu
+        </button>
+      </div>
+    </div>
+  }
+
+  @if (showSessionMenu()) {
+    <div class="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 p-4">
+      <div class="bg-white rounded-3xl shadow-2xl p-6 sm:p-8 flex flex-col gap-5 w-full max-w-md text-center">
+        <h2 class="text-3xl font-bold text-gray-800">🎨 Promijeni ploču</h2>
+
+        @if (lobbyError()) {
+          <p class="text-red-600 font-medium">{{ lobbyError() }}</p>
+        }
+
+        <p class="text-gray-500">Započni potpuno novu ploču ili se pridruži postojećoj pomoću koda. Različite ploče ne vide crteže jedna druge.</p>
+
+        <button
+          type="button"
+          [disabled]="lobbyBusy()"
+          (click)="startNewSession()"
+          class="bg-indigo-500 text-white text-lg font-bold py-3 rounded-2xl shadow transition active:scale-95 disabled:opacity-50"
+        >
+          {{ lobbyBusy() ? 'Pravim ploču…' : '➕ Nova ploča' }}
+        </button>
+
+        <div class="flex items-center gap-3 text-gray-400">
+          <span class="flex-1 h-px bg-gray-200"></span>
+          <span class="text-sm">ili</span>
+          <span class="flex-1 h-px bg-gray-200"></span>
+        </div>
+
+        <label class="flex flex-col gap-2 text-left">
+          <span class="font-medium text-gray-700">Pridruži se ploči</span>
+          <input
+            type="text"
+            inputmode="numeric"
+            maxlength="4"
+            placeholder="Upiši kod"
+            [ngModel]="joinCode()"
+            (ngModelChange)="onJoinCode($event)"
+            class="w-full text-center tracking-[0.5em] text-2xl font-bold border-2 border-gray-300 rounded-2xl py-3 focus:border-indigo-500 outline-none"
+          />
+        </label>
+        <button
+          type="button"
+          [disabled]="joinCode().length !== 4 || lobbyBusy()"
+          (click)="joinSession()"
+          class="bg-green-500 text-white text-lg font-bold py-3 rounded-2xl shadow transition active:scale-95 disabled:opacity-50"
+        >
+          {{ lobbyBusy() ? 'Spajam…' : '🖌️ Pridruži se' }}
+        </button>
+
+        <button
+          type="button"
+          (click)="closeSessionMenu()"
+          class="text-gray-500 underline text-sm mt-1"
+        >
+          Odustani
+        </button>
+      </div>
+    </div>
+  }
 
   @if (showCameraModal()) {
     <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/70">

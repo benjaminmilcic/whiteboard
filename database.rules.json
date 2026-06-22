@@ -7,8 +7,13 @@
     ".write": false,
 
     "whiteboard": {
-      ".read": "auth != null",
-      ".write": "auth != null"
+      "sessions": {
+        "$code": {
+          ".read": "auth != null",
+          ".write": "auth != null",
+          ".validate": "newData.hasChildren()"
+        }
+      }
     },
 
     "memory": {

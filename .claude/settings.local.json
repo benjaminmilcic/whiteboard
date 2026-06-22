@@ -38,7 +38,9 @@
       "Bash(node -e \"const sharp=require\\('sharp'\\);const fs=require\\('fs'\\);sharp\\(Buffer.from\\(fs.readFileSync\\('public/yatzy-icon.svg'\\)\\)\\).resize\\(256,256\\).png\\(\\).toFile\\('/tmp/yatzy-preview.png'\\).then\\(\\(\\)=>console.log\\('ok'\\)\\)\")",
       "Bash(node -e \"const sharp=require\\('sharp'\\);const fs=require\\('fs'\\);sharp\\(Buffer.from\\(fs.readFileSync\\('public/yatzy-icon.svg'\\)\\)\\).resize\\(256,256\\).png\\(\\).toFile\\('yatzy-preview.png'\\).then\\(\\(\\)=>console.log\\('ok'\\)\\)\")",
       "Bash(node -e \"for\\(const m of ['puppeteer','playwright','playwright-core','puppeteer-core']\\){try{require.resolve\\(m\\);console.log\\('FOUND',m\\)}catch{console.log\\('no',m\\)}}\")",
-      "PowerShell(npx -y firebase-tools deploy --only database,firestore:rules 2>&1 | Select-Object -Last 30)"
+      "PowerShell(npx -y firebase-tools deploy --only database,firestore:rules 2>&1 | Select-Object -Last 30)",
+      "PowerShell(npx tsc --noEmit -p tsconfig.app.json 2>&1 | Select-Object -First 40)",
+      "PowerShell(npx ng build 2>&1 | Select-Object -Last 25)"
     ],
     "deny": [],
     "ask": []
