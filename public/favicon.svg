@@ -2,28 +2,44 @@
   
   <defs>
     <linearGradient id="lc" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#38bdf8" />
-      <stop offset="1" stop-color="#6366f1" />
+      <stop offset="0" stop-color="#6366f1" />
+      <stop offset="1" stop-color="#4338ca" />
     </linearGradient>
   </defs>
   <rect x="0" y="0" width="512" height="512" rx="112" fill="url(#lc)" />
   
-  <!-- Anker (links) -->
-  <g fill="none" stroke="#ffffff" stroke-width="20"
-     stroke-linecap="round" stroke-linejoin="round"
-     transform="translate(150 256) scale(0.62) translate(-256 -256)">
-    <line x1="256" y1="152" x2="256" y2="398" />
-    <circle cx="256" cy="122" r="30" />
-    <line x1="198" y1="184" x2="314" y2="184" />
-    <path d="M148 298 A108 108 0 0 0 364 298" />
-    <path d="M148 298 L120 256" />
-    <path d="M364 298 L392 256" />
-  </g>
-  <!-- Stift (rechts) -->
-  <g transform="translate(330 256) rotate(30) scale(0.9)">
-    <rect x="-22" y="-120" width="44" height="200" rx="10" fill="#fbbf24" stroke="#f59e0b" stroke-width="4" />
-    <rect x="-22" y="-120" width="44" height="34" fill="#f472b6" />
-    <polygon points="-22,80 22,80 0,128" fill="#fde68a" stroke="#f59e0b" stroke-width="4" />
-    <polygon points="-11,108 11,108 0,128" fill="#1f2937" />
-  </g>
+  <!-- Ohren -->
+  <path d="M150 206 L112 90 L236 168 Z" fill="#f97316" />
+  <path d="M362 206 L400 90 L276 168 Z" fill="#f97316" />
+  <path d="M160 196 L142 122 L214 172 Z" fill="#3730a3" />
+  <path d="M352 196 L370 122 L298 172 Z" fill="#3730a3" />
+
+  <!-- Kopf -->
+  <path d="M256 150
+           C 196 150 160 170 148 208
+           C 136 246 138 290 154 330
+           C 174 382 216 418 256 418
+           C 296 418 338 382 358 330
+           C 374 290 376 246 364 208
+           C 352 170 316 150 256 150 Z" fill="#f97316" />
+
+  <!-- Weiße Schnauze / Wangen -->
+  <path d="M186 280
+           C 202 270 240 274 256 296
+           C 272 274 310 270 326 280
+           C 328 326 300 378 256 418
+           C 212 378 184 326 186 280 Z" fill="#ffffff" />
+
+  <!-- Augen -->
+  <ellipse cx="208" cy="250" rx="15" ry="19" fill="#1f2937" />
+  <ellipse cx="304" cy="250" rx="15" ry="19" fill="#1f2937" />
+  <circle cx="214" cy="243" r="5" fill="#ffffff" />
+  <circle cx="310" cy="243" r="5" fill="#ffffff" />
+
+  <!-- Nase -->
+  <path d="M256 350
+           C 243 350 234 342 234 332
+           C 234 323 244 319 256 319
+           C 268 319 278 323 278 332
+           C 278 342 269 350 256 350 Z" fill="#1f2937" />
 </svg>

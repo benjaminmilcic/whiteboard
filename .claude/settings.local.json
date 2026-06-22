@@ -29,7 +29,11 @@
       "Bash(node -e \"const sharp=require\\('sharp'\\);sharp\\('public/puzzle-icon.svg'\\).resize\\(256,256\\).png\\(\\).toFile\\('puzzle-icon-preview.png'\\).then\\(\\(\\)=>console.log\\('ok'\\)\\).catch\\(e=>console.error\\(e.message\\)\\)\")",
       "Bash(node -e \"require\\('sharp'\\)\\('public/hangman-icon.svg'\\).resize\\(256,256\\).png\\(\\).toFile\\('hm-preview.png'\\).then\\(\\(\\)=>console.log\\('ok'\\)\\).catch\\(e=>console.error\\(e.message\\)\\)\")",
       "Bash(node -e \"require\\('sharp'\\)\\('public/hangman-icon.svg'\\).resize\\(256,256\\).png\\(\\).toFile\\('hm2.png'\\).then\\(\\(\\)=>console.log\\('ok'\\)\\).catch\\(e=>console.error\\(e.message\\)\\)\")",
-      "Bash(node -e \"const s=require\\('sharp'\\);Promise.all\\([s\\('public/hangman-icon.svg'\\).resize\\(256,256\\).png\\(\\).toFile\\('icon.png'\\),s\\('snowfull-preview.svg'\\).resize\\(180,198\\).png\\(\\).toFile\\('snow.png'\\)]\\).then\\(\\(\\)=>console.log\\('ok'\\)\\).catch\\(e=>console.error\\(e.message\\)\\)\")"
+      "Bash(node -e \"const s=require\\('sharp'\\);Promise.all\\([s\\('public/hangman-icon.svg'\\).resize\\(256,256\\).png\\(\\).toFile\\('icon.png'\\),s\\('snowfull-preview.svg'\\).resize\\(180,198\\).png\\(\\).toFile\\('snow.png'\\)]\\).then\\(\\(\\)=>console.log\\('ok'\\)\\).catch\\(e=>console.error\\(e.message\\)\\)\")",
+      "Bash(npm run *)",
+      "Bash(node -e \"console.log\\(JSON.stringify\\(require\\('./public/manifest.webmanifest'\\),null,0\\)\\)\")",
+      "Bash(node -e \"const fs=require\\('fs'\\);JSON.parse\\(fs.readFileSync\\('./public/manifest.webmanifest','utf8'\\)\\);console.log\\('manifest.webmanifest: valid JSON ✓'\\)\")",
+      "Bash(node -e \"const fs=require\\('fs'\\);const m=JSON.parse\\(fs.readFileSync\\('./public/manifest.webmanifest','utf8'\\)\\);console.log\\('manifest valid ✓  id =',m.id\\)\")"
     ],
     "deny": [],
     "ask": []

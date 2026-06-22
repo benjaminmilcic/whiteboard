@@ -1,7 +1,11 @@
-// Erzeugt die App-Icons für die zusammengelegte App.
-//  - whiteboard-icon-*  : Mal-/Whiteboard-Motiv (für die Auswahl-Kachel + PWA)
-//  - app-icon-*         : kombiniertes Start-Icon (Anker + Stift) für die
-//                         installierte PWA der Gesamt-App
+// Erzeugt die App-Icons für die zusammengelegte Spielesammlung "Igre za Lisu".
+//  - favicon.svg / favicon.ico / favicon-48 : Browser-Favicon
+//  - app-icon-*  : Start-/Launcher-Icon der installierten PWA
+//  - apple-touch-icon : iOS-Homescreen
+//
+// Motiv: 2x2 bunte Spiele-Kacheln (Stift = Malen, Puzzle, Schachfigur,
+//        Würfel) auf einem Farbverlauf – steht für die ganze Sammlung.
+//
 // Aufruf:  npm run icons   (sharp muss installiert sein)
 
 import sharp from 'sharp';
@@ -13,86 +17,66 @@ const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const outDir = join(root, 'public');
 mkdirSync(outDir, { recursive: true });
 
-// ---- Motiv: Whiteboard / Malen --------------------------------------
-// Weißes Blatt mit bunten Kritzel-Strichen und einem gelben Stift.
-const board = `
-  <g>
-    <rect x="92" y="104" width="328" height="304" rx="30" fill="#ffffff"
-          stroke="#e2e8f0" stroke-width="6" />
-    <g fill="none" stroke-width="20" stroke-linecap="round">
-      <path d="M132 188 q40 -34 80 0 t80 0 t40 -10" stroke="#ef4444" />
-      <path d="M132 256 q40 -34 80 0 t80 0 t40 -10" stroke="#22c55e" />
-      <path d="M132 324 q40 -34 80 0 t80 0 t40 -10" stroke="#3b82f6" />
-    </g>
-  </g>
-  <!-- Stift, diagonal über die rechte untere Ecke -->
-  <g transform="rotate(45 360 360)">
-    <rect x="338" y="150" width="44" height="250" rx="10" fill="#fbbf24"
-          stroke="#f59e0b" stroke-width="4" />
-    <rect x="338" y="150" width="44" height="40" fill="#f472b6" />
-    <polygon points="338,400 382,400 360,452" fill="#fde68a" stroke="#f59e0b" stroke-width="4" />
-    <polygon points="350,430 370,430 360,452" fill="#1f2937" />
-  </g>`;
+// ---- Motiv: Fuchs ("lisica" = Fuchs) -------------------------------
+// Kräftiges, kindgerechtes Fuchsgesicht (orange/weiß) – steht für
+// "Igre za Lisu". Hoher Kontrast auf Indigo-Hintergrund, unverwechselbar.
+const fox = `
+  <!-- Ohren -->
+  <path d="M150 206 L112 90 L236 168 Z" fill="#f97316" />
+  <path d="M362 206 L400 90 L276 168 Z" fill="#f97316" />
+  <path d="M160 196 L142 122 L214 172 Z" fill="#3730a3" />
+  <path d="M352 196 L370 122 L298 172 Z" fill="#3730a3" />
 
-const wbDefs = `
-  <defs>
-    <linearGradient id="wb" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#a78bfa" />
-      <stop offset="1" stop-color="#ec4899" />
-    </linearGradient>
-  </defs>`;
+  <!-- Kopf -->
+  <path d="M256 150
+           C 196 150 160 170 148 208
+           C 136 246 138 290 154 330
+           C 174 382 216 418 256 418
+           C 296 418 338 382 358 330
+           C 374 290 376 246 364 208
+           C 352 170 316 150 256 150 Z" fill="#f97316" />
 
-const wbRounded = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  ${wbDefs}
-  <rect x="0" y="0" width="512" height="512" rx="112" fill="url(#wb)" />
-  ${board}
-</svg>`;
+  <!-- Weiße Schnauze / Wangen -->
+  <path d="M186 280
+           C 202 270 240 274 256 296
+           C 272 274 310 270 326 280
+           C 328 326 300 378 256 418
+           C 212 378 184 326 186 280 Z" fill="#ffffff" />
 
-const wbMaskable = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  ${wbDefs}
-  <rect x="0" y="0" width="512" height="512" fill="url(#wb)" />
-  <g transform="translate(256 256) scale(0.82) translate(-256 -256)">${board}</g>
-</svg>`;
+  <!-- Augen -->
+  <ellipse cx="208" cy="250" rx="15" ry="19" fill="#1f2937" />
+  <ellipse cx="304" cy="250" rx="15" ry="19" fill="#1f2937" />
+  <circle cx="214" cy="243" r="5" fill="#ffffff" />
+  <circle cx="310" cy="243" r="5" fill="#ffffff" />
 
-// ---- Kombiniertes Start-Icon (Anker + Stift) ------------------------
+  <!-- Nase -->
+  <path d="M256 350
+           C 243 350 234 342 234 332
+           C 234 323 244 319 256 319
+           C 268 319 278 323 278 332
+           C 278 342 269 350 256 350 Z" fill="#1f2937" />`;
+
+const gamesArt = fox;
+
 const launcherDefs = `
   <defs>
     <linearGradient id="lc" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#38bdf8" />
-      <stop offset="1" stop-color="#6366f1" />
+      <stop offset="0" stop-color="#6366f1" />
+      <stop offset="1" stop-color="#4338ca" />
     </linearGradient>
   </defs>`;
-
-const launcherArt = `
-  <!-- Anker (links) -->
-  <g fill="none" stroke="#ffffff" stroke-width="20"
-     stroke-linecap="round" stroke-linejoin="round"
-     transform="translate(150 256) scale(0.62) translate(-256 -256)">
-    <line x1="256" y1="152" x2="256" y2="398" />
-    <circle cx="256" cy="122" r="30" />
-    <line x1="198" y1="184" x2="314" y2="184" />
-    <path d="M148 298 A108 108 0 0 0 364 298" />
-    <path d="M148 298 L120 256" />
-    <path d="M364 298 L392 256" />
-  </g>
-  <!-- Stift (rechts) -->
-  <g transform="translate(330 256) rotate(30) scale(0.9)">
-    <rect x="-22" y="-120" width="44" height="200" rx="10" fill="#fbbf24" stroke="#f59e0b" stroke-width="4" />
-    <rect x="-22" y="-120" width="44" height="34" fill="#f472b6" />
-    <polygon points="-22,80 22,80 0,128" fill="#fde68a" stroke="#f59e0b" stroke-width="4" />
-    <polygon points="-11,108 11,108 0,128" fill="#1f2937" />
-  </g>`;
 
 const launcherRounded = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
   ${launcherDefs}
   <rect x="0" y="0" width="512" height="512" rx="112" fill="url(#lc)" />
-  ${launcherArt}
+  ${gamesArt}
 </svg>`;
 
+// Maskable: Motiv etwas kleiner, Hintergrund randlos (Safe-Zone)
 const launcherMaskable = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
   ${launcherDefs}
   <rect x="0" y="0" width="512" height="512" fill="url(#lc)" />
-  <g transform="translate(256 256) scale(0.82) translate(-256 -256)">${launcherArt}</g>
+  <g transform="translate(256 256) scale(0.8) translate(-256 -256)">${gamesArt}</g>
 </svg>`;
 
 async function png(svg, size, name) {
@@ -100,18 +84,52 @@ async function png(svg, size, name) {
   console.log('  ✓', name, `(${size}px)`);
 }
 
+// PNG-basierte .ico mit mehreren Größen erzeugen
+function buildIco(images) {
+  const count = images.length;
+  const header = Buffer.alloc(6);
+  header.writeUInt16LE(0, 0); // reserved
+  header.writeUInt16LE(1, 2); // type = icon
+  header.writeUInt16LE(count, 4);
+
+  const entries = Buffer.alloc(16 * count);
+  let offset = 6 + 16 * count;
+  const bodies = [];
+  images.forEach((img, i) => {
+    const e = i * 16;
+    entries.writeUInt8(img.size >= 256 ? 0 : img.size, e + 0); // width
+    entries.writeUInt8(img.size >= 256 ? 0 : img.size, e + 1); // height
+    entries.writeUInt8(0, e + 2); // colors
+    entries.writeUInt8(0, e + 3); // reserved
+    entries.writeUInt16LE(1, e + 4); // color planes
+    entries.writeUInt16LE(32, e + 6); // bits per pixel
+    entries.writeUInt32LE(img.data.length, e + 8);
+    entries.writeUInt32LE(offset, e + 12);
+    offset += img.data.length;
+    bodies.push(img.data);
+  });
+  return Buffer.concat([header, entries, ...bodies]);
+}
+
+async function ico(svg, sizes, name) {
+  const images = [];
+  for (const size of sizes) {
+    const data = await sharp(Buffer.from(svg)).resize(size, size).png().toBuffer();
+    images.push({ size, data });
+  }
+  writeFileSync(join(outDir, name), buildIco(images));
+  console.log('  ✓', name, `(ico ${sizes.join('/')}px)`);
+}
+
 console.log('Icons werden erzeugt …');
 
-// Hinweis: Das Whiteboard bringt sein eigenes Icon mit (public/icon-512.png),
-// das auf der Auswahl-Kachel verwendet wird. Hier wird nur das kombinierte
-// Start-/Launcher-Icon der Gesamt-App erzeugt.
-
-// Kombiniertes App-/Launcher-Icon
 writeFileSync(join(outDir, 'favicon.svg'), launcherRounded);
+console.log('  ✓ favicon.svg');
 await png(launcherRounded, 48, 'favicon-48.png');
 await png(launcherRounded, 192, 'app-icon-192.png');
 await png(launcherRounded, 512, 'app-icon-512.png');
 await png(launcherMaskable, 512, 'app-icon-maskable-512.png');
 await png(launcherMaskable, 180, 'apple-touch-icon.png');
+await ico(launcherRounded, [16, 32, 48], 'favicon.ico');
 
 console.log('Fertig.');
