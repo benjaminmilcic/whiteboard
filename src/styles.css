@@ -5,6 +5,22 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Kein versehentliches „Zurück" durch horizontales Wischen (Browser-Geste
+   Swipe-to-go-back). Vor allem auf dem Tablet hat das Kinder aus dem
+   laufenden Spiel ins Hauptmenü geworfen. Gilt für alle Spiele.
+
+   overscroll-behavior-x allein reicht auf Touch-Geräten nicht – die Geste
+   wird teils schon vom Compositor abgefangen. touch-action: pan-y erlaubt
+   nur noch vertikales Scrollen (inkl. Pull-to-refresh) und Zoom, blockt aber
+   horizontale Wischgesten komplett. Zeichnen (Canvas: touch-none) und Ziehen
+   (DraggableDirective: touch-action none) setzen ihre eigene touch-action und
+   funktionieren weiter. */
+html,
+body {
+  overscroll-behavior-x: none;
+  touch-action: pan-y pinch-zoom;
+}
+
 /* Verspielte, kindgerechte Schrift für die Start-Auswahl und die Spiele.
    Das Whiteboard bleibt bei der Material-/Roboto-Schrift. */
 app-home,

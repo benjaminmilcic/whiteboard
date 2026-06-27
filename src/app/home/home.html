@@ -141,6 +141,22 @@
       <span class="text-base text-slate-500 -mt-2">{{ 'home.yatzySub' | transloco }}</span>
     </button>
 
+    <!-- UNO -->
+    <button
+      type="button"
+      (click)="go('uno')"
+      class="flex-1 bg-white/95 rounded-[2rem] shadow-2xl p-6 flex flex-col items-center gap-4
+             hover:scale-105 active:scale-95 transition focus:outline-none focus:ring-4 focus:ring-white max-w-[250px] w-full"
+    >
+      <img
+        src="/uno-icon.svg"
+        [alt]="'home.uno' | transloco"
+        class="w-28 h-28 sm:w-32 sm:h-32 rounded-[1.6rem] shadow-lg"
+      />
+      <span class="text-xl sm:text-2xl font-extrabold text-slate-700">{{ 'home.uno' | transloco }}</span>
+      <span class="text-base text-slate-500 -mt-2">{{ 'home.unoSub' | transloco }}</span>
+    </button>
+
     <!-- Slagalica (Puzzle) -->
     <button
       type="button"

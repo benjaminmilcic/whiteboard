@@ -1,0 +1,84 @@
+<div class="home">
+  <div class="home-card">
+    <header class="home-head">
+      <h1 class="title">{{ 'uno.title' | transloco }}</h1>
+      <p class="subtitle">{{ 'uno.subtitle' | transloco }}</p>
+    </header>
+
+    @if (game.error()) {
+      <p class="error">{{ game.error() }}</p>
+    }
+
+    <!-- Name -->
+    <label class="field">
+      <span class="field-label">{{ 'uno.nameLabel' | transloco }}</span>
+      <input
+        class="text-input"
+        type="text"
+        maxlength="12"
+        [placeholder]="'uno.namePlaceholder' | transloco"
+        [ngModel]="name()"
+        (ngModelChange)="onName($event)"
+      />
+    </label>
+
+    <!-- Avatar -->
+    <div class="field">
+      <span class="field-label">{{ 'uno.chooseAvatar' | transloco }}</span>
+      <div class="avatar-grid">
+        @for (a of avatars; track a) {
+          <button
+            type="button"
+            class="avatar"
+            [class.avatar--active]="emoji() === a"
+            (click)="emoji.set(a)"
+          >
+            {{ a }}
+          </button>
+        }
+      </div>
+    </div>
+
+    @if (!showJoin()) {
+      <button
+        type="button"
+        class="btn btn-primary"
+        [disabled]="!nameValid() || game.busy()"
+        (click)="create()"
+      >
+        {{ (game.busy() ? 'uno.creating' : 'uno.newGame') | transloco }}
+      </button>
+
+      <button type="button" class="btn btn-ghost" (click)="showJoin.set(true)">
+        {{ 'uno.joinPrompt' | transloco }}
+      </button>
+    } @else {
+      <!-- Spiel beitreten -->
+      <label class="field">
+        <span class="field-label">{{ 'uno.codeLabel' | transloco }}</span>
+        <input
+          class="text-input code-input"
+          type="text"
+          inputmode="numeric"
+          maxlength="4"
+          [placeholder]="'uno.codePlaceholder' | transloco"
+          [ngModel]="joinCode()"
+          (ngModelChange)="onCode($event)"
+        />
+      </label>
+
+      <button
+        type="button"
+        class="btn btn-primary"
+        [disabled]="!nameValid() || joinCode().length !== 4 || game.busy()"
+        (click)="join()"
+      >
+        {{ (game.busy() ? 'uno.connecting' : 'uno.join') | transloco }}
+      </button>
+
+      <button type="button" class="btn btn-ghost" (click)="showJoin.set(false)">
+        {{ 'uno.back' | transloco }}
+      </button>
+    }
+  </div>
+</div>

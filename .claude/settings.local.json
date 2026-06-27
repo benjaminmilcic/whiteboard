@@ -40,7 +40,9 @@
       "Bash(node -e \"for\\(const m of ['puppeteer','playwright','playwright-core','puppeteer-core']\\){try{require.resolve\\(m\\);console.log\\('FOUND',m\\)}catch{console.log\\('no',m\\)}}\")",
       "PowerShell(npx -y firebase-tools deploy --only database,firestore:rules 2>&1 | Select-Object -Last 30)",
       "PowerShell(npx tsc --noEmit -p tsconfig.app.json 2>&1 | Select-Object -First 40)",
-      "PowerShell(npx ng build 2>&1 | Select-Object -Last 25)"
+      "PowerShell(npx ng build 2>&1 | Select-Object -Last 25)",
+      "Bash(node -e \"const fs=require\\('fs'\\);const s=fs.readFileSync\\('public/i18n/de.json','utf8'\\);console.log\\('first 200:',JSON.stringify\\(s.slice\\(0,200\\)\\)\\);console.log\\('keys order:',Object.keys\\(require\\('./public/i18n/de.json'\\)\\).join\\(', '\\)\\);\")",
+      "Bash(node \"C:\\\\Users\\\\benja\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\D--eigene-Projekte-whiteboard\\\\b8c276f5-76fb-4dfc-952b-41f8a9e01f29\\\\scratchpad\\\\add-uno-i18n.mjs\")"
     ],
     "deny": [],
     "ask": []

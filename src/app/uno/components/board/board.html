@@ -1,0 +1,150 @@
+@if (game(); as g) {
+  <div class="board-screen">
+    <!-- Gegner oben -->
+    <header class="bar">
+      @if (svc.opponent(); as opp) {
+        <div class="player" [class.player--active]="g.currentTurn === opp.id">
+          <span class="avatar">{{ opp.emoji }}</span>
+          <span class="player-name">{{ opp.name }}</span>
+          <span class="cards-badge">🂠 {{ svc.opponentCount() }}</span>
+          @if (svc.opponentCount() === 1) {
+            <span class="uno-badge">UNO!</span>
+          }
+        </div>
+      } @else {
+        <div class="player player--empty">
+          <span class="player-name">{{ 'uno.waitingPlayer' | transloco }}</span>
+        </div>
+      }
+
+      <div class="turn" [class.turn--mine]="svc.isMyTurn()">
+        @if (svc.isMyTurn()) {
+          {{ 'uno.yourTurn' | transloco }}
+        } @else {
+          {{ 'uno.othersTurn' | transloco: { name: currentName() || ('uno.player' | transloco) } }}
+        }
+      </div>
+    </header>
+
+    <!-- Tischmitte: Ziehstapel · Ablage · aktive Farbe -->
+    <main class="table">
+      <button
+        type="button"
+        class="pile draw-pile"
+        [disabled]="!svc.isMyTurn()"
+        [class.pile--hint]="svc.isMyTurn() && !svc.hasPlayable()"
+        (click)="onDraw()"
+        [attr.aria-label]="'uno.draw' | transloco"
+      >
+        <span class="card-back">UNO</span>
+        <span class="pile-label">{{ 'uno.draw' | transloco }}</span>
+      </button>
+
+      <div class="discard">
+        @if (svc.topCard(); as top) {
+          <div class="card card--{{ top.color }} card--current-{{ g.currentColor }} discard-card">
+            <span class="card-corner top-left">{{ corner(top) }}</span>
+            <span class="card-center">{{ label(top) }}</span>
+            <span class="card-corner bottom-right">{{ corner(top) }}</span>
+          </div>
+        }
+        <div class="color-dot color-dot--{{ g.currentColor }}" aria-hidden="true"></div>
+      </div>
+    </main>
+
+    <!-- Meine Hand unten -->
+    <footer class="hand-wrap">
+      <div class="hand-label">
+        {{ 'uno.yourCards' | transloco }}
+        @if (svc.myHand().length === 1) {
+          <span class="uno-badge">UNO!</span>
+        }
+      </div>
+      <div class="hand">
+        @for (card of svc.myHand(); track card.id) {
+          <button
+            type="button"
+            class="card card--{{ card.color }} hand-card"
+            [class.card--playable]="isPlayable(card)"
+            [class.card--locked]="svc.isMyTurn() && !isPlayable(card)"
+            [disabled]="!isPlayable(card)"
+            (click)="onCardClick(card)"
+          >
+            <span class="card-corner top-left">{{ corner(card) }}</span>
+            <span class="card-center">{{ label(card) }}</span>
+            <span class="card-corner bottom-right">{{ corner(card) }}</span>
+          </button>
+        }
+      </div>
+    </footer>
+
+    <!-- Joker-Farbwahl: oben angedockt + durchsichtiger Hintergrund, damit die
+         eigene Hand sichtbar bleibt; zusätzlich frei verschiebbar (appDraggable). -->
+    @if (pendingWild()) {
+      <div class="overlay overlay--wild" (click)="cancelWild()">
+        <div class="panel color-panel" appDraggable (click)="$event.stopPropagation()">
+          <h2 class="panel-title">{{ 'uno.chooseColor' | transloco }}</h2>
+          <div class="color-grid">
+            @for (c of pickColors; track c) {
+              <button
+                type="button"
+                class="color-choice color-choice--{{ c }}"
+                [attr.aria-label]="'uno.color_' + c | transloco"
+                (click)="chooseColor(c)"
+              ></button>
+            }
+          </div>
+          <button type="button" class="btn btn-ghost" (click)="cancelWild()">
+            {{ 'uno.cancel' | transloco }}
+          </button>
+        </div>
+      </div>
+    }
+
+    <!-- Warten auf Mitspieler -->
+    @if (g.status === 'waiting') {
+      <div class="overlay">
+        <div class="panel">
+          <h2 class="panel-title">{{ 'uno.codeTitle' | transloco }}</h2>
+          <p class="code">{{ g.code }}</p>
+          <p class="panel-text">{{ 'uno.codeShare' | transloco }}</p>
+          <div class="spinner" aria-hidden="true"></div>
+          <button type="button" class="btn btn-ghost" (click)="leave()">
+            {{ 'uno.cancel' | transloco }}
+          </button>
+        </div>
+      </div>
+    }
+
+    <!-- Spielende -->
+    @if (g.status === 'finished') {
+      <div class="overlay">
+        <div
+          class="panel"
+          appDraggable
+          [class.panel--win]="outcome() === 'win'"
+          [class.panel--lose]="outcome() === 'lose'"
+        >
+          @switch (outcome()) {
+            @case ('win') { <div class="result-emoji anim-win">🏆</div> }
+            @case ('lose') { <div class="result-emoji anim-lose">😢</div> }
+          }
+
+          <h2 class="result-title">
+            @switch (outcome()) {
+              @case ('win') { {{ 'uno.won' | transloco: { name: svc.me()?.name } }} }
+              @case ('lose') { {{ 'uno.lost' | transloco: { name: svc.opponent()?.name } }} }
+            }
+          </h2>
+
+          <button type="button" class="btn btn-primary" (click)="playAgain()">
+            {{ 'uno.playAgain' | transloco }}
+          </button>
+          <button type="button" class="btn btn-ghost" (click)="leave()">
+            {{ 'uno.home' | transloco }}
+          </button>
+        </div>
+      </div>
+    }
+  </div>
+}

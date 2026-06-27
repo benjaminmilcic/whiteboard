@@ -1,0 +1,40 @@
+<main
+  class="h-dvh w-full bg-gradient-to-b from-amber-300 via-orange-400 to-rose-500
+         flex flex-col overflow-hidden"
+>
+  <!-- Buttonleiste (wie bei Brodovi/Memory): Spiel beenden · Sprachen · Hauptmenü -->
+  <header class="w-full flex justify-end items-center gap-4 px-3 pt-3 shrink-0">
+    @if (game()) {
+      <button
+        type="button"
+        (click)="endGame()"
+        class="bg-rose-500 hover:bg-rose-600 text-white text-base font-extrabold
+               rounded-full px-4 py-2 shadow-lg active:scale-95 transition shrink-0"
+      >
+        {{ 'uno.endGame' | transloco }}
+      </button>
+    }
+    <app-language-switcher />
+    <button
+      type="button"
+      (click)="goHome()"
+      title="Natrag na izbornik"
+      aria-label="Natrag na izbornik"
+      class="w-12 h-12 rounded-full overflow-hidden ring-2 ring-white shadow-lg
+             bg-white/40 hover:scale-110 active:scale-95 transition shrink-0"
+    >
+      <img src="/familie.jpg" alt="Natrag na izbornik" class="w-full h-full object-cover" />
+    </button>
+  </header>
+
+  <!-- Spiel-Oberfläche unter der Buttonleiste.
+       overflow-y-auto: die Home-Ansicht darf bei Bedarf scrollen; das Board
+       passt sich selbst ein (nur die Handkarten scrollen intern). -->
+  <div class="flex-1 w-full min-h-0 overflow-y-auto">
+    @if (game()) {
+      <app-uno-board />
+    } @else {
+      <app-uno-home />
+    }
+  </div>
+</main>

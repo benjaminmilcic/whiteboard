@@ -10,6 +10,7 @@ import { SchachComponent } from './schach/schach';
 import { PuzzleComponent } from './puzzle/puzzle';
 import { HangmanComponent } from './hangman/hangman';
 import { YatzyComponent } from './yatzy/yatzy';
+import { UnoComponent } from './uno/uno';
 
 export const routes: Routes = [
   { path: '', component: HomeComponent },
@@ -23,5 +24,6 @@ export const routes: Routes = [
   { path: 'puzzle', component: PuzzleComponent },
   { path: 'hangman', component: HangmanComponent },
   { path: 'yatzy', component: YatzyComponent },
+  { path: 'uno', component: UnoComponent },
   { path: '**', redirectTo: '' },
 ];

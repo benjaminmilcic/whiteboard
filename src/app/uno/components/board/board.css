@@ -1,0 +1,493 @@
+:host {
+  display: block;
+  height: 100%;
+}
+
+.board-screen {
+  position: relative;
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  box-sizing: border-box;
+}
+
+/* ---- Kopfzeile (Gegner) ------------------------------------------------- */
+.bar {
+  flex: 0 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+}
+
+.player {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.25rem 0.7rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.65);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.player--active {
+  background: #fff;
+  box-shadow: 0 0 0 3px #ffd34d;
+  transform: scale(1.04);
+}
+
+.avatar {
+  font-size: 1.4rem;
+  line-height: 1;
+}
+
+.player-name {
+  font-weight: 800;
+  color: #9f1239;
+  max-width: 7rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.player--empty .player-name {
+  color: #a16207;
+  font-weight: 600;
+}
+
+.cards-badge {
+  font-weight: 800;
+  color: #7c2d12;
+  background: #ffe9d2;
+  border-radius: 999px;
+  padding: 0.1rem 0.5rem;
+  font-size: 0.95rem;
+}
+
+.uno-badge {
+  font-weight: 900;
+  color: #fff;
+  background: #e11d48;
+  border-radius: 999px;
+  padding: 0.1rem 0.55rem;
+  letter-spacing: 0.06em;
+  box-shadow: 0 2px 6px rgba(225, 29, 72, 0.5);
+  animation: uno-pop 0.7s ease-in-out infinite alternate;
+}
+
+@keyframes uno-pop {
+  to {
+    transform: scale(1.12);
+  }
+}
+
+.turn {
+  font-weight: 800;
+  color: #fff;
+  background: rgba(159, 18, 57, 0.5);
+  padding: 0.35rem 0.8rem;
+  border-radius: 999px;
+}
+
+.turn--mine {
+  background: #16a34a;
+}
+
+/* ---- Tischmitte --------------------------------------------------------- */
+.table {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  padding: 0.75rem 0.5rem;
+}
+
+.pile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.pile:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+
+.pile-label {
+  font-weight: 800;
+  color: #7c2d12;
+  font-size: 0.85rem;
+}
+
+.card-back {
+  width: clamp(3.6rem, 17vw, 5.5rem);
+  aspect-ratio: 5 / 7;
+  border-radius: 0.7rem;
+  background: linear-gradient(150deg, #1f2937, #111827);
+  color: #fde047;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  font-style: italic;
+  font-size: clamp(1rem, 5vw, 1.5rem);
+  letter-spacing: 0.05em;
+  border: 3px solid #fff;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.35);
+  transform: rotate(-4deg);
+}
+
+.draw-pile.pile--hint .card-back {
+  animation: draw-bob 0.9s ease-in-out infinite alternate;
+  box-shadow: 0 0 0 4px #fde047, 0 6px 14px rgba(0, 0, 0, 0.35);
+}
+
+@keyframes draw-bob {
+  to {
+    transform: rotate(-4deg) translateY(-6px);
+  }
+}
+
+.discard {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.color-dot {
+  position: absolute;
+  right: -0.7rem;
+  top: -0.7rem;
+  width: 1.4rem;
+  height: 1.4rem;
+  border-radius: 50%;
+  border: 3px solid #fff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+.color-dot--r { background: #ef4444; }
+.color-dot--y { background: #facc15; }
+.color-dot--g { background: #22c55e; }
+.color-dot--b { background: #3b82f6; }
+
+/* ---- Karten ------------------------------------------------------------- */
+.card {
+  position: relative;
+  width: clamp(3.6rem, 17vw, 5.5rem);
+  aspect-ratio: 5 / 7;
+  border-radius: 0.7rem;
+  border: 3px solid #fff;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: inherit;
+  color: #fff;
+  flex: 0 0 auto;
+}
+
+.card-center {
+  font-size: clamp(1.3rem, 6vw, 2.1rem);
+  font-weight: 900;
+  text-shadow: 0 2px 0 rgba(0, 0, 0, 0.25);
+  /* weißes Oval hinter der Zahl wie bei echten UNO-Karten */
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  inset: 18% 26%;
+  background: rgba(255, 255, 255, 0.85);
+  border-radius: 50%;
+  transform: rotate(-20deg);
+}
+
+.card-center,
+.card-corner {
+  position: relative;
+  z-index: 1;
+}
+
+.card-center {
+  color: #1f2937;
+}
+
+.card-corner {
+  position: absolute;
+  font-size: clamp(0.65rem, 2.6vw, 0.95rem);
+  font-weight: 800;
+  line-height: 1;
+}
+
+.top-left {
+  top: 0.25rem;
+  left: 0.3rem;
+}
+
+.bottom-right {
+  bottom: 0.25rem;
+  right: 0.3rem;
+  transform: rotate(180deg);
+}
+
+.card--r { background: linear-gradient(160deg, #f87171, #dc2626); }
+.card--y { background: linear-gradient(160deg, #fde047, #eab308); }
+.card--g { background: linear-gradient(160deg, #4ade80, #16a34a); }
+.card--b { background: linear-gradient(160deg, #60a5fa, #2563eb); }
+/* Joker: schwarz mit vier Farbflächen */
+.card--w {
+  background:
+    conic-gradient(#ef4444 0 25%, #facc15 0 50%, #22c55e 0 75%, #3b82f6 0 100%);
+}
+.card--w::before {
+  background: rgba(17, 24, 39, 0.82);
+}
+.card--w .card-center,
+.card--w .card-corner {
+  color: #fff;
+}
+
+.discard-card {
+  transform: rotate(3deg) scale(1.05);
+}
+
+/* ---- Hand --------------------------------------------------------------- */
+.hand-wrap {
+  /* füllt den restlichen Platz bis zum unteren Rand.
+     Basis 0 (nicht auto!), damit der min-h-dvh-Wrapper nicht mitwächst,
+     sondern die Hand auf die Resthöhe begrenzt wird und intern scrollt. */
+  flex: 1 1 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.hand-label {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 800;
+  color: #fff;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  padding-left: 0.25rem;
+}
+
+.hand {
+  /* nimmt die volle Resthöhe ein; nur die eigenen Karten scrollen vertikal,
+     Kopfzeile + Stapel bleiben sichtbar (nicht die ganze Seite). */
+  flex: 1 1 0;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  display: flex;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  justify-content: center;
+  gap: 0.35rem;
+  /* oben extra Platz, damit der Hover-Effekt nicht abgeschnitten wird */
+  padding: 0.9rem 0.25rem 0.5rem;
+}
+
+.hand-card {
+  cursor: pointer;
+  transition: transform 0.12s ease, box-shadow 0.12s ease, opacity 0.12s ease;
+}
+
+.hand-card.card--playable {
+  box-shadow: 0 0 0 3px #16a34a, 0 6px 14px rgba(0, 0, 0, 0.3);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .hand-card.card--playable:hover {
+    transform: translateY(-10px) scale(1.05);
+  }
+}
+
+.hand-card.card--locked {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.hand-card:disabled {
+  cursor: default;
+}
+
+/* ---- Overlays ----------------------------------------------------------- */
+.overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(60, 12, 20, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  z-index: 5;
+}
+
+.panel {
+  width: 100%;
+  max-width: 22rem;
+  background: #fff;
+  border-radius: 1.4rem;
+  padding: 1.5rem 1.25rem;
+  text-align: center;
+  box-shadow: 0 18px 40px rgba(60, 12, 20, 0.4);
+}
+
+.panel-title {
+  margin: 0 0 0.75rem;
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #9f1239;
+}
+
+.panel-text {
+  color: #8a5a2b;
+  margin: 0.5rem 0 1rem;
+}
+
+.code {
+  font-size: 2.8rem;
+  font-weight: 800;
+  letter-spacing: 0.4rem;
+  color: #e11d48;
+  background: #ffe4e9;
+  border-radius: 1rem;
+  padding: 0.6rem;
+  margin: 0.25rem 0;
+}
+
+.spinner {
+  width: 2.4rem;
+  height: 2.4rem;
+  margin: 0.5rem auto 1rem;
+  border: 4px solid #ffd9b3;
+  border-top-color: #f97316;
+  border-radius: 50%;
+  animation: uno-spin 0.9s linear infinite;
+}
+
+@keyframes uno-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Joker-Farbwahl: oben andocken, Hintergrund (fast) durchsichtig,
+   damit die eigene Hand beim Auswählen sichtbar bleibt. */
+.overlay--wild {
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 0.75rem;
+  background: rgba(30, 10, 15, 0.12);
+}
+
+.color-panel {
+  max-width: 17rem;
+  cursor: grab;
+  box-shadow: 0 14px 36px rgba(60, 12, 20, 0.5);
+}
+
+.color-panel:active {
+  cursor: grabbing;
+}
+
+.color-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.7rem;
+  margin: 0 auto 0.5rem;
+  max-width: 14rem;
+}
+
+.color-choice {
+  aspect-ratio: 1;
+  border: 4px solid #fff;
+  border-radius: 1rem;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+  transition: transform 0.1s ease;
+}
+
+.color-choice:active {
+  transform: scale(0.92);
+}
+
+.color-choice--r { background: #ef4444; }
+.color-choice--y { background: #facc15; }
+.color-choice--g { background: #22c55e; }
+.color-choice--b { background: #3b82f6; }
+
+.result-emoji {
+  font-size: 4rem;
+  line-height: 1;
+}
+
+.anim-win {
+  animation: uno-bounce 0.7s ease infinite alternate;
+}
+
+.anim-lose {
+  animation: uno-shake 0.6s ease;
+}
+
+@keyframes uno-bounce {
+  to {
+    transform: translateY(-12px) scale(1.08);
+  }
+}
+
+@keyframes uno-shake {
+  0%, 100% { transform: rotate(0); }
+  25% { transform: rotate(-10deg); }
+  75% { transform: rotate(10deg); }
+}
+
+.result-title {
+  margin: 0.6rem 0 1rem;
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #9f1239;
+}
+
+.btn {
+  width: 100%;
+  border: 0;
+  border-radius: 1rem;
+  padding: 0.8rem 1rem;
+  font-size: 1.1rem;
+  font-weight: 800;
+  font-family: inherit;
+  cursor: pointer;
+  margin-top: 0.5rem;
+}
+
+.btn-primary {
+  background: linear-gradient(180deg, #fb7185, #e11d48);
+  color: #fff;
+  box-shadow: 0 6px 0 #9f1239;
+}
+
+.btn-primary:active {
+  transform: translateY(3px);
+  box-shadow: 0 3px 0 #9f1239;
+}
+
+.btn-ghost {
+  background: transparent;
+  color: #e11d48;
+  box-shadow: inset 0 0 0 3px #ffc9d4;
+}

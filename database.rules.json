@@ -81,6 +81,16 @@
           ".validate": "newData.hasChildren()"
         }
       }
+    },
+
+    "uno": {
+      "games": {
+        "$code": {
+          ".read": "auth != null",
+          ".write": "auth != null",
+          ".validate": "newData.hasChildren()"
+        }
+      }
     }
   }
 }
