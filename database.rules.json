@@ -101,6 +101,16 @@
           ".validate": "newData.hasChildren()"
         }
       }
+    },
+
+    "mill": {
+      "games": {
+        "$code": {
+          ".read": "auth != null",
+          ".write": "auth != null",
+          ".validate": "newData.hasChildren()"
+        }
+      }
     }
   }
 }

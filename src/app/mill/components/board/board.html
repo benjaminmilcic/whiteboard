@@ -1,0 +1,133 @@
+@if (game(); as g) {
+  <div class="board-screen">
+    <!-- Kopfzeile: Spieler + wer dran ist -->
+    <header class="bar">
+      <div class="player" [class.player--active]="g.currentTurn === svc.me()?.id">
+        @if (svc.me(); as m) {
+          <span class="dot" [style.background]="svc.mySeat() === 0 ? '#e11d48' : '#1d4ed8'"></span>
+          <span class="avatar">{{ m.emoji }}</span>
+          <span class="player-name">{{ m.name }}</span>
+          @if (svc.phase() === 'place') {
+            <span class="count">{{ svc.toPlace()[svc.mySeat()] }}</span>
+          }
+        }
+      </div>
+
+      @if (svc.opponent(); as opp) {
+        <div class="player" [class.player--active]="g.currentTurn === opp.id">
+          <span class="dot" [style.background]="svc.mySeat() === 0 ? '#1d4ed8' : '#e11d48'"></span>
+          <span class="avatar">{{ opp.emoji }}</span>
+          <span class="player-name">{{ opp.name }}</span>
+          @if (svc.phase() === 'place') {
+            <span class="count">{{ svc.toPlace()[1 - svc.mySeat()] }}</span>
+          }
+        </div>
+      } @else {
+        <div class="player player--empty">
+          <span class="player-name">{{ 'mill.waitingPlayer' | transloco }}</span>
+        </div>
+      }
+    </header>
+
+    <!-- Statushinweis -->
+    <p class="status" [class.status--mine]="svc.isMyTurn()" [class.status--remove]="svc.removing()">
+      @if (svc.removing()) {
+        {{ 'mill.removeHint' | transloco }}
+      } @else if (svc.isMyTurn()) {
+        @if (svc.phase() === 'place') {
+          {{ 'mill.placeHint' | transloco }}
+        } @else if (selected() !== null) {
+          {{ 'mill.moveTargetHint' | transloco }}
+        } @else {
+          {{ 'mill.moveHint' | transloco }}
+        }
+      } @else {
+        {{ 'mill.othersTurn' | transloco: { name: currentName() || ('mill.player' | transloco) } }}
+      }
+    </p>
+
+    <!-- Spielbrett -->
+    <main class="board-wrap">
+      <div class="board">
+        <svg class="lines" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+          <rect x="6" y="6" width="88" height="88" />
+          <rect x="20.667" y="20.667" width="58.667" height="58.667" />
+          <rect x="35.333" y="35.333" width="29.333" height="29.333" />
+          <line x1="50" y1="6" x2="50" y2="35.333" />
+          <line x1="50" y1="64.667" x2="50" y2="94" />
+          <line x1="6" y1="50" x2="35.333" y2="50" />
+          <line x1="64.667" y1="50" x2="94" y2="50" />
+        </svg>
+
+        @for (p of points(); track p.index) {
+          <button
+            type="button"
+            class="point"
+            [class.point--empty]="p.occupant === -1"
+            [class.point--placeable]="p.placeable"
+            [class.point--selectable]="p.selectable"
+            [class.point--selected]="p.selected"
+            [class.point--target]="p.target"
+            [class.point--removable]="p.removable"
+            [style.left.%]="p.x"
+            [style.top.%]="p.y"
+            [disabled]="
+              !p.placeable && !p.selectable && !p.selected && !p.target && !p.removable
+            "
+            (click)="onPoint(p)"
+          >
+            @if (p.occupant !== -1) {
+              <span class="piece" [style.background]="p.color">{{ p.emoji }}</span>
+            }
+          </button>
+        }
+      </div>
+    </main>
+
+    <!-- Warten auf Mitspieler -->
+    @if (g.status === 'waiting') {
+      <div class="overlay">
+        <div class="panel">
+          <h2 class="panel-title">{{ 'mill.codeTitle' | transloco }}</h2>
+          <p class="code">{{ g.code }}</p>
+          <p class="panel-text">{{ 'mill.codeShare' | transloco }}</p>
+          <div class="spinner" aria-hidden="true"></div>
+          <button type="button" class="btn btn-ghost" (click)="leave()">
+            {{ 'mill.cancel' | transloco }}
+          </button>
+        </div>
+      </div>
+    }
+
+    <!-- Spielende -->
+    @if (g.status === 'finished') {
+      <div class="overlay">
+        <div
+          class="panel"
+          appDraggable
+          [class.panel--win]="outcome() === 'win'"
+          [class.panel--lose]="outcome() === 'lose'"
+        >
+          @switch (outcome()) {
+            @case ('win') { <div class="result-emoji anim-win">🏆</div> }
+            @case ('lose') { <div class="result-emoji anim-lose">😢</div> }
+          }
+
+          <h2 class="result-title">
+            @switch (outcome()) {
+              @case ('win') { {{ 'mill.won' | transloco: { name: svc.me()?.name } }} }
+              @case ('lose') { {{ 'mill.lost' | transloco: { name: svc.opponent()?.name } }} }
+            }
+          </h2>
+
+          <button type="button" class="btn btn-primary" (click)="playAgain()">
+            {{ 'mill.playAgain' | transloco }}
+          </button>
+          <button type="button" class="btn btn-ghost" (click)="leave()">
+            {{ 'mill.home' | transloco }}
+          </button>
+        </div>
+      </div>
+    }
+  </div>
+}

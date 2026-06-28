@@ -12,6 +12,7 @@ import { HangmanComponent } from './hangman/hangman';
 import { YatzyComponent } from './yatzy/yatzy';
 import { UnoComponent } from './uno/uno';
 import { LudoComponent } from './ludo/ludo';
+import { MillComponent } from './mill/mill';
 
 export const routes: Routes = [
   { path: '', component: HomeComponent },
@@ -27,5 +28,6 @@ export const routes: Routes = [
   { path: 'yatzy', component: YatzyComponent },
   { path: 'uno', component: UnoComponent },
   { path: 'ludo', component: LudoComponent },
+  { path: 'mill', component: MillComponent },
   { path: '**', redirectTo: '' },
 ];
