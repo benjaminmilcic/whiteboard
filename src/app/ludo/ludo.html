@@ -1,0 +1,37 @@
+<main
+  class="h-dvh w-full bg-gradient-to-b from-lime-300 via-emerald-400 to-teal-500
+         flex flex-col overflow-hidden"
+>
+  <!-- Buttonleiste (wie bei den anderen Spielen): Spiel beenden · Sprachen · Hauptmenü -->
+  <header class="w-full flex justify-end items-center gap-4 px-3 pt-3 shrink-0">
+    @if (game()) {
+      <button
+        type="button"
+        (click)="endGame()"
+        class="bg-rose-500 hover:bg-rose-600 text-white text-base font-extrabold
+               rounded-full px-4 py-2 shadow-lg active:scale-95 transition shrink-0"
+      >
+        {{ 'ludo.endGame' | transloco }}
+      </button>
+    }
+    <app-language-switcher />
+    <button
+      type="button"
+      (click)="goHome()"
+      title="Natrag na izbornik"
+      aria-label="Natrag na izbornik"
+      class="w-12 h-12 rounded-full overflow-hidden ring-2 ring-white shadow-lg
+             bg-white/40 hover:scale-110 active:scale-95 transition shrink-0"
+    >
+      <img src="/familie.jpg" alt="Natrag na izbornik" class="w-full h-full object-cover" />
+    </button>
+  </header>
+
+  <div class="flex-1 w-full min-h-0 overflow-y-auto">
+    @if (game()) {
+      <app-ludo-board />
+    } @else {
+      <app-ludo-home />
+    }
+  </div>
+</main>

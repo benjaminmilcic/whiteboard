@@ -91,6 +91,16 @@
           ".validate": "newData.hasChildren()"
         }
       }
+    },
+
+    "ludo": {
+      "games": {
+        "$code": {
+          ".read": "auth != null",
+          ".write": "auth != null",
+          ".validate": "newData.hasChildren()"
+        }
+      }
     }
   }
 }

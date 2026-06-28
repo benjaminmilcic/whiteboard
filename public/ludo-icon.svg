@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#34d399"/>
+      <stop offset="1" stop-color="#0d9488"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="96" fill="url(#bg)"/>
+
+  <!-- Kreuz-Laufbahn -->
+  <g fill="#f8fafc">
+    <rect x="208" y="48" width="96" height="416" rx="20"/>
+    <rect x="48" y="208" width="416" height="96" rx="20"/>
+  </g>
+
+  <!-- vier farbige Ecken (Garagen) -->
+  <rect x="48"  y="48"  width="128" height="128" rx="28" fill="#dc2626"/>
+  <rect x="336" y="48"  width="128" height="128" rx="28" fill="#facc15"/>
+  <rect x="48"  y="336" width="128" height="128" rx="28" fill="#16a34a"/>
+  <rect x="336" y="336" width="128" height="128" rx="28" fill="#2563eb"/>
+
+  <!-- Figuren in den Ecken -->
+  <g fill="#ffffff" opacity="0.95">
+    <circle cx="92"  cy="92"  r="20"/>
+    <circle cx="132" cy="132" r="20"/>
+    <circle cx="380" cy="92"  r="20"/>
+    <circle cx="420" cy="132" r="20"/>
+    <circle cx="92"  cy="420" r="20"/>
+    <circle cx="132" cy="380" r="20"/>
+    <circle cx="380" cy="420" r="20"/>
+    <circle cx="420" cy="380" r="20"/>
+  </g>
+
+  <!-- Mitte / Ziel -->
+  <circle cx="256" cy="256" r="46" fill="#fbbf24" stroke="#fff" stroke-width="6"/>
+</svg>

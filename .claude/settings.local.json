@@ -45,7 +45,9 @@
       "Bash(node \"C:\\\\Users\\\\benja\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\D--eigene-Projekte-whiteboard\\\\b8c276f5-76fb-4dfc-952b-41f8a9e01f29\\\\scratchpad\\\\add-uno-i18n.mjs\")",
       "Bash(node -e \"try{const y=require\\('js-yaml'\\);console.log\\('js-yaml ok'\\)}catch\\(e\\){console.log\\('no js-yaml'\\)}\")",
       "Bash(python -c \"import yaml,sys; yaml.safe_load\\(open\\('.github/workflows/firebase-hosting-merge.yml'\\)\\); print\\('YAML valid \\(python\\)'\\)\")",
-      "Bash(node -e \"const y=require\\('js-yaml'\\);const fs=require\\('fs'\\);const d=y.load\\(fs.readFileSync\\('.github/workflows/firebase-hosting-merge.yml','utf8'\\)\\);const steps=d.jobs.build_and_deploy.steps;console.log\\('steps:',steps.length\\);console.log\\('retry step:',JSON.stringify\\(steps.find\\(s=>s.uses&&s.uses.includes\\('retry'\\)\\).with\\)\\);console.log\\('YAML valid'\\)\")"
+      "Bash(node -e \"const y=require\\('js-yaml'\\);const fs=require\\('fs'\\);const d=y.load\\(fs.readFileSync\\('.github/workflows/firebase-hosting-merge.yml','utf8'\\)\\);const steps=d.jobs.build_and_deploy.steps;console.log\\('steps:',steps.length\\);console.log\\('retry step:',JSON.stringify\\(steps.find\\(s=>s.uses&&s.uses.includes\\('retry'\\)\\).with\\)\\);console.log\\('YAML valid'\\)\")",
+      "Bash(ls src/app/home)",
+      "Bash(find src/app -name \"*.routes.ts\" -o -name \"app.config.ts\" -o -name \"app.routes.ts\")"
     ],
     "deny": [],
     "ask": []

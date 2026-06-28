@@ -11,6 +11,7 @@ import { PuzzleComponent } from './puzzle/puzzle';
 import { HangmanComponent } from './hangman/hangman';
 import { YatzyComponent } from './yatzy/yatzy';
 import { UnoComponent } from './uno/uno';
+import { LudoComponent } from './ludo/ludo';
 
 export const routes: Routes = [
   { path: '', component: HomeComponent },
@@ -25,5 +26,6 @@ export const routes: Routes = [
   { path: 'hangman', component: HangmanComponent },
   { path: 'yatzy', component: YatzyComponent },
   { path: 'uno', component: UnoComponent },
+  { path: 'ludo', component: LudoComponent },
   { path: '**', redirectTo: '' },
 ];

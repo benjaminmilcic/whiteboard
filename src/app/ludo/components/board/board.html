@@ -1,0 +1,132 @@
+@if (game(); as g) {
+  <div class="board-screen">
+    <!-- Kopfzeile: Gegner + wer dran ist -->
+    <header class="bar">
+      @if (svc.opponent(); as opp) {
+        <div class="player" [class.player--active]="g.currentTurn === opp.id">
+          <span class="avatar">{{ opp.emoji }}</span>
+          <span class="player-name">{{ opp.name }}</span>
+        </div>
+      } @else {
+        <div class="player player--empty">
+          <span class="player-name">{{ 'ludo.waitingPlayer' | transloco }}</span>
+        </div>
+      }
+
+      <div class="turn" [class.turn--mine]="svc.isMyTurn()">
+        @if (svc.isMyTurn()) {
+          {{ (svc.mustMove() ? 'ludo.pickPiece' : 'ludo.yourTurn') | transloco }}
+        } @else {
+          {{ 'ludo.othersTurn' | transloco: { name: currentName() || ('ludo.player' | transloco) } }}
+        }
+      </div>
+    </header>
+
+    <!-- Spielbrett -->
+    <main class="board-wrap">
+      <div class="board">
+        @for (cell of cells; track cell.row * 11 + cell.col) {
+          <div
+            class="cell cell--{{ cell.kind }}"
+            [class.cell--start]="cell.start"
+            [style.--seat-color]="cell.seat >= 0 ? (cell.seat === 0 ? '#dc2626' : '#2563eb') : null"
+            [style.gridRow]="cell.row + 1"
+            [style.gridColumn]="cell.col + 1"
+          >
+            @if (cell.kind === 'center') {
+              <span class="center-mark">🏁</span>
+            }
+            @for (t of tokensAt(cell); track t.key) {
+              <button
+                type="button"
+                class="token"
+                [class.token--movable]="t.movable"
+                [style.background]="t.color"
+                [disabled]="!t.movable"
+                (click)="onToken(t)"
+              >
+                {{ t.emoji }}
+              </button>
+            }
+          </div>
+        }
+      </div>
+    </main>
+
+    <!-- Würfel + Aktion -->
+    <footer class="control">
+      <div
+        class="dice"
+        [class.dice--rolled]="g.dice !== null"
+        [class.dice--blocked]="svc.noMove()"
+        aria-hidden="true"
+      >
+        {{ g.dice !== null ? g.dice : '🎲' }}
+      </div>
+      @if (svc.isMyTurn()) {
+        @if (canRoll()) {
+          <button type="button" class="btn btn-primary" (click)="roll()">
+            {{ 'ludo.roll' | transloco }}
+          </button>
+        } @else if (svc.noMove()) {
+          <p class="hint hint--blocked">
+            {{ 'ludo.noMove' | transloco: { n: g.dice } }}
+          </p>
+          <button type="button" class="btn btn-primary" (click)="pass()">
+            {{ (svc.passRerolls() ? 'ludo.rollAgain' : 'ludo.pass') | transloco }}
+          </button>
+        } @else {
+          <p class="hint">{{ 'ludo.pickHint' | transloco }}</p>
+        }
+      } @else {
+        <p class="hint">{{ 'ludo.waitTurn' | transloco }}</p>
+      }
+    </footer>
+
+    <!-- Warten auf Mitspieler -->
+    @if (g.status === 'waiting') {
+      <div class="overlay">
+        <div class="panel">
+          <h2 class="panel-title">{{ 'ludo.codeTitle' | transloco }}</h2>
+          <p class="code">{{ g.code }}</p>
+          <p class="panel-text">{{ 'ludo.codeShare' | transloco }}</p>
+          <div class="spinner" aria-hidden="true"></div>
+          <button type="button" class="btn btn-ghost" (click)="leave()">
+            {{ 'ludo.cancel' | transloco }}
+          </button>
+        </div>
+      </div>
+    }
+
+    <!-- Spielende -->
+    @if (g.status === 'finished') {
+      <div class="overlay">
+        <div
+          class="panel"
+          appDraggable
+          [class.panel--win]="outcome() === 'win'"
+          [class.panel--lose]="outcome() === 'lose'"
+        >
+          @switch (outcome()) {
+            @case ('win') { <div class="result-emoji anim-win">🏆</div> }
+            @case ('lose') { <div class="result-emoji anim-lose">😢</div> }
+          }
+
+          <h2 class="result-title">
+            @switch (outcome()) {
+              @case ('win') { {{ 'ludo.won' | transloco: { name: svc.me()?.name } }} }
+              @case ('lose') { {{ 'ludo.lost' | transloco: { name: svc.opponent()?.name } }} }
+            }
+          </h2>
+
+          <button type="button" class="btn btn-primary" (click)="playAgain()">
+            {{ 'ludo.playAgain' | transloco }}
+          </button>
+          <button type="button" class="btn btn-ghost" (click)="leave()">
+            {{ 'ludo.home' | transloco }}
+          </button>
+        </div>
+      </div>
+    }
+  </div>
+}
