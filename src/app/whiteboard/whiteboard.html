@@ -280,7 +280,7 @@
   </div>
 
   @if (showInfo()) {
-    <div class="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 p-4" (click)="showInfo.set(false)">
+    <div class="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 p-4" (mousedown)="onBackdropPointerDown($event)" (click)="onBackdropClick($event) && showInfo.set(false)">
       <div class="bg-white rounded-3xl shadow-2xl p-6 sm:p-8 flex flex-col gap-4 w-full max-w-sm text-center" (click)="$event.stopPropagation()">
         <h2 class="text-2xl font-bold text-gray-800">🔑 Kod ploče</h2>
         <p class="text-gray-500">Reci ovaj kod prijateljima da se pridruže.</p>
@@ -302,8 +302,8 @@
   }
 
   @if (showSessionMenu()) {
-    <div class="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 p-4" (click)="closeSessionMenu()">
-      <div class="bg-white rounded-3xl shadow-2xl p-6 sm:p-8 flex flex-col gap-5 w-full max-w-md text-center">
+    <div class="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 p-4" (mousedown)="onBackdropPointerDown($event)" (click)="onBackdropClick($event) && closeSessionMenu()">
+      <div class="bg-white rounded-3xl shadow-2xl p-6 sm:p-8 flex flex-col gap-5 w-full max-w-md text-center" (click)="$event.stopPropagation()">
         <h2 class="text-3xl font-bold text-gray-800">🎨 Promijeni ploču</h2>
 
         @if (lobbyError()) {

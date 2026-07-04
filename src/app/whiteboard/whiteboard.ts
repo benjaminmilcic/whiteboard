@@ -293,6 +293,22 @@ export class Whiteboard implements AfterViewInit, OnDestroy {
     this.showSessionMenu.set(false);
   }
 
+  /** Merkt sich, ob der Klick wirklich auf dem Backdrop begonnen hat (nicht im Dialog). */
+  private backdropPressed = false;
+
+  onBackdropPointerDown(event: MouseEvent): void {
+    this.backdropPressed = event.target === event.currentTarget;
+  }
+
+  /** true, wenn Druecken UND Loslassen auf dem Backdrop passierten. Verhindert
+   *  versehentliches Schliessen beim Markieren von Text, wenn die Maus dabei
+   *  ueber den Dialogrand hinausgezogen wird. */
+  onBackdropClick(event: MouseEvent): boolean {
+    const shouldClose = this.backdropPressed && event.target === event.currentTarget;
+    this.backdropPressed = false;
+    return shouldClose;
+  }
+
   toggleInfo(): void {
     this.showInfo.update((v) => !v);
   }
