@@ -13,6 +13,7 @@ import { YatzyComponent } from './yatzy/yatzy';
 import { UnoComponent } from './uno/uno';
 import { LudoComponent } from './ludo/ludo';
 import { MillComponent } from './mill/mill';
+import { MoorhuhnComponent } from './moorhuhn/moorhuhn';
 
 export const routes: Routes = [
   { path: '', component: HomeComponent },
@@ -29,5 +30,6 @@ export const routes: Routes = [
   { path: 'uno', component: UnoComponent },
   { path: 'ludo', component: LudoComponent },
   { path: 'mill', component: MillComponent },
+  { path: 'moorhuhn', component: MoorhuhnComponent },
   { path: '**', redirectTo: '' },
 ];

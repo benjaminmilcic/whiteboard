@@ -1,227 +1,254 @@
 <main
-  class="relative min-h-dvh w-full bg-gradient-to-b from-sky-300 via-sky-400 to-indigo-500
-         flex flex-col"
+  class="relative min-h-dvh w-full bg-gradient-to-b from-sky-300 via-sky-400 to-indigo-500 flex flex-col"
 >
   <!-- Sticky Kopf: Sprachleiste -->
   <header
-    class="sticky top-0 z-20 w-full flex items-center justify-end
-           px-4 py-3 bg-sky-400/80 backdrop-blur-md shadow-lg"
+    class="sticky top-0 z-20 w-full flex items-center justify-end px-4 py-3 bg-sky-400/80 backdrop-blur-md shadow-lg"
   >
     <app-language-switcher class="z-10" />
   </header>
 
   <!-- Spiele-Auswahl -->
   <div class="flex-1 w-full flex flex-col items-center justify-start sm:justify-center px-4 py-8">
-    <div class="grid grid-cols-1 min-[450px]:grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-6 w-full max-w-6xl justify-items-center auto-rows-fr">
-    <!-- Whiteboard -->
-    <button
+    <div
+      class="grid grid-cols-1 min-[450px]:grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-6 w-full max-w-6xl justify-items-center auto-rows-fr"
+    >
+      <!-- Whiteboard -->
+      <button
+        type="button"
+        (click)="go('whiteboard')"
+        class="flex-1 bg-white/95 rounded-[2rem] shadow-2xl p-6 flex flex-col items-center gap-4 hover:scale-105 active:scale-95 transition focus:outline-none focus:ring-4 focus:ring-white max-w-[250px] w-full"
+      >
+        <img
+          src="/icon-512.png"
+          [alt]="'home.whiteboardSub' | transloco"
+          class="w-28 h-28 sm:w-32 sm:h-32 rounded-[1.6rem] shadow-lg"
+        />
+        <span class="text-xl sm:text-2xl font-extrabold text-slate-700">{{
+          'home.whiteboard' | transloco
+        }}</span>
+        <span class="text-base text-slate-500 -mt-2">{{ 'home.whiteboardSub' | transloco }}</span>
+      </button>
+
+      <!-- Schiffe versenken -->
+      <button
+        type="button"
+        (click)="go('schiffe')"
+        class="flex-1 bg-white/95 rounded-[2rem] shadow-2xl p-6 flex flex-col items-center gap-4 hover:scale-105 active:scale-95 transition focus:outline-none focus:ring-4 focus:ring-white max-w-[250px] w-full"
+      >
+        <img
+          src="/schiffe-icon-512.png"
+          [alt]="'home.schiffeSub' | transloco"
+          class="w-28 h-28 sm:w-32 sm:h-32 rounded-[1.6rem] shadow-lg"
+        />
+        <span class="text-xl sm:text-2xl font-extrabold text-slate-700">{{
+          'home.schiffe' | transloco
+        }}</span>
+        <span class="text-base text-slate-500 -mt-2">{{ 'home.schiffeSub' | transloco }}</span>
+      </button>
+
+      <!-- Memory -->
+      <button
+        type="button"
+        (click)="go('memory')"
+        class="flex-1 bg-white/95 rounded-[2rem] shadow-2xl p-6 flex flex-col items-center gap-4 hover:scale-105 active:scale-95 transition focus:outline-none focus:ring-4 focus:ring-white max-w-[250px] w-full"
+      >
+        <img
+          src="/memory-icon-512.png"
+          [alt]="'home.memory' | transloco"
+          class="w-28 h-28 sm:w-32 sm:h-32 rounded-[1.6rem] shadow-lg"
+        />
+        <span class="text-xl sm:text-2xl font-extrabold text-slate-700">{{
+          'home.memory' | transloco
+        }}</span>
+        <span class="text-base text-slate-500 -mt-2">{{ 'home.memorySub' | transloco }}</span>
+      </button>
+
+      <!-- Vier gewinnt -->
+      <button
+        type="button"
+        (click)="go('connect4')"
+        class="flex-1 bg-white/95 rounded-[2rem] shadow-2xl p-6 flex flex-col items-center gap-4 hover:scale-105 active:scale-95 transition focus:outline-none focus:ring-4 focus:ring-white max-w-[250px] w-full"
+      >
+        <img
+          src="/connect4-icon.svg"
+          [alt]="'home.connect4' | transloco"
+          class="w-28 h-28 sm:w-32 sm:h-32 rounded-[1.6rem] shadow-lg"
+        />
+        <span class="text-xl sm:text-2xl font-extrabold text-slate-700">{{
+          'home.connect4' | transloco
+        }}</span>
+        <span class="text-base text-slate-500 -mt-2">{{ 'home.connect4Sub' | transloco }}</span>
+      </button>
+
+      <!-- Backgammon -->
+      <button
+        type="button"
+        (click)="go('backgammon')"
+        class="flex-1 bg-white/95 rounded-[2rem] shadow-2xl p-6 flex flex-col items-center gap-4 hover:scale-105 active:scale-95 transition focus:outline-none focus:ring-4 focus:ring-white max-w-[250px] w-full"
+      >
+        <img
+          src="/backgammon-icon.svg"
+          [alt]="'home.backgammon' | transloco"
+          class="w-28 h-28 sm:w-32 sm:h-32 rounded-[1.6rem] shadow-lg"
+        />
+        <span class="text-xl sm:text-2xl font-extrabold text-slate-700">{{
+          'home.backgammon' | transloco
+        }}</span>
+        <span class="text-base text-slate-500 -mt-2">{{ 'home.backgammonSub' | transloco }}</span>
+      </button>
+
+      <!-- Dame -->
+      <button
+        type="button"
+        (click)="go('dame')"
+        class="flex-1 bg-white/95 rounded-[2rem] shadow-2xl p-6 flex flex-col items-center gap-4 hover:scale-105 active:scale-95 transition focus:outline-none focus:ring-4 focus:ring-white max-w-[250px] w-full"
+      >
+        <img
+          src="/dame-icon.svg"
+          [alt]="'home.dame' | transloco"
+          class="w-28 h-28 sm:w-32 sm:h-32 rounded-[1.6rem] shadow-lg"
+        />
+        <span class="text-xl sm:text-2xl font-extrabold text-slate-700">{{
+          'home.dame' | transloco
+        }}</span>
+        <span class="text-base text-slate-500 -mt-2">{{ 'home.dameSub' | transloco }}</span>
+      </button>
+
+      <!-- Schach -->
+      <button
+        type="button"
+        (click)="go('schach')"
+        class="flex-1 bg-white/95 rounded-[2rem] shadow-2xl p-6 flex flex-col items-center gap-4 hover:scale-105 active:scale-95 transition focus:outline-none focus:ring-4 focus:ring-white max-w-[250px] w-full"
+      >
+        <img
+          src="/schach-icon.svg"
+          [alt]="'home.schach' | transloco"
+          class="w-28 h-28 sm:w-32 sm:h-32 rounded-[1.6rem] shadow-lg"
+        />
+        <span class="text-xl sm:text-2xl font-extrabold text-slate-700">{{
+          'home.schach' | transloco
+        }}</span>
+        <span class="text-base text-slate-500 -mt-2">{{ 'home.schachSub' | transloco }}</span>
+      </button>
+
+      <!-- Yatzy -->
+      <button
+        type="button"
+        (click)="go('yatzy')"
+        class="flex-1 bg-white/95 rounded-[2rem] shadow-2xl p-6 flex flex-col items-center gap-4 hover:scale-105 active:scale-95 transition focus:outline-none focus:ring-4 focus:ring-white max-w-[250px] w-full"
+      >
+        <img
+          src="/yatzy-icon.svg"
+          [alt]="'home.yatzy' | transloco"
+          class="w-28 h-28 sm:w-32 sm:h-32 rounded-[1.6rem] shadow-lg"
+        />
+        <span class="text-xl sm:text-2xl font-extrabold text-slate-700">{{
+          'home.yatzy' | transloco
+        }}</span>
+        <span class="text-base text-slate-500 -mt-2">{{ 'home.yatzySub' | transloco }}</span>
+      </button>
+
+      <!-- UNO -->
+      <button
+        type="button"
+        (click)="go('uno')"
+        class="flex-1 bg-white/95 rounded-[2rem] shadow-2xl p-6 flex flex-col items-center gap-4 hover:scale-105 active:scale-95 transition focus:outline-none focus:ring-4 focus:ring-white max-w-[250px] w-full"
+      >
+        <img
+          src="/uno-icon.svg"
+          [alt]="'home.uno' | transloco"
+          class="w-28 h-28 sm:w-32 sm:h-32 rounded-[1.6rem] shadow-lg"
+        />
+        <span class="text-xl sm:text-2xl font-extrabold text-slate-700">{{
+          'home.uno' | transloco
+        }}</span>
+        <span class="text-base text-slate-500 -mt-2">{{ 'home.unoSub' | transloco }}</span>
+      </button>
+
+      <!-- Čovječe, ne ljuti se (Mensch ärgere dich nicht) -->
+      <button
+        type="button"
+        (click)="go('ludo')"
+        class="flex-1 bg-white/95 rounded-[2rem] shadow-2xl p-6 flex flex-col items-center gap-4 hover:scale-105 active:scale-95 transition focus:outline-none focus:ring-4 focus:ring-white max-w-[250px] w-full"
+      >
+        <img
+          src="/ludo-icon.svg"
+          [alt]="'home.ludo' | transloco"
+          class="w-28 h-28 sm:w-32 sm:h-32 rounded-[1.6rem] shadow-lg"
+        />
+        <span class="text-xl sm:text-2xl font-extrabold text-slate-700">{{
+          'home.ludo' | transloco
+        }}</span>
+        <span class="text-base text-slate-500 -mt-2">{{ 'home.ludoSub' | transloco }}</span>
+      </button>
+
+      <!-- Mlin (Mühle) -->
+      <button
+        type="button"
+        (click)="go('mill')"
+        class="flex-1 bg-white/95 rounded-[2rem] shadow-2xl p-6 flex flex-col items-center gap-4 hover:scale-105 active:scale-95 transition focus:outline-none focus:ring-4 focus:ring-white max-w-[250px] w-full"
+      >
+        <img
+          src="/mill-icon.svg"
+          [alt]="'home.mill' | transloco"
+          class="w-28 h-28 sm:w-32 sm:h-32 rounded-[1.6rem] shadow-lg"
+        />
+        <span class="text-xl sm:text-2xl font-extrabold text-slate-700">{{
+          'home.mill' | transloco
+        }}</span>
+        <span class="text-base text-slate-500 -mt-2">{{ 'home.millSub' | transloco }}</span>
+      </button>
+
+      <!-- Slagalica (Puzzle) -->
+      <button
+        type="button"
+        (click)="go('puzzle')"
+        class="flex-1 bg-white/95 rounded-[2rem] shadow-2xl p-6 flex flex-col items-center gap-4 hover:scale-105 active:scale-95 transition focus:outline-none focus:ring-4 focus:ring-white max-w-[250px] w-full"
+      >
+        <img
+          src="/puzzle-icon.svg"
+          [alt]="'home.puzzle' | transloco"
+          class="w-28 h-28 sm:w-32 sm:h-32 rounded-[1.6rem] shadow-lg"
+        />
+        <span class="text-xl sm:text-2xl font-extrabold text-slate-700">{{
+          'home.puzzle' | transloco
+        }}</span>
+        <span class="text-base text-slate-500 -mt-2">{{ 'home.puzzleSub' | transloco }}</span>
+      </button>
+
+      <!-- Pogodi riječ (Galgenmännchen) -->
+      <button
+        type="button"
+        (click)="go('hangman')"
+        class="flex-1 bg-white/95 rounded-[2rem] shadow-2xl p-6 flex flex-col items-center gap-4 hover:scale-105 active:scale-95 transition focus:outline-none focus:ring-4 focus:ring-white max-w-[250px] w-full"
+      >
+        <img
+          src="/hangman-icon.svg"
+          [alt]="'home.hangman' | transloco"
+          class="w-28 h-28 sm:w-32 sm:h-32 rounded-[1.6rem] shadow-lg"
+        />
+        <span class="text-xl sm:text-2xl font-extrabold text-slate-700">{{
+          'home.hangman' | transloco
+        }}</span>
+        <span class="text-base text-slate-500 -mt-2">{{ 'home.hangmanSub' | transloco }}</span>
+      </button>
+
+      <!-- Divlje kokoši (Moorhuhn) -->
+      <!-- <button
       type="button"
-      (click)="go('whiteboard')"
+      (click)="go('moorhuhn')"
       class="flex-1 bg-white/95 rounded-[2rem] shadow-2xl p-6 flex flex-col items-center gap-4
              hover:scale-105 active:scale-95 transition focus:outline-none focus:ring-4 focus:ring-white max-w-[250px] w-full"
     >
       <img
-        src="/icon-512.png"
-        [alt]="'home.whiteboardSub' | transloco"
+        src="/moorhuhn-icon.svg"
+        [alt]="'home.moorhuhn' | transloco"
         class="w-28 h-28 sm:w-32 sm:h-32 rounded-[1.6rem] shadow-lg"
       />
-      <span class="text-xl sm:text-2xl font-extrabold text-slate-700">{{ 'home.whiteboard' | transloco }}</span>
-      <span class="text-base text-slate-500 -mt-2">{{ 'home.whiteboardSub' | transloco }}</span>
-    </button>
-
-    <!-- Schiffe versenken -->
-    <button
-      type="button"
-      (click)="go('schiffe')"
-      class="flex-1 bg-white/95 rounded-[2rem] shadow-2xl p-6 flex flex-col items-center gap-4
-             hover:scale-105 active:scale-95 transition focus:outline-none focus:ring-4 focus:ring-white max-w-[250px] w-full"
-    >
-      <img
-        src="/schiffe-icon-512.png"
-        [alt]="'home.schiffeSub' | transloco"
-        class="w-28 h-28 sm:w-32 sm:h-32 rounded-[1.6rem] shadow-lg"
-      />
-      <span class="text-xl sm:text-2xl font-extrabold text-slate-700">{{ 'home.schiffe' | transloco }}</span>
-      <span class="text-base text-slate-500 -mt-2">{{ 'home.schiffeSub' | transloco }}</span>
-    </button>
-
-    <!-- Memory -->
-    <button
-      type="button"
-      (click)="go('memory')"
-      class="flex-1 bg-white/95 rounded-[2rem] shadow-2xl p-6 flex flex-col items-center gap-4
-             hover:scale-105 active:scale-95 transition focus:outline-none focus:ring-4 focus:ring-white max-w-[250px] w-full"
-    >
-      <img
-        src="/memory-icon-512.png"
-        [alt]="'home.memory' | transloco"
-        class="w-28 h-28 sm:w-32 sm:h-32 rounded-[1.6rem] shadow-lg"
-      />
-      <span class="text-xl sm:text-2xl font-extrabold text-slate-700">{{ 'home.memory' | transloco }}</span>
-      <span class="text-base text-slate-500 -mt-2">{{ 'home.memorySub' | transloco }}</span>
-    </button>
-
-    <!-- Vier gewinnt -->
-    <button
-      type="button"
-      (click)="go('connect4')"
-      class="flex-1 bg-white/95 rounded-[2rem] shadow-2xl p-6 flex flex-col items-center gap-4
-             hover:scale-105 active:scale-95 transition focus:outline-none focus:ring-4 focus:ring-white max-w-[250px] w-full"
-    >
-      <img
-        src="/connect4-icon.svg"
-        [alt]="'home.connect4' | transloco"
-        class="w-28 h-28 sm:w-32 sm:h-32 rounded-[1.6rem] shadow-lg"
-      />
-      <span class="text-xl sm:text-2xl font-extrabold text-slate-700">{{ 'home.connect4' | transloco }}</span>
-      <span class="text-base text-slate-500 -mt-2">{{ 'home.connect4Sub' | transloco }}</span>
-    </button>
-
-    <!-- Backgammon -->
-    <button
-      type="button"
-      (click)="go('backgammon')"
-      class="flex-1 bg-white/95 rounded-[2rem] shadow-2xl p-6 flex flex-col items-center gap-4
-             hover:scale-105 active:scale-95 transition focus:outline-none focus:ring-4 focus:ring-white max-w-[250px] w-full"
-    >
-      <img
-        src="/backgammon-icon.svg"
-        [alt]="'home.backgammon' | transloco"
-        class="w-28 h-28 sm:w-32 sm:h-32 rounded-[1.6rem] shadow-lg"
-      />
-      <span class="text-xl sm:text-2xl font-extrabold text-slate-700">{{ 'home.backgammon' | transloco }}</span>
-      <span class="text-base text-slate-500 -mt-2">{{ 'home.backgammonSub' | transloco }}</span>
-    </button>
-
-    <!-- Dame -->
-    <button
-      type="button"
-      (click)="go('dame')"
-      class="flex-1 bg-white/95 rounded-[2rem] shadow-2xl p-6 flex flex-col items-center gap-4
-             hover:scale-105 active:scale-95 transition focus:outline-none focus:ring-4 focus:ring-white max-w-[250px] w-full"
-    >
-      <img
-        src="/dame-icon.svg"
-        [alt]="'home.dame' | transloco"
-        class="w-28 h-28 sm:w-32 sm:h-32 rounded-[1.6rem] shadow-lg"
-      />
-      <span class="text-xl sm:text-2xl font-extrabold text-slate-700">{{ 'home.dame' | transloco }}</span>
-      <span class="text-base text-slate-500 -mt-2">{{ 'home.dameSub' | transloco }}</span>
-    </button>
-
-    <!-- Schach -->
-    <button
-      type="button"
-      (click)="go('schach')"
-      class="flex-1 bg-white/95 rounded-[2rem] shadow-2xl p-6 flex flex-col items-center gap-4
-             hover:scale-105 active:scale-95 transition focus:outline-none focus:ring-4 focus:ring-white max-w-[250px] w-full"
-    >
-      <img
-        src="/schach-icon.svg"
-        [alt]="'home.schach' | transloco"
-        class="w-28 h-28 sm:w-32 sm:h-32 rounded-[1.6rem] shadow-lg"
-      />
-      <span class="text-xl sm:text-2xl font-extrabold text-slate-700">{{ 'home.schach' | transloco }}</span>
-      <span class="text-base text-slate-500 -mt-2">{{ 'home.schachSub' | transloco }}</span>
-    </button>
-
-    <!-- Yatzy -->
-    <button
-      type="button"
-      (click)="go('yatzy')"
-      class="flex-1 bg-white/95 rounded-[2rem] shadow-2xl p-6 flex flex-col items-center gap-4
-             hover:scale-105 active:scale-95 transition focus:outline-none focus:ring-4 focus:ring-white max-w-[250px] w-full"
-    >
-      <img
-        src="/yatzy-icon.svg"
-        [alt]="'home.yatzy' | transloco"
-        class="w-28 h-28 sm:w-32 sm:h-32 rounded-[1.6rem] shadow-lg"
-      />
-      <span class="text-xl sm:text-2xl font-extrabold text-slate-700">{{ 'home.yatzy' | transloco }}</span>
-      <span class="text-base text-slate-500 -mt-2">{{ 'home.yatzySub' | transloco }}</span>
-    </button>
-
-    <!-- UNO -->
-    <button
-      type="button"
-      (click)="go('uno')"
-      class="flex-1 bg-white/95 rounded-[2rem] shadow-2xl p-6 flex flex-col items-center gap-4
-             hover:scale-105 active:scale-95 transition focus:outline-none focus:ring-4 focus:ring-white max-w-[250px] w-full"
-    >
-      <img
-        src="/uno-icon.svg"
-        [alt]="'home.uno' | transloco"
-        class="w-28 h-28 sm:w-32 sm:h-32 rounded-[1.6rem] shadow-lg"
-      />
-      <span class="text-xl sm:text-2xl font-extrabold text-slate-700">{{ 'home.uno' | transloco }}</span>
-      <span class="text-base text-slate-500 -mt-2">{{ 'home.unoSub' | transloco }}</span>
-    </button>
-
-    <!-- Čovječe, ne ljuti se (Mensch ärgere dich nicht) -->
-    <button
-      type="button"
-      (click)="go('ludo')"
-      class="flex-1 bg-white/95 rounded-[2rem] shadow-2xl p-6 flex flex-col items-center gap-4
-             hover:scale-105 active:scale-95 transition focus:outline-none focus:ring-4 focus:ring-white max-w-[250px] w-full"
-    >
-      <img
-        src="/ludo-icon.svg"
-        [alt]="'home.ludo' | transloco"
-        class="w-28 h-28 sm:w-32 sm:h-32 rounded-[1.6rem] shadow-lg"
-      />
-      <span class="text-xl sm:text-2xl font-extrabold text-slate-700">{{ 'home.ludo' | transloco }}</span>
-      <span class="text-base text-slate-500 -mt-2">{{ 'home.ludoSub' | transloco }}</span>
-    </button>
-
-    <!-- Mlin (Mühle) -->
-    <button
-      type="button"
-      (click)="go('mill')"
-      class="flex-1 bg-white/95 rounded-[2rem] shadow-2xl p-6 flex flex-col items-center gap-4
-             hover:scale-105 active:scale-95 transition focus:outline-none focus:ring-4 focus:ring-white max-w-[250px] w-full"
-    >
-      <img
-        src="/mill-icon.svg"
-        [alt]="'home.mill' | transloco"
-        class="w-28 h-28 sm:w-32 sm:h-32 rounded-[1.6rem] shadow-lg"
-      />
-      <span class="text-xl sm:text-2xl font-extrabold text-slate-700">{{ 'home.mill' | transloco }}</span>
-      <span class="text-base text-slate-500 -mt-2">{{ 'home.millSub' | transloco }}</span>
-    </button>
-
-    <!-- Slagalica (Puzzle) -->
-    <button
-      type="button"
-      (click)="go('puzzle')"
-      class="flex-1 bg-white/95 rounded-[2rem] shadow-2xl p-6 flex flex-col items-center gap-4
-             hover:scale-105 active:scale-95 transition focus:outline-none focus:ring-4 focus:ring-white max-w-[250px] w-full"
-    >
-      <img
-        src="/puzzle-icon.svg"
-        [alt]="'home.puzzle' | transloco"
-        class="w-28 h-28 sm:w-32 sm:h-32 rounded-[1.6rem] shadow-lg"
-      />
-      <span class="text-xl sm:text-2xl font-extrabold text-slate-700">{{ 'home.puzzle' | transloco }}</span>
-      <span class="text-base text-slate-500 -mt-2">{{ 'home.puzzleSub' | transloco }}</span>
-    </button>
-
-    <!-- Pogodi riječ (Galgenmännchen) -->
-    <button
-      type="button"
-      (click)="go('hangman')"
-      class="flex-1 bg-white/95 rounded-[2rem] shadow-2xl p-6 flex flex-col items-center gap-4
-             hover:scale-105 active:scale-95 transition focus:outline-none focus:ring-4 focus:ring-white max-w-[250px] w-full"
-    >
-      <img
-        src="/hangman-icon.svg"
-        [alt]="'home.hangman' | transloco"
-        class="w-28 h-28 sm:w-32 sm:h-32 rounded-[1.6rem] shadow-lg"
-      />
-      <span class="text-xl sm:text-2xl font-extrabold text-slate-700">{{ 'home.hangman' | transloco }}</span>
-      <span class="text-base text-slate-500 -mt-2">{{ 'home.hangmanSub' | transloco }}</span>
-    </button>
-
-    
+      <span class="text-xl sm:text-2xl font-extrabold text-slate-700">{{ 'home.moorhuhn' | transloco }}</span>
+      <span class="text-base text-slate-500 -mt-2">{{ 'home.moorhuhnSub' | transloco }}</span>
+    </button> -->
     </div>
   </div>
 </main>

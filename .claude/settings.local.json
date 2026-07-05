@@ -48,7 +48,12 @@
       "Bash(node -e \"const y=require\\('js-yaml'\\);const fs=require\\('fs'\\);const d=y.load\\(fs.readFileSync\\('.github/workflows/firebase-hosting-merge.yml','utf8'\\)\\);const steps=d.jobs.build_and_deploy.steps;console.log\\('steps:',steps.length\\);console.log\\('retry step:',JSON.stringify\\(steps.find\\(s=>s.uses&&s.uses.includes\\('retry'\\)\\).with\\)\\);console.log\\('YAML valid'\\)\")",
       "Bash(ls src/app/home)",
       "Bash(find src/app -name \"*.routes.ts\" -o -name \"app.config.ts\" -o -name \"app.routes.ts\")",
-      "WebFetch(domain:www.brettspielwelt.de)"
+      "WebFetch(domain:www.brettspielwelt.de)",
+      "Bash(node -e \"const j=require\\('./src/assets/i18n/hr.json'\\); console.log\\(JSON.stringify\\(j.home,null,1\\)\\); console.log\\('HANGMAN:',JSON.stringify\\(j.hangman,null,1\\)\\);\")",
+      "Bash(node -e \"const j=require\\('./public/i18n/hr.json'\\); console.log\\('HOME:',JSON.stringify\\(j.home,null,1\\)\\); console.log\\('HANGMAN:',JSON.stringify\\(j.hangman,null,1\\)\\); console.log\\('KEYS:',Object.keys\\(j\\)\\);\")",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:4287/)",
+      "Bash(taskkill //F //FI \"WINDOWTITLE eq *ng serve*\")",
+      "Bash(pkill -f \"ng serve\")"
     ],
     "deny": [],
     "ask": []

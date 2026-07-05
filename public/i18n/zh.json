@@ -297,7 +297,9 @@
     "ludo": "飞行棋",
     "ludoSub": "把所有棋子送到终点",
     "mill": "九子棋",
-    "millSub": "连成三子一线"
+    "millSub": "连成三子一线",
+    "moorhuhn": "野鸡大作战",
+    "moorhuhnSub": "打中小鸡！"
   },
   "uno": {
     "title": "UNO",
@@ -396,5 +398,19 @@
     "lost": "{{name}} 赢了！",
     "playAgain": "再玩一次",
     "home": "返回首页"
+  },
+  "moorhuhn": {
+    "title": "野鸡大作战",
+    "intro": "在时间结束前尽量打中更多的鸡！又小又快的分数更高，金色的 🐓 分数最高！",
+    "chooseLevel": "选择难度",
+    "easy": "简单",
+    "medium": "中等",
+    "hard": "困难",
+    "again": "再来一次",
+    "back": "返回开始",
+    "record": "新纪录！",
+    "bravo": "太棒了！",
+    "points": "{{count}} 分",
+    "summary": "你打中了 {{count}} 只鸡 · 最佳：{{best}}"
   }
 }

@@ -297,7 +297,9 @@
     "ludo": "Čovječe, ne ljuti se",
     "ludoSub": "Dovedi sve figure do cilja",
     "mill": "Mlin",
-    "millSub": "Složi tri u nizu"
+    "millSub": "Složi tri u nizu",
+    "moorhuhn": "Divlje kokoši",
+    "moorhuhnSub": "Gađaj kokoši!"
   },
   "uno": {
     "title": "UNO",
@@ -396,5 +398,19 @@
     "lost": "{{name}} je pobijedio!",
     "playAgain": "Igraj ponovno",
     "home": "Natrag na početak"
+  },
+  "moorhuhn": {
+    "title": "Divlje kokoši",
+    "intro": "Gađaj što više kokoši dok vrijeme ne istekne! Male i brze vrijede više, a zlatna 🐓 najviše!",
+    "chooseLevel": "Odaberi razinu",
+    "easy": "Lako",
+    "medium": "Srednje",
+    "hard": "Teško",
+    "again": "Još jednom",
+    "back": "Natrag na početak",
+    "record": "Novi rekord!",
+    "bravo": "Bravo!",
+    "points": "{{count}} bodova",
+    "summary": "Pogodila si {{count}} kokoši · Najbolje: {{best}}"
   }
 }

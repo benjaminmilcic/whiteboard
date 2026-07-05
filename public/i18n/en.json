@@ -297,7 +297,9 @@
     "ludo": "Ludo",
     "ludoSub": "Get all your pieces home",
     "mill": "Nine Men's Morris",
-    "millSub": "Make three in a row"
+    "millSub": "Make three in a row",
+    "moorhuhn": "Wild Chickens",
+    "moorhuhnSub": "Hit the chickens!"
   },
   "uno": {
     "title": "UNO",
@@ -396,5 +398,19 @@
     "lost": "{{name}} won!",
     "playAgain": "Play again",
     "home": "Back to start"
+  },
+  "moorhuhn": {
+    "title": "Wild Chickens",
+    "intro": "Hit as many chickens as you can before time runs out! Small and fast ones are worth more, the golden 🐓 the most!",
+    "chooseLevel": "Choose a level",
+    "easy": "Easy",
+    "medium": "Medium",
+    "hard": "Hard",
+    "again": "Again",
+    "back": "Back to start",
+    "record": "New record!",
+    "bravo": "Well done!",
+    "points": "{{count}} points",
+    "summary": "You hit {{count}} chickens · Best: {{best}}"
   }
 }

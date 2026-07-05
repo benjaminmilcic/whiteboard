@@ -1,0 +1,174 @@
+<main
+  class="relative min-h-dvh w-full overflow-hidden flex flex-col bg-gradient-to-b from-sky-300 via-sky-400 to-indigo-500 select-none"
+>
+  <!-- Buttonleiste: Spielstand · Zeit/Neustart · Hauptmenü. -->
+  <header class="relative z-50 w-full flex flex-wrap justify-between items-center gap-3 px-3 py-3 shrink-0">
+    <!-- Spielstand -->
+    <div class="flex items-center gap-2 sm:gap-3">
+      <div class="badge">
+        <span class="badge-ico">🎯</span>
+        <span class="badge-num">{{ score() }}</span>
+      </div>
+      <div class="badge badge--best">
+        <span class="badge-ico">🏆</span>
+        <span class="badge-num">{{ best() }}</span>
+      </div>
+      @if (status() === 'playing') {
+        <div class="badge badge--level">{{ 'moorhuhn.' + level() | transloco }}</div>
+      }
+    </div>
+
+    <div class="flex items-center gap-3 ml-auto">
+      @if (status() === 'playing') {
+        <div class="badge badge--time">
+          <span class="badge-ico">⏱️</span>
+          <span class="badge-num">{{ timeLeft() }}</span>
+        </div>
+      }
+      <!-- @else if (status() === 'over') {
+        <button
+          type="button"
+          (click)="start()"
+          class="bg-emerald-500 hover:bg-emerald-600 text-white text-base font-extrabold
+                 rounded-full px-4 py-2 shadow-lg active:scale-95 transition shrink-0"
+        >
+          🔄 {{ 'moorhuhn.again' | transloco }}
+        </button>
+      } -->
+      <app-language-switcher />
+      <button
+        type="button"
+        (click)="goHome()"
+        [title]="'moorhuhn.back' | transloco"
+        [attr.aria-label]="'moorhuhn.back' | transloco"
+        class="w-12 h-12 rounded-full overflow-hidden ring-2 ring-white shadow-lg bg-white/40 hover:scale-110 active:scale-95 transition shrink-0"
+      >
+        <img
+          src="/familie.jpg"
+          [alt]="'moorhuhn.back' | transloco"
+          class="w-full h-full object-cover"
+        />
+      </button>
+    </div>
+  </header>
+
+  <!-- Zeitbalken -->
+  @if (status() === 'playing') {
+    <div class="time-track">
+      <div class="time-fill" [style.width.%]="timePct()"></div>
+    </div>
+  }
+
+  <!-- Spielfeld -->
+  <div #arena class="arena" [class.arena--play]="status() === 'playing'" (pointerdown)="miss()">
+    <!-- Deko: Wolken -->
+    <div class="cloud" style="top: 8%; left: 6%; font-size: 60px">☁️</div>
+    <div class="cloud" style="top: 16%; left: 62%; font-size: 84px">☁️</div>
+    <div class="cloud" style="top: 4%; left: 40%; font-size: 48px">☁️</div>
+
+    <!-- fliegende Kokoši -->
+    @for (c of chickens(); track c.id) {
+      <div
+        class="chicken"
+        [class.chicken--hit]="c.hit"
+        [class.fly-r]="c.dir === 1"
+        [class.fly-l]="c.dir === -1"
+        [style.top.%]="c.y"
+        [style.font-size.px]="c.size"
+        [style.animation-duration.s]="c.dur"
+        (animationend)="escaped(c.id)"
+        (pointerdown)="shoot(c, $event)"
+      >
+        <span class="sprite" [style.transform]="c.dir === 1 ? 'scaleX(-1)' : 'scaleX(1)'">
+          <span class="bob">
+            @if (c.hit) {
+              <span class="puff">💥</span>
+            } @else {
+              {{ c.golden ? '🐓' : '🐔' }}
+            }
+          </span>
+        </span>
+        @if (c.hit) {
+          <span class="plus" [class.plus--gold]="c.golden">+{{ c.points }}</span>
+        }
+        @if (c.golden && !c.hit) {
+          <span class="sparkle">✨</span>
+        }
+      </div>
+    }
+
+    <!-- Boden mit Büschen -->
+    <div class="ground">
+      <span class="bush" style="left: 4%">🌳</span>
+      <span class="bush" style="left: 22%">🌿</span>
+      <span class="bush" style="left: 48%">🌳</span>
+      <span class="bush" style="left: 70%">🌾</span>
+      <span class="bush" style="left: 88%">🌳</span>
+    </div>
+
+    <!-- Startbildschirm mit Stufen-Wahl -->
+    @if (status() === 'idle') {
+      <div class="overlay">
+        <div class="panel" appDraggable>
+          <div class="result-emoji">🐔</div>
+          <h2 class="result-title">{{ 'moorhuhn.title' | transloco }}</h2>
+          <p class="result-text">{{ 'moorhuhn.intro' | transloco }}</p>
+          <p class="level-label">{{ 'moorhuhn.chooseLevel' | transloco }}</p>
+          <div class="levels">
+            @for (lv of levelList; track lv) {
+              <button
+                type="button"
+                class="level-btn"
+                [class.level-btn--active]="level() === lv"
+                (click)="start(lv)"
+              >
+                <span class="level-dots">{{
+                  lv === 'easy' ? '●' : lv === 'medium' ? '●●' : '●●●'
+                }}</span>
+                <span>{{ 'moorhuhn.' + lv | transloco }}</span>
+              </button>
+            }
+          </div>
+          <button type="button" class="btn btn-ghost" (click)="goHome()">
+            {{ 'moorhuhn.back' | transloco }}
+          </button>
+        </div>
+      </div>
+    }
+
+    <!-- Ende -->
+    @if (status() === 'over') {
+      <div class="overlay">
+        <div class="panel" appDraggable [class.panel--win]="newRecord()">
+          <div class="result-emoji">{{ newRecord() ? '🏆' : '🐔' }}</div>
+          <h2 class="result-title">
+            {{ (newRecord() ? 'moorhuhn.record' : 'moorhuhn.bravo') | transloco }}
+          </h2>
+          <p class="result-score">{{ 'moorhuhn.points' | transloco: { count: score() } }}</p>
+          <p class="result-text">
+            {{ 'moorhuhn.summary' | transloco: { count: hits(), best: best() } }}
+          </p>
+          <p class="level-label">{{ 'moorhuhn.chooseLevel' | transloco }}</p>
+          <div class="levels">
+            @for (lv of levelList; track lv) {
+              <button
+                type="button"
+                class="level-btn"
+                [class.level-btn--active]="level() === lv"
+                (click)="start(lv)"
+              >
+                <span class="level-dots">{{
+                  lv === 'easy' ? '●' : lv === 'medium' ? '●●' : '●●●'
+                }}</span>
+                <span>{{ 'moorhuhn.' + lv | transloco }}</span>
+              </button>
+            }
+          </div>
+          <button type="button" class="btn btn-ghost" (click)="goHome()">
+            {{ 'moorhuhn.back' | transloco }}
+          </button>
+        </div>
+      </div>
+    }
+  </div>
+</main>

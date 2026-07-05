@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#bfe6ff"/>
+      <stop offset="1" stop-color="#79c2ff"/>
+    </linearGradient>
+    <linearGradient id="grass" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#7ed957"/>
+      <stop offset="1" stop-color="#4e9b34"/>
+    </linearGradient>
+    <filter id="soft" x="-25%" y="-25%" width="150%" height="150%">
+      <feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#1f4a6b" flood-opacity="0.25"/>
+    </filter>
+  </defs>
+
+  <rect x="32" y="32" width="448" height="448" rx="60" fill="url(#sky)"/>
+
+  <!-- Wolken -->
+  <g fill="#ffffff" opacity="0.9">
+    <circle cx="120" cy="120" r="26"/>
+    <circle cx="152" cy="120" r="32"/>
+    <circle cx="188" cy="120" r="24"/>
+    <circle cx="360" cy="96" r="20"/>
+    <circle cx="386" cy="96" r="26"/>
+  </g>
+
+  <!-- Boden -->
+  <path d="M32 372 h448 v48 a60 60 0 0 1 -60 60 H92 a60 60 0 0 1 -60 -60 Z" fill="url(#grass)"/>
+  <ellipse cx="110" cy="392" rx="34" ry="20" fill="#3f8a2b"/>
+  <ellipse cx="410" cy="392" rx="30" ry="18" fill="#3f8a2b"/>
+
+  <!-- Kokoš (Huhn) -->
+  <g filter="url(#soft)" transform="translate(196 176)">
+    <!-- Körper -->
+    <ellipse cx="70" cy="120" rx="86" ry="70" fill="#ffffff"/>
+    <!-- Kopf -->
+    <circle cx="150" cy="78" r="46" fill="#ffffff"/>
+    <!-- Kamm -->
+    <path d="M132 40 q10 -22 22 -4 q10 -22 22 -2 q8 -16 18 2 l-4 22 q-30 -12 -56 0 Z" fill="#ef4444"/>
+    <!-- Auge -->
+    <circle cx="164" cy="72" r="7" fill="#1f2937"/>
+    <!-- Schnabel -->
+    <path d="M190 82 l34 -6 l-30 24 Z" fill="#f59e0b"/>
+    <!-- Kehllappen -->
+    <path d="M176 100 q10 22 -6 30 q-14 -10 -6 -30 Z" fill="#ef4444"/>
+    <!-- Flügel -->
+    <path d="M60 96 q56 12 74 56 q-46 20 -84 -14 Z" fill="#f1f5f9"/>
+    <!-- Schwanzfedern -->
+    <path d="M-14 96 q-40 -26 -56 -6 q30 6 30 30 q-30 4 -20 34 q28 -16 62 -18 Z" fill="#e2e8f0"/>
+    <!-- Beine -->
+    <g stroke="#f59e0b" stroke-width="9" stroke-linecap="round">
+      <line x1="52" y1="186" x2="52" y2="212"/>
+      <line x1="92" y1="186" x2="92" y2="212"/>
+    </g>
+  </g>
+
+  <!-- Zielscheibe / Fadenkreuz -->
+  <g transform="translate(346 300)" stroke="#e11d48" stroke-width="10" fill="none" filter="url(#soft)">
+    <circle cx="0" cy="0" r="46" fill="#ffffff" fill-opacity="0.55"/>
+    <circle cx="0" cy="0" r="46"/>
+    <circle cx="0" cy="0" r="8" fill="#e11d48" stroke="none"/>
+    <line x1="-64" y1="0" x2="-20" y2="0"/>
+    <line x1="20" y1="0" x2="64" y2="0"/>
+    <line x1="0" y1="-64" x2="0" y2="-20"/>
+    <line x1="0" y1="20" x2="0" y2="64"/>
+  </g>
+</svg>

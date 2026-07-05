@@ -1,0 +1,365 @@
+:host {
+  display: block;
+}
+
+/* ---- Spielstand-Badges ------------------------------------------------ */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 9999px;
+  padding: 0.3rem 0.8rem;
+  box-shadow: 0 6px 14px rgba(30, 60, 120, 0.25);
+  font-weight: 800;
+  color: #334155;
+}
+.badge--best {
+  color: #b45309;
+}
+.badge--time {
+  color: #1d4ed8;
+}
+.badge--level {
+  color: #7c3aed;
+  text-transform: capitalize;
+}
+.badge-ico {
+  font-size: 1.15rem;
+  line-height: 1;
+}
+.badge-num {
+  font-size: 1.25rem;
+  min-width: 1.4ch;
+  text-align: center;
+}
+
+/* ---- Zeitbalken ------------------------------------------------------- */
+
+.time-track {
+  position: relative;
+  z-index: 20;
+  height: 10px;
+  margin: 0.5rem 0.9rem 0;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.35);
+  overflow: hidden;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+.time-fill {
+  height: 100%;
+  border-radius: 9999px;
+  background: linear-gradient(90deg, #4ade80, #facc15 60%, #f87171);
+  transition: width 1s linear;
+}
+
+/* ---- Spielfeld -------------------------------------------------------- */
+
+.arena {
+  position: relative;
+  flex: 1;
+  width: 100%;
+  overflow: hidden;
+}
+.arena--play {
+  cursor: crosshair;
+}
+
+.cloud {
+  position: absolute;
+  opacity: 0.9;
+  pointer-events: none;
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.08));
+  animation: drift 26s linear infinite;
+}
+@keyframes drift {
+  from {
+    transform: translateX(-3vw);
+  }
+  to {
+    transform: translateX(3vw);
+  }
+}
+
+/* Boden */
+.ground {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 74px;
+  background: linear-gradient(180deg, #6cc24a 0%, #4e9b34 100%);
+  border-top: 4px solid #3f8a2b;
+  box-shadow: 0 -6px 16px rgba(0, 0, 0, 0.12);
+  pointer-events: none;
+}
+.bush {
+  position: absolute;
+  bottom: 34px;
+  font-size: 54px;
+  transform: translateX(-50%);
+  filter: drop-shadow(0 3px 2px rgba(0, 0, 0, 0.15));
+}
+
+/* ---- Kokoši ----------------------------------------------------------- */
+
+.chicken {
+  position: absolute;
+  left: 0;
+  z-index: 10;
+  line-height: 1;
+  cursor: crosshair;
+  will-change: transform;
+  touch-action: manipulation;
+  animation-name: fly-r;
+  animation-timing-function: linear;
+  animation-iteration-count: 1;
+  animation-fill-mode: forwards;
+}
+.chicken.fly-l {
+  animation-name: fly-l;
+}
+
+@keyframes fly-r {
+  from {
+    transform: translateX(-25vw);
+  }
+  to {
+    transform: translateX(125vw);
+  }
+}
+@keyframes fly-l {
+  from {
+    transform: translateX(125vw);
+  }
+  to {
+    transform: translateX(-25vw);
+  }
+}
+
+/* Auf- und Ab-Flattern */
+.sprite {
+  display: inline-block;
+}
+.bob {
+  display: inline-block;
+  animation: bob 0.55s ease-in-out infinite;
+  filter: drop-shadow(0 4px 3px rgba(0, 0, 0, 0.2));
+}
+@keyframes bob {
+  0%,
+  100% {
+    transform: translateY(-6px) rotate(-5deg);
+  }
+  50% {
+    transform: translateY(6px) rotate(5deg);
+  }
+}
+
+/* Getroffen: Flug + Flattern anhalten, Puff zeigen, herabfallen & verblassen */
+.chicken--hit {
+  animation-play-state: paused;
+  z-index: 30;
+}
+.chicken--hit .bob {
+  animation: none;
+  transform: none;
+}
+.puff {
+  display: inline-block;
+  animation: pop 0.6s ease-out forwards;
+}
+@keyframes pop {
+  0% {
+    transform: scale(0.4);
+    opacity: 1;
+  }
+  35% {
+    transform: scale(1.35);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(0.9) translateY(40px);
+    opacity: 0;
+  }
+}
+
+/* Punkte-Aufploppen */
+.plus {
+  position: absolute;
+  top: -0.4em;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.6em;
+  font-weight: 900;
+  color: #ffffff;
+  -webkit-text-stroke: 1.5px #16a34a;
+  paint-order: stroke fill;
+  pointer-events: none;
+  animation: floatUp 0.65s ease-out forwards;
+}
+.plus--gold {
+  -webkit-text-stroke: 1.5px #d97706;
+}
+@keyframes floatUp {
+  from {
+    transform: translate(-50%, 0);
+    opacity: 1;
+  }
+  to {
+    transform: translate(-50%, -40px);
+    opacity: 0;
+  }
+}
+
+/* Glitzer der goldenen Kokoš */
+.sparkle {
+  position: absolute;
+  top: -0.2em;
+  right: -0.2em;
+  font-size: 0.5em;
+  pointer-events: none;
+  animation: twinkle 0.9s ease-in-out infinite;
+}
+@keyframes twinkle {
+  0%,
+  100% {
+    transform: scale(0.8);
+    opacity: 0.6;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 1;
+  }
+}
+
+/* ---- Overlay (Start / Ende) ------------------------------------------ */
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: rgba(15, 23, 42, 0.35);
+  backdrop-filter: blur(2px);
+}
+.panel {
+  background: #ffffff;
+  border-radius: 1.75rem;
+  padding: 1.75rem 1.5rem;
+  width: min(92vw, 24rem);
+  text-align: center;
+  box-shadow: 0 20px 50px rgba(15, 23, 42, 0.35);
+  border: 4px solid #e2e8f0;
+}
+.panel--win {
+  border-color: #fbbf24;
+  background: linear-gradient(180deg, #fffdf5, #fff7e0);
+}
+.result-emoji {
+  font-size: 3.5rem;
+  line-height: 1;
+}
+.result-title {
+  margin-top: 0.4rem;
+  font-size: 1.6rem;
+  font-weight: 900;
+  color: #334155;
+}
+.result-score {
+  margin-top: 0.3rem;
+  font-size: 2rem;
+  font-weight: 900;
+  color: #ea580c;
+}
+.result-text {
+  margin-top: 0.5rem;
+  font-size: 1rem;
+  color: #64748b;
+  line-height: 1.4;
+}
+
+/* Stufen-Wahl */
+.level-label {
+  margin-top: 1rem;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.levels {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  margin-top: 0.5rem;
+}
+.level-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  width: 100%;
+  border-radius: 9999px;
+  padding: 0.65rem 1rem;
+  font-weight: 800;
+  font-size: 1.1rem;
+  color: #475569;
+  background: #f1f5f9;
+  border: 3px solid transparent;
+  transition:
+    transform 0.1s ease,
+    border-color 0.15s ease,
+    background 0.15s ease;
+}
+.level-btn:hover {
+  background: #e2e8f0;
+}
+.level-btn:active {
+  transform: scale(0.96);
+}
+.level-btn--active {
+  border-color: #10b981;
+  background: #ecfdf5;
+  color: #047857;
+}
+.level-dots {
+  color: #10b981;
+  font-size: 0.9rem;
+  letter-spacing: 0.1em;
+}
+
+.btn {
+  display: block;
+  width: 100%;
+  margin-top: 0.8rem;
+  border-radius: 9999px;
+  padding: 0.7rem 1rem;
+  font-weight: 800;
+  font-size: 1.1rem;
+  transition: transform 0.1s ease;
+}
+.btn:active {
+  transform: scale(0.96);
+}
+.btn-primary {
+  background: #10b981;
+  color: #fff;
+  box-shadow: 0 8px 18px rgba(16, 185, 129, 0.4);
+}
+.btn-primary:hover {
+  background: #059669;
+}
+.btn-ghost {
+  background: transparent;
+  color: #64748b;
+  margin-top: 0.4rem;
+  font-size: 1rem;
+}
+.btn-ghost:hover {
+  color: #334155;
+}

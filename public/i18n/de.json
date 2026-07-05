@@ -297,7 +297,9 @@
     "ludo": "Ärger dich nicht",
     "ludoSub": "Bring alle Figuren ins Ziel",
     "mill": "Mühle",
-    "millSub": "Schließe drei in einer Reihe"
+    "millSub": "Schließe drei in einer Reihe",
+    "moorhuhn": "Wilde Hühner",
+    "moorhuhnSub": "Triff die Hühner!"
   },
   "uno": {
     "title": "UNO",
@@ -396,5 +398,19 @@
     "lost": "{{name}} hat gewonnen!",
     "playAgain": "Nochmal spielen",
     "home": "Zurück zum Start"
+  },
+  "moorhuhn": {
+    "title": "Wilde Hühner",
+    "intro": "Triff so viele Hühner wie möglich, bevor die Zeit abläuft! Kleine und schnelle zählen mehr, das goldene 🐓 am meisten!",
+    "chooseLevel": "Stufe wählen",
+    "easy": "Leicht",
+    "medium": "Mittel",
+    "hard": "Schwer",
+    "again": "Nochmal",
+    "back": "Zurück zum Start",
+    "record": "Neuer Rekord!",
+    "bravo": "Bravo!",
+    "points": "{{count}} Punkte",
+    "summary": "Du hast {{count}} Hühner getroffen · Bestwert: {{best}}"
   }
 }
