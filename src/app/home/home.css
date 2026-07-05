@@ -2,3 +2,87 @@
   display: block;
   width: 100%;
 }
+
+/* Animierbarer Winkel für den umlaufenden Lichtpunkt */
+@property --border-angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
+/* Rahmen + Farbverlauf für alle Spiele-Buttons – gilt global, ohne jeden Button einzeln anzufassen */
+:host button[type='button'] {
+  position: relative;
+  border: 3px solid rgb(217 119 6 / 0.7); /* amber-600 – warmer Gold-Kontrast zum rosa Verlauf */
+  /* warmer Pastell-Verlauf: creme → pfirsich → rosé (passt zum Rose-Text) */
+  background: linear-gradient(160deg, #fff7ed 0%, #ffe4e6 55%, #fbcfe8 100%);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+/* Verspielter rosa Glow beim Drüberfahren – kindgerechtes Feedback */
+:host button[type='button']:hover {
+  box-shadow: 0 14px 30px rgb(244 114 182 / 0.45); /* pink-400 */
+  /* etwas kräftigerer, wärmerer Verlauf beim Hover */
+  background: linear-gradient(160deg, #ffedd5 0%, #fecdd3 55%, #f9a8d4 100%);
+}
+
+/* Leuchtpunkt, der beim Hover um den Rahmen herumfährt */
+:host button[type='button']::after {
+  content: '';
+  position: absolute;
+  inset: -3px; /* deckt genau den 3px-Rahmen ab, liegt also auf dem Rahmen */
+  border-radius: calc(2rem + 3px); /* Außenradius = Button-Ecke (2rem) + Rahmen */
+  padding: 3px; /* Dicke des Leuchtrings = Rahmendicke */
+  /* ein heller, kurzer Komet-Bogen im ansonsten transparenten Kreis */
+  background: conic-gradient(
+    from var(--border-angle),
+    transparent 0deg,
+    transparent 320deg,
+    #fde68a 338deg,
+    #fb7185 350deg,
+    #f472b6 357deg,
+    transparent 360deg
+  );
+  /* Maske: nur der Ring am Rand bleibt sichtbar, die Mitte wird ausgestanzt */
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  pointer-events: none;
+}
+
+:host button[type='button']:hover::after {
+  opacity: 1;
+  animation: border-run 2.2s linear infinite;
+}
+
+@keyframes border-run {
+  to {
+    --border-angle: 360deg;
+  }
+}
+
+/* Wer reduzierte Bewegung bevorzugt, bekommt keine Umlauf-Animation */
+@media (prefers-reduced-motion: reduce) {
+  :host button[type='button']:hover::after {
+    animation: none;
+  }
+}
+
+/* Spielname (erster span) – kräftig-dunkler Beerenton als Hauptlabel */
+:host button[type='button'] > span:first-of-type {
+  color: rgb(136 19 55); /* rose-900 */
+}
+
+/* Untertitel (letzter span) – etwas hellerer Rose-Ton, klar vom Gold-Rahmen abgesetzt */
+:host button[type='button'] > span:last-child {
+  color: rgb(190 24 93); /* rose-700 */
+}
+
+
