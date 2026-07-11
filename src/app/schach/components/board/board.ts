@@ -19,6 +19,11 @@ const GLYPH: Record<string, string> = {
   k: '♚', q: '♛', r: '♜', b: '♝', n: '♞', p: '♟',
 };
 
+/** Vollständige Grundaufstellung je Farbe (ohne König, der nie geschlagen wird). */
+const START: Record<string, number> = { q: 1, r: 2, b: 2, n: 2, p: 8 };
+/** Reihenfolge der Anzeige: stärkste zuerst. */
+const CAP_ORDER = ['q', 'r', 'b', 'n', 'p'] as const;
+
 @Component({
   selector: 'app-schach-board',
   standalone: true,
@@ -145,6 +150,42 @@ export class SchachBoard implements OnDestroy {
   protected isCapture(i: number): boolean {
     return this.isTarget(i) && !!this.game()?.board[i];
   }
+
+  // ---- Geschlagene Figuren -------------------------------------------------
+  /**
+   * Ermittelt aus dem aktuellen Brett, welche Figuren jeder Farbe geschlagen
+   * wurden (= fehlende Figuren gegenüber der Grundaufstellung). Bauern, die per
+   * Umwandlung zu einer Dame wurden, zählen nicht als geschlagen.
+   */
+  private readonly captures = computed<{ white: string[]; black: string[] }>(() => {
+    const g = this.game();
+    const counts: Record<string, number> = {};
+    if (g) for (const p of g.board) if (p) counts[p] = (counts[p] ?? 0) + 1;
+
+    const build = (white: boolean): string[] => {
+      const ch = (t: string) => (white ? t.toUpperCase() : t);
+      // Umgewandelte Bauern: überzählige Figuren jenseits der Grundaufstellung.
+      let promoted = 0;
+      for (const t of ['q', 'r', 'b', 'n'] as const) {
+        const extra = (counts[ch(t)] ?? 0) - START[t];
+        if (extra > 0) promoted += extra;
+      }
+      const glyphs: string[] = [];
+      for (const t of CAP_ORDER) {
+        let missing = START[t] - (counts[ch(t)] ?? 0);
+        if (t === 'p') missing -= promoted;
+        for (let k = 0; k < missing; k++) glyphs.push(GLYPH[t]);
+      }
+      return glyphs;
+    };
+
+    return { white: build(true), black: build(false) };
+  });
+
+  /** Von Weiß geschlagene (schwarze) Figuren. */
+  protected readonly capturedByWhite = computed<string[]>(() => this.captures().black);
+  /** Von Schwarz geschlagene (weiße) Figuren. */
+  protected readonly capturedByBlack = computed<string[]>(() => this.captures().white);
 
   // ---- Interaktion ---------------------------------------------------------
   protected tapSquare(i: number): void {

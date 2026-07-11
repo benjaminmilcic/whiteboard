@@ -34,6 +34,15 @@
 
     <!-- Spielbrett mit Feldbezeichnungen am Rand -->
     <div class="field-wrap">
+      <!-- Geschlagene schwarze Figuren -->
+      <aside class="tray tray--black">
+        <div class="caps">
+          @for (gl of capturedByWhite(); track $index) {
+            <span class="cap cap--black">{{ gl }}</span>
+          }
+        </div>
+      </aside>
+
       <div class="board-area">
         <div class="ranks">
           @for (r of ranks(); track $index) {
@@ -70,6 +79,15 @@
           }
         </div>
       </div>
+
+      <!-- Geschlagene weiße Figuren -->
+      <aside class="tray tray--white">
+        <div class="caps">
+          @for (gl of capturedByBlack(); track $index) {
+            <span class="cap cap--white">{{ gl }}</span>
+          }
+        </div>
+      </aside>
     </div>
 
     <!-- Warten auf Mitspieler -->
