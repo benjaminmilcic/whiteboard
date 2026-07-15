@@ -12,6 +12,7 @@ import { TranslocoModule } from '@jsverse/transloco';
 import { GameService } from '../../game/game.service';
 import { EffectsService } from '../../../memory/effects/effects.service';
 import { DraggableDirective } from '../../../shared/draggable.directive';
+import { SpeakOnClickDirective } from '../../../shared/speak-on-click.directive';
 import type { BgColor } from '../../game/game.types';
 
 type Outcome = 'win' | 'lose';
@@ -36,7 +37,7 @@ const PIPS: Record<number, number[]> = {
 @Component({
   selector: 'app-bg-board',
   standalone: true,
-  imports: [NgTemplateOutlet, TranslocoModule, DraggableDirective],
+  imports: [NgTemplateOutlet, TranslocoModule, DraggableDirective, SpeakOnClickDirective],
   templateUrl: './board.html',
   styleUrl: './board.css',
   changeDetection: ChangeDetectionStrategy.OnPush,

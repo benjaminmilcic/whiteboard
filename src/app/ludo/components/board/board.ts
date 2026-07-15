@@ -11,6 +11,7 @@ import { TranslocoModule } from '@jsverse/transloco';
 import { GameService } from '../../game/game.service';
 import { EffectsService } from '../../../memory/effects/effects.service';
 import { DraggableDirective } from '../../../shared/draggable.directive';
+import { SpeakOnClickDirective } from '../../../shared/speak-on-click.directive';
 import { GOAL_BASE, SEAT_START, TRACK_LEN } from '../../game/game.types';
 
 type Outcome = 'win' | 'lose';
@@ -68,7 +69,7 @@ interface Token {
 @Component({
   selector: 'app-ludo-board',
   standalone: true,
-  imports: [TranslocoModule, DraggableDirective],
+  imports: [TranslocoModule, DraggableDirective, SpeakOnClickDirective],
   templateUrl: './board.html',
   styleUrl: './board.css',
   changeDetection: ChangeDetectionStrategy.OnPush,

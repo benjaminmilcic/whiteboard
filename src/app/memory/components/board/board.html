@@ -5,7 +5,7 @@
       <div class="players">
         <div class="player" [class.player--active]="g.currentTurn === svc.me()?.id">
           <span class="player-ava"><app-motif [motifId]="svc.me()?.avatar ?? ''" /></span>
-          <span class="player-name">{{ svc.me()?.name }}</span>
+          <span class="player-name" [speakOnClick]="svc.me()?.name || ''">{{ svc.me()?.name }}</span>
           <span class="player-score">{{ svc.me()?.score ?? 0 }}</span>
         </div>
 
@@ -14,7 +14,7 @@
         @if (svc.opponent(); as opp) {
           <div class="player" [class.player--active]="g.currentTurn === opp.id">
             <span class="player-ava"><app-motif [motifId]="opp.avatar" /></span>
-            <span class="player-name">{{ opp.name }}</span>
+            <span class="player-name" [speakOnClick]="opp.name">{{ opp.name }}</span>
             <span class="player-score">{{ opp.score }}</span>
           </div>
         } @else {

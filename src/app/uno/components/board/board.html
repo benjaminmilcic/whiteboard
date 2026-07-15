@@ -5,7 +5,7 @@
       @if (svc.opponent(); as opp) {
         <div class="player" [class.player--active]="g.currentTurn === opp.id">
           <span class="avatar">{{ opp.emoji }}</span>
-          <span class="player-name">{{ opp.name }}</span>
+          <span class="player-name" [speakOnClick]="opp.name">{{ opp.name }}</span>
           <span class="cards-badge">🂠 {{ svc.opponentCount() }}</span>
           @if (svc.opponentCount() === 1) {
             <span class="uno-badge">UNO!</span>

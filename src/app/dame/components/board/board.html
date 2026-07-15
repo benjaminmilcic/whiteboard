@@ -5,7 +5,7 @@
       <div class="players">
         <div class="player" [class.player--active]="g.currentTurn === svc.me()?.id">
           <span class="chip chip--{{ svc.me()?.color }}">{{ svc.me()?.emoji }}</span>
-          <span class="pname">{{ svc.me()?.name }}</span>
+          <span class="pname" [speakOnClick]="svc.me()?.name || ''">{{ svc.me()?.name }}</span>
         </div>
 
         <span class="vs">♟️</span>
@@ -13,7 +13,7 @@
         @if (svc.opponent(); as opp) {
           <div class="player" [class.player--active]="g.currentTurn === opp.id">
             <span class="chip chip--{{ opp.color }}">{{ opp.emoji }}</span>
-            <span class="pname">{{ opp.name }}</span>
+            <span class="pname" [speakOnClick]="opp.name">{{ opp.name }}</span>
           </div>
         } @else {
           <div class="player player--empty">

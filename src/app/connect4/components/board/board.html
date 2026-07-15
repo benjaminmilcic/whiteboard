@@ -5,7 +5,7 @@
       <div class="players">
         <div class="player" [class.player--active]="g.currentTurn === svc.me()?.id">
           <span class="disc disc--{{ svc.me()?.color }}">{{ svc.me()?.emoji }}</span>
-          <span class="player-name">{{ svc.me()?.name }}</span>
+          <span class="player-name" [speakOnClick]="svc.me()?.name || ''">{{ svc.me()?.name }}</span>
         </div>
 
         <span class="vs">⚔️</span>
@@ -13,7 +13,7 @@
         @if (svc.opponent(); as opp) {
           <div class="player" [class.player--active]="g.currentTurn === opp.id">
             <span class="disc disc--{{ opp.color }}">{{ opp.emoji }}</span>
-            <span class="player-name">{{ opp.name }}</span>
+            <span class="player-name" [speakOnClick]="opp.name">{{ opp.name }}</span>
           </div>
         } @else {
           <div class="player player--empty">

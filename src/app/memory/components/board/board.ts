@@ -12,6 +12,7 @@ import { EffectsService } from '../../effects/effects.service';
 import { Card } from '../card/card';
 import { Motif } from '../motif/motif';
 import { DraggableDirective } from '../../../shared/draggable.directive';
+import { SpeakOnClickDirective } from '../../../shared/speak-on-click.directive';
 
 type Outcome = 'win' | 'lose' | 'tie';
 
@@ -20,7 +21,7 @@ const COLS_BY_PAIRS: Record<number, number> = { 6: 4, 10: 5, 12: 6 };
 @Component({
   selector: 'app-board',
   standalone: true,
-  imports: [Card, Motif, TranslocoModule, DraggableDirective],
+  imports: [Card, Motif, TranslocoModule, DraggableDirective, SpeakOnClickDirective],
   templateUrl: './board.html',
   styleUrl: './board.css',
   changeDetection: ChangeDetectionStrategy.OnPush,

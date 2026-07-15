@@ -11,6 +11,7 @@ import { TranslocoModule } from '@jsverse/transloco';
 import { GameService } from '../../game/game.service';
 import { EffectsService } from '../../../memory/effects/effects.service';
 import { DraggableDirective } from '../../../shared/draggable.directive';
+import { SpeakOnClickDirective } from '../../../shared/speak-on-click.directive';
 import type { UnoCard, UnoColor } from '../../game/game.types';
 
 type Outcome = 'win' | 'lose';
@@ -18,7 +19,7 @@ type Outcome = 'win' | 'lose';
 @Component({
   selector: 'app-uno-board',
   standalone: true,
-  imports: [TranslocoModule, DraggableDirective],
+  imports: [TranslocoModule, DraggableDirective, SpeakOnClickDirective],
   templateUrl: './board.html',
   styleUrl: './board.css',
   changeDetection: ChangeDetectionStrategy.OnPush,

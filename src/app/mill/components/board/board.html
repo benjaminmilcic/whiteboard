@@ -6,7 +6,7 @@
         @if (svc.me(); as m) {
           <span class="dot" [style.background]="svc.mySeat() === 0 ? '#e11d48' : '#1d4ed8'"></span>
           <span class="avatar">{{ m.emoji }}</span>
-          <span class="player-name">{{ m.name }}</span>
+          <span class="player-name" [speakOnClick]="m.name">{{ m.name }}</span>
           @if (svc.phase() === 'place') {
             <span class="count">{{ svc.toPlace()[svc.mySeat()] }}</span>
           }
@@ -17,7 +17,7 @@
         <div class="player" [class.player--active]="g.currentTurn === opp.id">
           <span class="dot" [style.background]="svc.mySeat() === 0 ? '#1d4ed8' : '#e11d48'"></span>
           <span class="avatar">{{ opp.emoji }}</span>
-          <span class="player-name">{{ opp.name }}</span>
+          <span class="player-name" [speakOnClick]="opp.name">{{ opp.name }}</span>
           @if (svc.phase() === 'place') {
             <span class="count">{{ svc.toPlace()[1 - svc.mySeat()] }}</span>
           }
