@@ -36,6 +36,17 @@
       ✕
     </button>
   </div>
+} @else if (awayNames()) {
+  <!-- Der Gegner ist nicht mehr verbunden: sichtbar machen, statt still warten. -->
+  <div
+    role="status"
+    class="fixed top-2 left-1/2 -translate-x-1/2 z-50 max-w-[92vw] pointer-events-none
+           flex items-center gap-3 rounded-full bg-slate-700/95 text-white
+           px-5 py-2 shadow-xl ring-2 ring-white/30"
+  >
+    <span class="text-lg" aria-hidden="true">🔌</span>
+    <span class="text-sm font-bold">{{ 'sync.away' | transloco: { names: awayNames() } }}</span>
+  </div>
 } @else if (pending()) {
   <div
     role="status"

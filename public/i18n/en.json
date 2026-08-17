@@ -421,6 +421,7 @@
     "lost": "Lost connection to the game – reconnecting …",
     "timeout": "The database is not responding.",
     "retry": "Refresh",
-    "dismiss": "Hide"
+    "dismiss": "Hide",
+    "away": "{{names}} is not connected right now"
   }
 }

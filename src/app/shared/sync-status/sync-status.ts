@@ -1,5 +1,6 @@
-import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
 import { TranslocoModule } from '@jsverse/transloco';
+import type { AwayPlayer } from '../game-channel';
 
 /**
  * Zeigt an, wenn die Verbindung zum Spiel nicht steht oder ein Zug nicht
@@ -27,6 +28,16 @@ export class SyncStatusComponent {
   readonly error = input<string | null>(null);
   /** Ein Zug ist unterwegs und dauert auffaellig lange. */
   readonly pending = input(false);
+  /** Mitspieler, die gerade nicht verbunden sind. */
+  readonly away = input<AwayPlayer[]>([]);
+
+  /** Namen der Abwesenden, fertig fuer die Meldung. */
+  protected readonly awayNames = computed(() =>
+    this.away()
+      .map((p) => p.name)
+      .filter(Boolean)
+      .join(', '),
+  );
 
   /** Hinweis wegklicken. */
   readonly dismissed = output<void>();

@@ -311,8 +311,13 @@
 }
 
 @media (hover: hover) and (pointer: fine) {
+  /* Wächst nach OBEN, die Unterkante bleibt liegen (transform-origin: bottom).
+     Vorher hob translateY(-10px) die Karte unter dem Mauszeiger weg: wer sie
+     unten anfasste, verlor den Hover, die Karte fiel zurück, der Hover kam
+     wieder – ein Flackern, in dem ein Klick ins Leere gehen kann. */
   .hand-card.card--playable:hover {
-    transform: translateY(-10px) scale(1.05);
+    transform-origin: bottom center;
+    transform: scale(1.12);
   }
 }
 

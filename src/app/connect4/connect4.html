@@ -7,6 +7,7 @@
     [offline]="svc.offline()"
     [error]="svc.error()"
     [pending]="svc.pending()"
+    [away]="svc.absent()"
     (retried)="svc.resync()"
     (dismissed)="svc.dismissError()"
   />

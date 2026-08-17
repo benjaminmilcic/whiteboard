@@ -421,6 +421,7 @@
     "lost": "Verbindung zum Spiel verloren – wird neu aufgebaut …",
     "timeout": "Die Datenbank antwortet nicht.",
     "retry": "Aktualisieren",
-    "dismiss": "Ausblenden"
+    "dismiss": "Ausblenden",
+    "away": "{{names}} ist gerade nicht verbunden"
   }
 }

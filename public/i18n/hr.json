@@ -421,6 +421,7 @@
     "lost": "Veza s igrom je prekinuta – ponovno se povezujem …",
     "timeout": "Baza podataka ne odgovara.",
     "retry": "Osvježi",
-    "dismiss": "Sakrij"
+    "dismiss": "Sakrij",
+    "away": "{{names}} trenutno nije povezan"
   }
 }

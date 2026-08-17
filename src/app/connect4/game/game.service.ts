@@ -34,6 +34,7 @@ export class GameService {
     authReady,
     basePath: 'connect4/games',
     activeKey: ACTIVE_CODE_KEY,
+    playerId: () => this.playerId,
     normalize: (raw) => this.normalize(raw as C4Game),
     canResume: (g) => !!g.players[this.playerId] && g.status !== 'finished',
     t: (key) => this.i18n.translate(key),
@@ -47,6 +48,8 @@ export class GameService {
   readonly offline = this.channel.offline;
   /** Ein Zug ist unterwegs und dauert auffällig lange. */
   readonly pending = this.channel.pending;
+  /** Mitspieler, die gerade nicht verbunden sind. */
+  readonly absent = this.channel.awayPlayers;
 
   /** Nach einem Neuladen zurück ins laufende Spiel. */
   resume(): Promise<boolean> {

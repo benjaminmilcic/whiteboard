@@ -27,12 +27,16 @@
 //     Oberflaeche anzeigt – und zusaetzlich als console.warn, damit im
 //     Fehlerfall ueberhaupt etwas in der Browserkonsole steht.
 // =============================================================
-import { signal } from '@angular/core';
+import { computed, signal } from '@angular/core';
 import {
   get,
+  onDisconnect,
   onValue,
   ref,
+  remove,
   runTransaction,
+  serverTimestamp,
+  set,
   type Database,
   type Unsubscribe,
 } from 'firebase/database';
@@ -53,6 +57,8 @@ const PENDING_HINT_AFTER = 800;
 const RESYNC_THROTTLE = 1_500;
 /** Aelter als das wird ein gemerktes Spiel nicht mehr fortgesetzt. */
 const RESUME_MAX_AGE = 12 * 60 * 60 * 1000;
+/** Takt fuer die Abwesenheits-Anzeige (nur lokal, kein Datenbankzugriff). */
+const TICK_MS = 1_000;
 
 /** Standardmeldung, wenn die Datenbank nicht antwortet. */
 export const TIMEOUT_MESSAGE = 'Zeitüberschreitung: Die Datenbank antwortet nicht.';
@@ -74,6 +80,28 @@ export interface SyncedGame {
   /** Fortlaufende Revision – schuetzt vor dem Ueberschreiben durch alte Zuege. */
   rev?: number;
   updatedAt?: number;
+  /** Fuer die Abwesenheits-Anzeige – jedes Spiel hier hat eine Spielerliste. */
+  players?: Record<string, { name?: string }>;
+}
+
+/**
+ * Ist dieses Geraet gerade mit der Datenbank verbunden?
+ *
+ * `at` ist eine SERVER-Zeit (serverTimestamp). Nie direkt mit Date.now()
+ * vergleichen – die Uhr eines Handys kann daneben liegen. Dafuer gibt es
+ * `awayMs()`, das den Versatz aus `.info/serverTimeOffset` einrechnet.
+ */
+export interface PlayerPresence {
+  online: boolean;
+  at: number;
+}
+
+/** Ein Mitspieler, der gerade nicht verbunden ist. */
+export interface AwayPlayer {
+  id: string;
+  name: string;
+  /** Sekunden seit dem Verschwinden. */
+  seconds: number;
 }
 
 export interface GameChannelOptions<T extends SyncedGame> {
@@ -85,6 +113,9 @@ export interface GameChannelOptions<T extends SyncedGame> {
   authReady: Promise<void>;
   /** Pfad zu den Spielen, z. B. 'connect4/games'. */
   basePath: string;
+  /** Eigene Spieler-Id – fuer den Praesenz-Eintrag. Als Funktion, damit die
+   *  Reihenfolge der Felder im Service keine Rolle spielt. */
+  playerId: () => string;
   /** localStorage-Schluessel fuer das zuletzt geoeffnete Spiel. */
   activeKey: string;
   /** Rohdaten aus Firebase auffuellen – die normalize() des jeweiligen Spiels. */
@@ -108,6 +139,14 @@ export class GameChannel<T extends SyncedGame> {
   readonly offline = signal(false);
   /** Ein Zug ist unterwegs und dauert auffaellig lange. */
   readonly pending = signal(false);
+  /**
+   * Wer von den Mitspielern gerade verbunden ist. Liegt im Spielknoten selbst
+   * (`<code>/presence/<spielerId>`), kommt also mit jedem Snapshot mit – kein
+   * zweiter Listener und keine Aenderung an den Datenbank-Regeln noetig.
+   */
+  readonly presence = signal<Record<string, PlayerPresence>>({});
+  /** Tickt sekuendlich, solange ein Spiel offen ist – treibt die Abwesenheitsanzeige. */
+  readonly tick = signal(0);
 
   private code: string | null = null;
   private dataUnsub: Unsubscribe | null = null;
@@ -115,6 +154,10 @@ export class GameChannel<T extends SyncedGame> {
   private reattachTimer: ReturnType<typeof setTimeout> | null = null;
   private offlineTimer: ReturnType<typeof setTimeout> | null = null;
   private pendingTimer: ReturnType<typeof setTimeout> | null = null;
+  private tickTimer: ReturnType<typeof setInterval> | null = null;
+  private offsetUnsub: Unsubscribe | null = null;
+  /** Versatz zwischen lokaler Uhr und Server-Uhr in Millisekunden. */
+  private serverOffset = 0;
   private retryDelay = RETRY_MIN;
   private lastResync = 0;
   /** true, solange ein Zug auf die Bestaetigung des Servers wartet. */
@@ -140,24 +183,98 @@ export class GameChannel<T extends SyncedGame> {
     this.lastResync = Date.now();
     this.watchConnection();
     this.bindWakeups();
+    this.startTicking();
     this.attach();
   }
 
   /** Spiel verlassen: alle Listener loesen und den Zustand leeren. */
   close(): void {
+    const code = this.code;
     this.code = null;
     this.forget();
+    // Praesenz-Eintrag mitnehmen, damit der Gegner nicht "ist weg" sieht,
+    // obwohl das Spiel bewusst beendet wurde.
+    if (code) void this.dropPresence(code);
     this.clearTimers();
     this.dataUnsub?.();
     this.dataUnsub = null;
     this.connUnsub?.();
     this.connUnsub = null;
+    this.offsetUnsub?.();
+    this.offsetUnsub = null;
     this.unbindWakeups();
     this.recovering = false;
     this.state.set(null);
     this.error.set(null);
     this.pending.set(false);
     this.offline.set(false);
+    this.presence.set({});
+  }
+
+  // ---- Praesenz -----------------------------------------------------------
+  /**
+   * Wie lange ist dieser Spieler schon nicht mehr verbunden? 0 = verbunden oder
+   * unbekannt (z. B. eine aeltere Partie ohne Praesenz-Eintraege).
+   *
+   * Liest `tick`, aktualisiert sich also sekuendlich von selbst.
+   */
+  awayMs(playerId: string): number {
+    this.tick();
+    const p = this.presence()[playerId];
+    if (!p || p.online !== false || !p.at) return 0;
+    return Math.max(0, Date.now() + this.serverOffset - p.at);
+  }
+
+  /**
+   * Alle Mitspieler (ohne einen selbst), die gerade nicht verbunden sind.
+   * Aktualisiert sich sekuendlich.
+   */
+  readonly awayPlayers = computed<AwayPlayer[]>(() => {
+    const players = this.state()?.players;
+    if (!players) return [];
+    const me = this.opts.playerId();
+    const out: AwayPlayer[] = [];
+    for (const [id, p] of Object.entries(players)) {
+      if (id === me) continue;
+      const seconds = Math.floor(this.awayMs(id) / 1000);
+      if (seconds > 0) out.push({ id, name: p?.name ?? '', seconds });
+    }
+    return out;
+  });
+
+  private presenceRef(code: string) {
+    return ref(this.opts.db, `${this.opts.basePath}/${code}/presence/${this.opts.playerId()}`);
+  }
+
+  /**
+   * Meldet dieses Geraet als verbunden und hinterlegt beim Server, was passieren
+   * soll, wenn die Verbindung stirbt.
+   *
+   * `onDisconnect` ist der einzige Weg, der auch Tab-Schliessen, Absturz,
+   * Flugmodus und leeren Akku abdeckt: die Datenbank fuehrt den Schreibvorgang
+   * SERVERSEITIG aus. Muss nach jedem Neuverbinden erneut hinterlegt werden.
+   */
+  private async announcePresence(code: string): Promise<void> {
+    try {
+      const p = this.presenceRef(code);
+      await onDisconnect(p).set({ online: false, at: serverTimestamp() });
+      await set(p, { online: true, at: serverTimestamp() });
+    } catch (e) {
+      console.warn('[sync] Präsenz konnte nicht gemeldet werden:', e);
+    }
+  }
+
+  private async dropPresence(code: string): Promise<void> {
+    try {
+      await remove(this.presenceRef(code));
+    } catch (e) {
+      console.warn('[sync] Präsenz konnte nicht entfernt werden:', e);
+    }
+  }
+
+  private startTicking(): void {
+    if (this.tickTimer) return;
+    this.tickTimer = setInterval(() => this.tick.update((n) => n + 1), TICK_MS);
   }
 
   /** Hinweis wegklicken. */
@@ -290,6 +407,10 @@ export class GameChannel<T extends SyncedGame> {
 
   /** Rohdaten uebernehmen: auffuellen, veroeffentlichen, Nachlauf ausloesen. */
   private apply(raw: unknown): void {
+    // Die Praesenz haengt im Spielknoten und kommt mit jedem Snapshot mit.
+    // Sie wird VOR normalize() gelesen, das sie nicht kennt.
+    const presence = (raw as { presence?: Record<string, PlayerPresence> } | null)?.presence;
+    this.presence.set(presence ?? {});
     const game = raw ? this.opts.normalize(raw) : null;
     this.state.set(game);
     this.opts.onState?.(game);
@@ -340,6 +461,14 @@ export class GameChannel<T extends SyncedGame> {
   }
 
   private watchConnection(): void {
+    if (!this.offsetUnsub) {
+      // Praesenz-Zeitstempel kommen vom Server; die Uhr des Geraets kann daneben
+      // liegen. Ohne diesen Versatz waere "seit wann weg" schlicht falsch.
+      this.offsetUnsub = onValue(ref(this.opts.db, '.info/serverTimeOffset'), (snap) => {
+        const v = snap.val();
+        if (typeof v === 'number') this.serverOffset = v;
+      });
+    }
     if (this.connUnsub) return;
     this.connUnsub = onValue(ref(this.opts.db, '.info/connected'), (snap) => {
       const up = snap.val() === true;
@@ -350,6 +479,9 @@ export class GameChannel<T extends SyncedGame> {
       }
       if (up) {
         this.offline.set(false);
+        // onDisconnect muss nach JEDEM Neuverbinden erneut hinterlegt werden.
+        const code = this.code;
+        if (code) void this.announcePresence(code);
         // Waehrend der Trennung verpasste Aenderungen nachholen.
         void this.resync();
       } else {
@@ -399,6 +531,8 @@ export class GameChannel<T extends SyncedGame> {
     this.reattachTimer = null;
     this.offlineTimer = null;
     this.pendingTimer = null;
+    if (this.tickTimer) clearInterval(this.tickTimer);
+    this.tickTimer = null;
   }
 
   private remember(code: string): void {
