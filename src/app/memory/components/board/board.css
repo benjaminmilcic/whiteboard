@@ -254,6 +254,8 @@
 }
 
 .tear {
+  /* Reine Deko – darf keine Klicks abfangen (opacity wird animiert). */
+  pointer-events: none;
   position: absolute;
   top: 45%;
   font-size: 1.2rem;
