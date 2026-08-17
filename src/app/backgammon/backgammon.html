@@ -2,6 +2,14 @@
   class="min-h-dvh w-full bg-gradient-to-b from-amber-200 via-orange-300 to-rose-400
          flex flex-col overflow-x-hidden"
 >
+  <!-- Verbindungs-/Fehlerhinweis – gilt für Start- und Spielansicht. -->
+  <app-sync-status
+    [offline]="svc.offline()"
+    [error]="svc.error()"
+    [pending]="svc.pending()"
+    (retried)="svc.resync()"
+    (dismissed)="svc.dismissError()"
+  />
   <!-- Buttonleiste: Spiel beenden · Sprachen · Hauptmenü -->
   <header class="w-full flex justify-end items-center gap-4 px-3 pt-3 shrink-0">
     @if (game()) {

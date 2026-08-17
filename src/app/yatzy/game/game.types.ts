@@ -28,6 +28,9 @@ export interface YatzyGame {
   /** Wertungstabelle je Spieler: nur eingetragene Kategorien sind gesetzt. */
   scores: Record<string, ScoreMap>;
   winnerId: string | null; // playerId, 'tie' oder null
+  /** Fortlaufende Revision – verhindert, dass ein verspäteter Zug einen
+   *  neueren Stand überschreibt (siehe shared/game-channel.ts). */
+  rev: number;
   createdAt: number;
   updatedAt: number;
 }

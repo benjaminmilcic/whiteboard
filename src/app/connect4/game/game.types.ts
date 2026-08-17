@@ -28,6 +28,9 @@ export interface C4Game {
   winningCells: number[] | null;
   /** Index des zuletzt geworfenen Steins (für die Hervorhebung) oder null. */
   lastMove: number | null;
+  /** Fortlaufende Revision – verhindert, dass ein verspäteter Zug einen
+   *  neueren Stand überschreibt (siehe shared/game-channel.ts). */
+  rev: number;
   createdAt: number;
   updatedAt: number;
 }

@@ -50,6 +50,9 @@ export interface UnoGame {
   winnerId: string | null;
   /** Letzter Spielzug (für kurze Hinweis-Einblendung), oder null. */
   lastAction: UnoAction | null;
+  /** Fortlaufende Revision – verhindert, dass ein verspäteter Zug einen
+   *  neueren Stand überschreibt (siehe shared/game-channel.ts). */
+  rev: number;
   createdAt: number;
   updatedAt: number;
 }

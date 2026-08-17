@@ -31,6 +31,9 @@ export interface ChessGame {
   /** playerId des Siegers, 'draw' bei Patt, oder null. */
   winnerId: string | null;
   lastMove: { from: number; to: number } | null;
+  /** Fortlaufende Revision – verhindert, dass ein verspäteter Zug einen
+   *  neueren Stand überschreibt (siehe shared/game-channel.ts). */
+  rev: number;
   createdAt: number;
   updatedAt: number;
 }

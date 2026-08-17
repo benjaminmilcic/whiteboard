@@ -1,6 +1,8 @@
-import { Injectable, computed, signal } from '@angular/core';
-import { ref, set, get, update, onValue, type Unsubscribe } from 'firebase/database';
+import { Injectable, computed, inject, signal } from '@angular/core';
+import { TranslocoService } from '@jsverse/transloco';
+import { ref, set, get } from 'firebase/database';
 import { authReady, db, databaseConfigured } from '../firebase/firebase';
+import { GameChannel, withTimeout } from '../../shared/game-channel';
 import {
   ADJACENCY,
   MILLS,
@@ -13,19 +15,56 @@ import {
 const PLAYER_ID_KEY = 'mill_player_id';
 const PLAYER_NAME_KEY = 'mill_player_name';
 const PLAYER_EMOJI_KEY = 'mill_player_emoji';
+/** Zuletzt geöffnetes Spiel – für die Rückkehr nach einem Neuladen. */
+const ACTIVE_CODE_KEY = 'mill_active_code';
 const CODE_ALPHABET = '0123456789';
 
 export const AVATARS = ['🦄', '🐙', '🦈', '🐱', '🦖', '🐬', '🦊', '🐸', '🐧', '🦁'];
 
 @Injectable({ providedIn: 'root' })
 export class GameService {
-  readonly game = signal<MillGame | null>(null);
-  readonly error = signal<string | null>(null);
-  readonly busy = signal(false);
+  private readonly i18n = inject(TranslocoService);
 
   readonly playerId = this.loadPlayerId();
+  readonly busy = signal(false);
 
-  private gameUnsub: Unsubscribe | null = null;
+  /**
+   * Verbindung zum Spielknoten: hält den Zustand aktuell, baut abgebrochene
+   * Listener neu auf und schreibt Züge nur mit Server-Bestätigung.
+   */
+  private readonly channel = new GameChannel<MillGame>({
+    db,
+    configured: databaseConfigured,
+    authReady,
+    basePath: 'mill/games',
+    activeKey: ACTIVE_CODE_KEY,
+    normalize: (raw) => this.normalize(raw as MillGame),
+    canResume: (g) => !!g.players[this.playerId] && g.status !== 'finished',
+    t: (key) => this.i18n.translate(key),
+  });
+
+  /** Aktueller Spielzustand aus der Realtime Database. */
+  readonly game = this.channel.state;
+  /** Meldung für die Oberfläche (Konfiguration, Verbindung, nicht gespeicherter Zug). */
+  readonly error = this.channel.error;
+  /** Verbindung ist länger weg – die Oberfläche zeigt einen Hinweis. */
+  readonly offline = this.channel.offline;
+  /** Ein Zug ist unterwegs und dauert auffällig lange. */
+  readonly pending = this.channel.pending;
+
+  /** Nach einem Neuladen zurück ins laufende Spiel. */
+  resume(): Promise<boolean> {
+    return this.channel.resume();
+  }
+
+  /** Stand von Hand neu vom Server holen (Knopf im Hinweisbalken). */
+  resync(): Promise<void> {
+    return this.channel.resync();
+  }
+
+  dismissError(): void {
+    this.channel.dismissError();
+  }
 
   // ---- Abgeleitete Signale für die Oberfläche -----------------------------
   readonly me = computed<MillPlayer | null>(() => this.game()?.players[this.playerId] ?? null);
@@ -121,11 +160,12 @@ export class GameService {
         removing: false,
         winnerId: null,
         lastAction: null,
+        rev: 0,
         createdAt: Date.now(),
         updatedAt: Date.now(),
       };
-      await this.withTimeout(set(ref(db, `mill/games/${code}`), state));
-      this.subscribe(code);
+      await withTimeout(set(ref(db, `mill/games/${code}`), state));
+      this.channel.open(code);
       return code;
     } catch (e) {
       this.error.set(this.toMessage(e));
@@ -143,7 +183,7 @@ export class GameService {
     try {
       this.assertConfig();
       await authReady;
-      const snap = await this.withTimeout(get(ref(db, `mill/games/${code}`)));
+      const snap = await withTimeout(get(ref(db, `mill/games/${code}`)));
       if (!snap.exists()) {
         throw new Error('Nema igre s ovim kodom.');
       }
@@ -162,10 +202,11 @@ export class GameService {
         state.removing = false;
         state.winnerId = null;
         state.lastAction = null;
+        state.rev = (state.rev ?? 0) + 1;
         state.updatedAt = Date.now();
-        await this.withTimeout(set(ref(db, `mill/games/${code}`), state));
+        await withTimeout(set(ref(db, `mill/games/${code}`), state));
       }
-      this.subscribe(code);
+      this.channel.open(code);
     } catch (e) {
       this.error.set(this.toMessage(e));
       throw e;
@@ -252,9 +293,7 @@ export class GameService {
   }
 
   leaveGame(): void {
-    this.gameUnsub?.();
-    this.gameUnsub = null;
-    this.game.set(null);
+    this.channel.close();
   }
 
   // ---- Regel-Hilfen (öffentlich für die Oberfläche) -----------------------
@@ -362,7 +401,7 @@ export class GameService {
   }
 
   private async writeState(code: string, next: MillGame): Promise<void> {
-    await update(ref(db, `mill/games/${code}`), {
+    await this.channel.commit({
       board: next.board,
       placed: next.placed,
       currentTurn: next.currentTurn,
@@ -374,19 +413,6 @@ export class GameService {
     });
   }
 
-  private subscribe(code: string): void {
-    this.gameUnsub?.();
-    const gameRef = ref(db, `mill/games/${code}`);
-    this.gameUnsub = onValue(
-      gameRef,
-      (snap) => {
-        const raw = snap.val() as MillGame | null;
-        this.game.set(raw ? this.normalize(raw) : null);
-      },
-      (err) => this.error.set(this.toMessage(err)),
-    );
-  }
-
   /** Firebase liefert Arrays/Defaults nicht immer sauber – beim Lesen ergänzen. */
   private normalize(g: MillGame): MillGame {
     const board = Array.from({ length: POINTS_COUNT }, (_, i) =>
@@ -395,6 +421,7 @@ export class GameService {
     const placed = [Number(g.placed?.[0] ?? 0), Number(g.placed?.[1] ?? 0)];
     return {
       ...g,
+      rev: g.rev ?? 0,
       order: g.order ?? [],
       players: g.players ?? {},
       board,
@@ -412,7 +439,7 @@ export class GameService {
   private async uniqueCode(): Promise<string> {
     for (let attempt = 0; attempt < 8; attempt++) {
       const code = this.randomCode();
-      const snap = await this.withTimeout(get(ref(db, `mill/games/${code}`)));
+      const snap = await withTimeout(get(ref(db, `mill/games/${code}`)));
       if (!snap.exists()) return code;
     }
     return this.randomCode();
@@ -433,18 +460,6 @@ export class GameService {
           'src/app/shared/firebase-config.ts fehlt die gültige "databaseURL".',
       );
     }
-  }
-
-  private withTimeout<T>(p: Promise<T>, ms = 12000): Promise<T> {
-    return Promise.race([
-      p,
-      new Promise<T>((_, reject) =>
-        setTimeout(
-          () => reject(new Error('Zeitüberschreitung: Die Datenbank antwortet nicht.')),
-          ms,
-        ),
-      ),
-    ]);
   }
 
   private toMessage(e: unknown): string {

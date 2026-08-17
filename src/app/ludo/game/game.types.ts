@@ -54,6 +54,9 @@ export interface LudoGame {
   rollsLeft: number;
   winnerId: string | null;
   lastAction: LudoAction | null;
+  /** Fortlaufende Revision – verhindert, dass ein verspäteter Zug einen
+   *  neueren Stand überschreibt (siehe shared/game-channel.ts). */
+  rev: number;
   createdAt: number;
   updatedAt: number;
 }

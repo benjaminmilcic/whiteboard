@@ -1,6 +1,8 @@
-import { Injectable, computed, signal } from '@angular/core';
-import { ref, set, get, update, onValue, type Unsubscribe } from 'firebase/database';
+import { Injectable, computed, inject, signal } from '@angular/core';
+import { TranslocoService } from '@jsverse/transloco';
+import { ref, set, get } from 'firebase/database';
 import { authReady, db, databaseConfigured } from '../firebase/firebase';
+import { GameChannel, withTimeout } from '../../shared/game-channel';
 import type { YatzyGame, YPlayer } from './game.types';
 import {
   CATEGORIES,
@@ -15,19 +17,56 @@ import {
 const PLAYER_ID_KEY = 'yatzy_player_id';
 const PLAYER_NAME_KEY = 'yatzy_player_name';
 const PLAYER_EMOJI_KEY = 'yatzy_player_emoji';
+/** Zuletzt geöffnetes Spiel – für die Rückkehr nach einem Neuladen. */
+const ACTIVE_CODE_KEY = 'yatzy_active_code';
 const CODE_ALPHABET = '0123456789';
 
 export const AVATARS = ['🦄', '🐙', '🦈', '🐱', '🦖', '🐬', '🦊', '🐸', '🐧', '🦁'];
 
 @Injectable({ providedIn: 'root' })
 export class GameService {
-  readonly game = signal<YatzyGame | null>(null);
-  readonly error = signal<string | null>(null);
-  readonly busy = signal(false);
+  private readonly i18n = inject(TranslocoService);
 
   readonly playerId = this.loadPlayerId();
+  readonly busy = signal(false);
 
-  private gameUnsub: Unsubscribe | null = null;
+  /**
+   * Verbindung zum Spielknoten: hält den Zustand aktuell, baut abgebrochene
+   * Listener neu auf und schreibt Züge nur mit Server-Bestätigung.
+   */
+  private readonly channel = new GameChannel<YatzyGame>({
+    db,
+    configured: databaseConfigured,
+    authReady,
+    basePath: 'yatzy/games',
+    activeKey: ACTIVE_CODE_KEY,
+    normalize: (raw) => this.normalize(raw as YatzyGame),
+    canResume: (g) => !!g.players[this.playerId] && g.status !== 'finished',
+    t: (key) => this.i18n.translate(key),
+  });
+
+  /** Aktueller Spielzustand aus der Realtime Database. */
+  readonly game = this.channel.state;
+  /** Meldung für die Oberfläche (Konfiguration, Verbindung, nicht gespeicherter Zug). */
+  readonly error = this.channel.error;
+  /** Verbindung ist länger weg – die Oberfläche zeigt einen Hinweis. */
+  readonly offline = this.channel.offline;
+  /** Ein Zug ist unterwegs und dauert auffällig lange. */
+  readonly pending = this.channel.pending;
+
+  /** Nach einem Neuladen zurück ins laufende Spiel. */
+  resume(): Promise<boolean> {
+    return this.channel.resume();
+  }
+
+  /** Stand von Hand neu vom Server holen (Knopf im Hinweisbalken). */
+  resync(): Promise<void> {
+    return this.channel.resync();
+  }
+
+  dismissError(): void {
+    this.channel.dismissError();
+  }
 
   // ---- Abgeleitete Signale -------------------------------------------------
   readonly me = computed<YPlayer | null>(() => this.game()?.players[this.playerId] ?? null);
@@ -94,11 +133,12 @@ export class GameService {
         rolledThisTurn: false,
         scores: { [this.playerId]: {} },
         winnerId: null,
+        rev: 0,
         createdAt: Date.now(),
         updatedAt: Date.now(),
       };
-      await this.withTimeout(set(ref(db, `yatzy/games/${code}`), state));
-      this.subscribe(code);
+      await withTimeout(set(ref(db, `yatzy/games/${code}`), state));
+      this.channel.open(code);
       return code;
     } catch (e) {
       this.error.set(this.toMessage(e));
@@ -116,7 +156,7 @@ export class GameService {
     try {
       this.assertConfig();
       await authReady;
-      const snap = await this.withTimeout(get(ref(db, `yatzy/games/${code}`)));
+      const snap = await withTimeout(get(ref(db, `yatzy/games/${code}`)));
       if (!snap.exists()) {
         throw new Error('Kein Spiel mit diesem Code gefunden.');
       }
@@ -134,10 +174,11 @@ export class GameService {
         state.held = this.freshHeld();
         state.rollsLeft = MAX_ROLLS;
         state.rolledThisTurn = false;
+        state.rev = (state.rev ?? 0) + 1;
         state.updatedAt = Date.now();
-        await this.withTimeout(set(ref(db, `yatzy/games/${code}`), state));
+        await withTimeout(set(ref(db, `yatzy/games/${code}`), state));
       }
-      this.subscribe(code);
+      this.channel.open(code);
     } catch (e) {
       this.error.set(this.toMessage(e));
       throw e;
@@ -155,7 +196,7 @@ export class GameService {
 
     const first = !g.rolledThisTurn;
     const dice = g.dice.map((v, i) => (!first && g.held[i] ? v : this.rnd()));
-    await update(ref(db, `yatzy/games/${g.code}`), {
+    await this.channel.commit({
       dice,
       held: first ? this.freshHeld() : g.held,
       rollsLeft: g.rollsLeft - 1,
@@ -170,7 +211,7 @@ export class GameService {
     if (!g || g.status !== 'playing' || g.currentTurn !== this.playerId) return;
     if (!g.rolledThisTurn || g.rollsLeft === 0) return;
     const held = g.held.map((x, j) => (j === i ? !x : x));
-    await update(ref(db, `yatzy/games/${g.code}`), { held, updatedAt: Date.now() });
+    await this.channel.commit({ held, updatedAt: Date.now() });
   }
 
   /** Trägt die aktuelle Würfelkombination in eine Kategorie ein. */
@@ -203,7 +244,7 @@ export class GameService {
     } else {
       payload['currentTurn'] = next;
     }
-    await update(ref(db, `yatzy/games/${g.code}`), payload);
+    await this.channel.commit(payload);
   }
 
   /** Neue Runde – der Verlierer beginnt (bei Gleichstand der Host). */
@@ -231,25 +272,10 @@ export class GameService {
   }
 
   leaveGame(): void {
-    this.gameUnsub?.();
-    this.gameUnsub = null;
-    this.game.set(null);
+    this.channel.close();
   }
 
   // ---- Intern --------------------------------------------------------------
-  private subscribe(code: string): void {
-    this.gameUnsub?.();
-    const gameRef = ref(db, `yatzy/games/${code}`);
-    this.gameUnsub = onValue(
-      gameRef,
-      (snap) => {
-        const raw = snap.val() as YatzyGame | null;
-        this.game.set(raw ? this.normalize(raw) : null);
-      },
-      (err) => this.error.set(this.toMessage(err)),
-    );
-  }
-
   /** Firebase liefert leere Arrays/Objekte/Nullwerte unzuverlässig – auffüllen. */
   private normalize(g: YatzyGame): YatzyGame {
     const order = g.order ?? [];
@@ -257,6 +283,7 @@ export class GameService {
     for (const id of order) scores[id] = g.scores?.[id] ?? {};
     return {
       ...g,
+      rev: g.rev ?? 0,
       order,
       players: g.players ?? {},
       scores,
@@ -295,7 +322,7 @@ export class GameService {
   private async uniqueCode(): Promise<string> {
     for (let attempt = 0; attempt < 8; attempt++) {
       const code = this.randomCode();
-      const snap = await this.withTimeout(get(ref(db, `yatzy/games/${code}`)));
+      const snap = await withTimeout(get(ref(db, `yatzy/games/${code}`)));
       if (!snap.exists()) return code;
     }
     return this.randomCode();
@@ -316,18 +343,6 @@ export class GameService {
           'src/app/yatzy/firebase/firebase-config.ts fehlt die gültige "databaseURL".',
       );
     }
-  }
-
-  private withTimeout<T>(p: Promise<T>, ms = 12000): Promise<T> {
-    return Promise.race([
-      p,
-      new Promise<T>((_, reject) =>
-        setTimeout(
-          () => reject(new Error('Zeitüberschreitung: Die Datenbank antwortet nicht.')),
-          ms,
-        ),
-      ),
-    ]);
   }
 
   private toMessage(e: unknown): string {

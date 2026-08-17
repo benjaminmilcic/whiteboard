@@ -1,11 +1,15 @@
-import { Injectable, computed, signal } from '@angular/core';
-import { ref, set, get, update, onValue, type Unsubscribe } from 'firebase/database';
+import { Injectable, computed, inject, signal } from '@angular/core';
+import { TranslocoService } from '@jsverse/transloco';
+import { ref, set, get } from 'firebase/database';
 import { authReady, db, databaseConfigured } from '../firebase/firebase';
+import { GameChannel, withTimeout } from '../../shared/game-channel';
 import type { DameColor, DameGame, DameMove, DamePlayer } from './game.types';
 
 const PLAYER_ID_KEY = 'dame_player_id';
 const PLAYER_NAME_KEY = 'dame_player_name';
 const PLAYER_EMOJI_KEY = 'dame_player_emoji';
+/** Zuletzt geöffnetes Spiel – für die Rückkehr nach einem Neuladen. */
+const ACTIVE_CODE_KEY = 'dame_active_code';
 const CODE_ALPHABET = '0123456789'; // vierstelliger Zahlencode
 
 export const SIZE = 8;
@@ -21,13 +25,48 @@ const KING_DIRS: Dir[] = [
 
 @Injectable({ providedIn: 'root' })
 export class GameService {
-  readonly game = signal<DameGame | null>(null);
-  readonly error = signal<string | null>(null);
-  readonly busy = signal(false);
+  private readonly i18n = inject(TranslocoService);
 
   readonly playerId = this.loadPlayerId();
+  readonly busy = signal(false);
 
-  private gameUnsub: Unsubscribe | null = null;
+  /**
+   * Verbindung zum Spielknoten: hält den Zustand aktuell, baut abgebrochene
+   * Listener neu auf und schreibt Züge nur mit Server-Bestätigung.
+   */
+  private readonly channel = new GameChannel<DameGame>({
+    db,
+    configured: databaseConfigured,
+    authReady,
+    basePath: 'dame/games',
+    activeKey: ACTIVE_CODE_KEY,
+    normalize: (raw) => this.normalize(raw as DameGame),
+    canResume: (g) => !!g.players[this.playerId] && g.status !== 'finished',
+    t: (key) => this.i18n.translate(key),
+  });
+
+  /** Aktueller Spielzustand aus der Realtime Database. */
+  readonly game = this.channel.state;
+  /** Meldung für die Oberfläche (Konfiguration, Verbindung, nicht gespeicherter Zug). */
+  readonly error = this.channel.error;
+  /** Verbindung ist länger weg – die Oberfläche zeigt einen Hinweis. */
+  readonly offline = this.channel.offline;
+  /** Ein Zug ist unterwegs und dauert auffällig lange. */
+  readonly pending = this.channel.pending;
+
+  /** Nach einem Neuladen zurück ins laufende Spiel. */
+  resume(): Promise<boolean> {
+    return this.channel.resume();
+  }
+
+  /** Stand von Hand neu vom Server holen (Knopf im Hinweisbalken). */
+  resync(): Promise<void> {
+    return this.channel.resync();
+  }
+
+  dismissError(): void {
+    this.channel.dismissError();
+  }
 
   // ---- Abgeleitete Signale -------------------------------------------------
   readonly me = computed<DamePlayer | null>(() => this.game()?.players[this.playerId] ?? null);
@@ -103,11 +142,12 @@ export class GameService {
         players: { [this.playerId]: player },
         winnerId: null,
         lastMove: null,
+        rev: 0,
         createdAt: Date.now(),
         updatedAt: Date.now(),
       };
-      await this.withTimeout(set(ref(db, `dame/games/${code}`), state));
-      this.subscribe(code);
+      await withTimeout(set(ref(db, `dame/games/${code}`), state));
+      this.channel.open(code);
       return code;
     } catch (e) {
       this.error.set(this.toMessage(e));
@@ -125,7 +165,7 @@ export class GameService {
     try {
       this.assertConfig();
       await authReady;
-      const snap = await this.withTimeout(get(ref(db, `dame/games/${code}`)));
+      const snap = await withTimeout(get(ref(db, `dame/games/${code}`)));
       if (!snap.exists()) {
         throw new Error('Kein Spiel mit diesem Code gefunden.');
       }
@@ -140,10 +180,11 @@ export class GameService {
         state.order = [...state.order, this.playerId];
         state.status = 'playing';
         state.currentTurn = state.order[0]; // Host (weiß) beginnt
+        state.rev = (state.rev ?? 0) + 1;
         state.updatedAt = Date.now();
-        await this.withTimeout(set(ref(db, `dame/games/${code}`), state));
+        await withTimeout(set(ref(db, `dame/games/${code}`), state));
       }
-      this.subscribe(code);
+      this.channel.open(code);
     } catch (e) {
       this.error.set(this.toMessage(e));
       throw e;
@@ -207,7 +248,7 @@ export class GameService {
       }
     }
 
-    await update(ref(db, `dame/games/${g.code}`), patch);
+    await this.channel.commit(patch);
   }
 
   async playAgain(): Promise<void> {
@@ -217,7 +258,7 @@ export class GameService {
       g.winnerId && g.order.includes(g.winnerId)
         ? g.order.find((id) => id !== g.winnerId) ?? g.order[0]
         : g.order[0];
-    await update(ref(db, `dame/games/${g.code}`), {
+    await this.channel.commit({
       board: this.startBoard(),
       status: 'playing',
       currentTurn: starter,
@@ -229,9 +270,7 @@ export class GameService {
   }
 
   leaveGame(): void {
-    this.gameUnsub?.();
-    this.gameUnsub = null;
-    this.game.set(null);
+    this.channel.close();
   }
 
   // ---- Hilfen für die Oberfläche ------------------------------------------
@@ -391,22 +430,10 @@ export class GameService {
   }
 
   // ---- Intern --------------------------------------------------------------
-  private subscribe(code: string): void {
-    this.gameUnsub?.();
-    const gameRef = ref(db, `dame/games/${code}`);
-    this.gameUnsub = onValue(
-      gameRef,
-      (snap) => {
-        const raw = snap.val() as DameGame | null;
-        this.game.set(raw ? this.normalize(raw) : null);
-      },
-      (err) => this.error.set(this.toMessage(err)),
-    );
-  }
-
   private normalize(g: DameGame): DameGame {
     return {
       ...g,
+      rev: g.rev ?? 0,
       order: g.order ?? [],
       players: g.players ?? {},
       board: Array.from({ length: SIZE * SIZE }, (_, i) => g.board?.[i] ?? ''),
@@ -419,7 +446,7 @@ export class GameService {
   private async uniqueCode(): Promise<string> {
     for (let attempt = 0; attempt < 8; attempt++) {
       const code = this.randomCode();
-      const snap = await this.withTimeout(get(ref(db, `dame/games/${code}`)));
+      const snap = await withTimeout(get(ref(db, `dame/games/${code}`)));
       if (!snap.exists()) return code;
     }
     return this.randomCode();
@@ -440,15 +467,6 @@ export class GameService {
           'src/app/dame/firebase/firebase-config.ts fehlt die gültige "databaseURL".',
       );
     }
-  }
-
-  private withTimeout<T>(p: Promise<T>, ms = 12000): Promise<T> {
-    return Promise.race([
-      p,
-      new Promise<T>((_, reject) =>
-        setTimeout(() => reject(new Error('Zeitüberschreitung: Die Datenbank antwortet nicht.')), ms),
-      ),
-    ]);
   }
 
   private toMessage(e: unknown): string {

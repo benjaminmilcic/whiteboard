@@ -412,5 +412,15 @@
     "bravo": "Bravo!",
     "points": "{{count}} bodova",
     "summary": "Pogodila si {{count}} kokoši · Najbolje: {{best}}"
+  },
+  "sync": {
+    "offline": "Nema veze – čekam mrežu …",
+    "sending": "Šaljem tvoj potez …",
+    "notSaved": "Tvoj potez nije spremljen. Provjeri vezu i pokušaj ponovno.",
+    "changed": "Igra se u međuvremenu promijenila – prikaz je ponovno ažuran.",
+    "lost": "Veza s igrom je prekinuta – ponovno se povezujem …",
+    "timeout": "Baza podataka ne odgovara.",
+    "retry": "Osvježi",
+    "dismiss": "Sakrij"
   }
 }

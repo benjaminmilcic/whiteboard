@@ -1,11 +1,15 @@
-import { Injectable, computed, signal } from '@angular/core';
-import { ref, set, get, update, onValue, type Unsubscribe } from 'firebase/database';
+import { Injectable, computed, inject, signal } from '@angular/core';
+import { TranslocoService } from '@jsverse/transloco';
+import { ref, set, get } from 'firebase/database';
 import { authReady, db, databaseConfigured } from '../firebase/firebase';
+import { GameChannel, withTimeout } from '../../shared/game-channel';
 import type { BgColor, BgGame, BgMove, BgPlayer } from './game.types';
 
 const PLAYER_ID_KEY = 'bg_player_id';
 const PLAYER_NAME_KEY = 'bg_player_name';
 const PLAYER_EMOJI_KEY = 'bg_player_emoji';
+/** Zuletzt geöffnetes Spiel – für die Rückkehr nach einem Neuladen. */
+const ACTIVE_CODE_KEY = 'bg_active_code';
 const CODE_ALPHABET = '0123456789'; // vierstelliger Zahlencode
 
 export const POINTS = 24;
@@ -20,13 +24,48 @@ interface Bar {
 @Injectable({ providedIn: 'root' })
 export class GameService {
   /** Aktueller Spielzustand aus der Realtime Database. */
-  readonly game = signal<BgGame | null>(null);
-  readonly error = signal<string | null>(null);
-  readonly busy = signal(false);
+  private readonly i18n = inject(TranslocoService);
 
   readonly playerId = this.loadPlayerId();
+  readonly busy = signal(false);
 
-  private gameUnsub: Unsubscribe | null = null;
+  /**
+   * Verbindung zum Spielknoten: hält den Zustand aktuell, baut abgebrochene
+   * Listener neu auf und schreibt Züge nur mit Server-Bestätigung.
+   */
+  private readonly channel = new GameChannel<BgGame>({
+    db,
+    configured: databaseConfigured,
+    authReady,
+    basePath: 'backgammon/games',
+    activeKey: ACTIVE_CODE_KEY,
+    normalize: (raw) => this.normalize(raw as BgGame),
+    canResume: (g) => !!g.players[this.playerId] && g.status !== 'finished',
+    t: (key) => this.i18n.translate(key),
+  });
+
+  /** Aktueller Spielzustand aus der Realtime Database. */
+  readonly game = this.channel.state;
+  /** Meldung für die Oberfläche (Konfiguration, Verbindung, nicht gespeicherter Zug). */
+  readonly error = this.channel.error;
+  /** Verbindung ist länger weg – die Oberfläche zeigt einen Hinweis. */
+  readonly offline = this.channel.offline;
+  /** Ein Zug ist unterwegs und dauert auffällig lange. */
+  readonly pending = this.channel.pending;
+
+  /** Nach einem Neuladen zurück ins laufende Spiel. */
+  resume(): Promise<boolean> {
+    return this.channel.resume();
+  }
+
+  /** Stand von Hand neu vom Server holen (Knopf im Hinweisbalken). */
+  resync(): Promise<void> {
+    return this.channel.resync();
+  }
+
+  dismissError(): void {
+    this.channel.dismissError();
+  }
 
   // ---- Abgeleitete Signale für die Oberfläche -----------------------------
   readonly me = computed<BgPlayer | null>(() => this.game()?.players[this.playerId] ?? null);
@@ -114,11 +153,12 @@ export class GameService {
         diceLeft: [],
         rolled: false,
         winnerId: null,
+        rev: 0,
         createdAt: Date.now(),
         updatedAt: Date.now(),
       };
-      await this.withTimeout(set(ref(db, `backgammon/games/${code}`), state));
-      this.subscribe(code);
+      await withTimeout(set(ref(db, `backgammon/games/${code}`), state));
+      this.channel.open(code);
       return code;
     } catch (e) {
       this.error.set(this.toMessage(e));
@@ -136,7 +176,7 @@ export class GameService {
     try {
       this.assertConfig();
       await authReady;
-      const snap = await this.withTimeout(get(ref(db, `backgammon/games/${code}`)));
+      const snap = await withTimeout(get(ref(db, `backgammon/games/${code}`)));
       if (!snap.exists()) {
         throw new Error('Kein Spiel mit diesem Code gefunden.');
       }
@@ -152,10 +192,11 @@ export class GameService {
         state.order = [...state.order, this.playerId];
         state.status = 'playing';
         state.currentTurn = state.order[0]; // Host (weiß) beginnt
+        state.rev = (state.rev ?? 0) + 1;
         state.updatedAt = Date.now();
-        await this.withTimeout(set(ref(db, `backgammon/games/${code}`), state));
+        await withTimeout(set(ref(db, `backgammon/games/${code}`), state));
       }
-      this.subscribe(code);
+      this.channel.open(code);
     } catch (e) {
       this.error.set(this.toMessage(e));
       throw e;
@@ -172,7 +213,7 @@ export class GameService {
     const d1 = 1 + Math.floor(Math.random() * 6);
     const d2 = 1 + Math.floor(Math.random() * 6);
     const diceLeft = d1 === d2 ? [d1, d1, d1, d1] : [d1, d2];
-    await update(ref(db, `backgammon/games/${g.code}`), {
+    await this.channel.commit({
       dice: [d1, d2],
       diceLeft,
       rolled: true,
@@ -239,7 +280,7 @@ export class GameService {
     const base = { board, barWhite, barBlack, offWhite, offBlack, updatedAt: Date.now() };
 
     if (off >= CHECKERS) {
-      await update(ref(db, `backgammon/games/${g.code}`), {
+      await this.channel.commit({
         ...base,
         status: 'finished',
         winnerId: this.playerId,
@@ -253,9 +294,9 @@ export class GameService {
     const newBar: Bar = { white: barWhite, black: barBlack };
     const canContinue = diceLeft.length > 0 && this.anyMove(board, newBar, color, diceLeft);
     if (canContinue) {
-      await update(ref(db, `backgammon/games/${g.code}`), { ...base, diceLeft });
+      await this.channel.commit({ ...base, diceLeft });
     } else {
-      await update(ref(db, `backgammon/games/${g.code}`), {
+      await this.channel.commit({
         ...base,
         dice: [],
         diceLeft: [],
@@ -269,7 +310,7 @@ export class GameService {
   async passTurn(): Promise<void> {
     const g = this.game();
     if (!g || g.status !== 'playing' || g.currentTurn !== this.playerId) return;
-    await update(ref(db, `backgammon/games/${g.code}`), {
+    await this.channel.commit({
       dice: [],
       diceLeft: [],
       rolled: false,
@@ -286,7 +327,7 @@ export class GameService {
       g.winnerId && g.order.includes(g.winnerId)
         ? g.order.find((id) => id !== g.winnerId) ?? g.order[0]
         : g.order[0];
-    await update(ref(db, `backgammon/games/${g.code}`), {
+    await this.channel.commit({
       board: this.startBoard(),
       barWhite: 0,
       barBlack: 0,
@@ -303,9 +344,7 @@ export class GameService {
   }
 
   leaveGame(): void {
-    this.gameUnsub?.();
-    this.gameUnsub = null;
-    this.game.set(null);
+    this.channel.close();
   }
 
   // ---- Hilfen für die Oberfläche ------------------------------------------
@@ -444,23 +483,11 @@ export class GameService {
   }
 
   // ---- Intern --------------------------------------------------------------
-  private subscribe(code: string): void {
-    this.gameUnsub?.();
-    const gameRef = ref(db, `backgammon/games/${code}`);
-    this.gameUnsub = onValue(
-      gameRef,
-      (snap) => {
-        const raw = snap.val() as BgGame | null;
-        this.game.set(raw ? this.normalize(raw) : null);
-      },
-      (err) => this.error.set(this.toMessage(err)),
-    );
-  }
-
   /** Firebase lässt leere Arrays/Null-Werte weg – beim Einlesen wieder ergänzen. */
   private normalize(g: BgGame): BgGame {
     return {
       ...g,
+      rev: g.rev ?? 0,
       order: g.order ?? [],
       players: g.players ?? {},
       board: Array.from({ length: 24 }, (_, i) => g.board?.[i] ?? 0),
@@ -478,7 +505,7 @@ export class GameService {
   private async uniqueCode(): Promise<string> {
     for (let attempt = 0; attempt < 8; attempt++) {
       const code = this.randomCode();
-      const snap = await this.withTimeout(get(ref(db, `backgammon/games/${code}`)));
+      const snap = await withTimeout(get(ref(db, `backgammon/games/${code}`)));
       if (!snap.exists()) return code;
     }
     return this.randomCode();
@@ -499,15 +526,6 @@ export class GameService {
           'src/app/backgammon/firebase/firebase-config.ts fehlt die gültige "databaseURL".',
       );
     }
-  }
-
-  private withTimeout<T>(p: Promise<T>, ms = 12000): Promise<T> {
-    return Promise.race([
-      p,
-      new Promise<T>((_, reject) =>
-        setTimeout(() => reject(new Error('Zeitüberschreitung: Die Datenbank antwortet nicht.')), ms),
-      ),
-    ]);
   }
 
   private toMessage(e: unknown): string {
