@@ -6,6 +6,29 @@
     <span class="kc-owl-badge" aria-hidden="true">🦉</span>
     <span class="kc-title">Sovica</span>
     <span class="flex-1"></span>
+    <!-- Language as a dropdown: four flags in a row would not fit next to the buttons on a phone -->
+    <button
+      type="button"
+      class="kc-icon-button"
+      [title]="t('language')"
+      [attr.aria-label]="t('language')"
+      [matMenuTriggerFor]="languageMenu"
+    >
+      <img class="kc-flag" [src]="activeFlag()" alt="" />
+    </button>
+    <mat-menu #languageMenu="matMenu" xPosition="before">
+      @for (language of languages; track language.code) {
+        <button mat-menu-item type="button" (click)="setLanguage(language.code)">
+          <span class="flex items-center gap-3 font-spiel text-lg">
+            <img class="h-7 w-7 rounded-full object-cover shadow" [src]="language.flag" alt="" />
+            {{ language.label }}
+            @if (language.code === activeLanguage()) {
+              <mat-icon class="!m-0 text-emerald-600">check</mat-icon>
+            }
+          </span>
+        </button>
+      }
+    </mat-menu>
     <button
       type="button"
       class="kc-icon-button"
@@ -62,7 +85,6 @@
         }
       } @empty {
         <div class="kc-welcome">
-          <app-language-switcher class="kc-lang" />
           <div class="kc-welcome-owl" aria-hidden="true">🦉</div>
           <h1>{{ t('greeting', { name: childName }) }}</h1>
           <p>{{ t('intro') }}</p>

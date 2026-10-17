@@ -449,6 +449,7 @@
     "darkMode": "深色模式",
     "lightMode": "浅色模式",
     "home": "返回菜单",
+    "language": "语言",
     "errors": {
       "failed": "哎呀！出了点问题，请再试一次。🙈",
       "rate_limit": "Sovica 需要休息一下，请一分钟后再试。⏳",

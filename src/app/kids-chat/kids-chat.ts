@@ -3,6 +3,7 @@ import { TextFieldModule } from '@angular/cdk/text-field';
 import {
   afterRenderEffect,
   Component,
+  computed,
   effect,
   ElementRef,
   inject,
@@ -13,11 +14,12 @@ import {
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
+import { MatMenuModule } from '@angular/material/menu';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { TranslocoDirective, TranslocoService } from '@jsverse/transloco';
-import { LanguageSwitcherComponent } from '../schiffe/language-switcher/language-switcher';
 import { KidsChatService } from './kids-chat.service';
 import { MarkdownPipe } from './markdown.pipe';
 import { VoiceError, VoiceInputService } from './voice-input.service';
@@ -29,6 +31,14 @@ import { VoiceWaveform } from './voice-waveform';
 const CHILD_NAME = 'Lisa';
 const DARK_KEY = 'kidsChat.dark';
 
+/** The whiteboard's languages (as in its language switcher) – the chat follows the whiteboard's language. */
+const LANGUAGES = [
+  { code: 'hr', label: 'Hrvatski', flag: '/flags/hr.svg' },
+  { code: 'de', label: 'Deutsch', flag: '/flags/de.svg' },
+  { code: 'en', label: 'English', flag: '/flags/gb.svg' },
+  { code: 'zh', label: '中文', flag: '/flags/cn.svg' },
+];
+
 /**
  * "Sovica" – a child-friendly AI chat (Croatian, German, English) with voice input and a hands-free voice mode.
  * The answers come from backend/ (Groq), which checks every question and answer for child safety.
@@ -39,9 +49,9 @@ const DARK_KEY = 'kidsChat.dark';
     FormsModule,
     TextFieldModule,
     MatIconModule,
+    MatMenuModule,
     MatProgressSpinnerModule,
     TranslocoDirective,
-    LanguageSwitcherComponent,
     MarkdownPipe,
     KidsVoiceMode,
     VoiceWaveform,
@@ -61,19 +71,28 @@ export class KidsChatComponent implements OnDestroy {
   private readonly router = inject(Router);
 
   protected readonly childName = CHILD_NAME;
+  protected readonly languages = LANGUAGES;
+  /** Shown in the header – a dropdown, so it fits on a phone next to the other buttons. */
+  protected readonly activeLanguage = toSignal(this.transloco.langChanges$, {
+    initialValue: this.transloco.getActiveLang(),
+  });
+  protected readonly activeFlag = computed(
+    () => LANGUAGES.find((l) => l.code === this.activeLanguage())?.flag ?? LANGUAGES[0].flag,
+  );
   protected input = '';
   protected readonly dark = signal(loadDark());
   /** Index of the answer that was just copied – its button briefly shows a check mark. */
   protected readonly copiedIndex = signal<number | null>(null);
 
-  private readonly scrollContainer = viewChild.required<ElementRef<HTMLElement>>('scrollContainer');
+  // Not required: the template sits inside *transloco and only exists once the translations are loaded
+  private readonly scrollContainer = viewChild<ElementRef<HTMLElement>>('scrollContainer');
 
   constructor() {
     // Keep the newest tokens in view while the answer streams in
     afterRenderEffect(() => {
       this.chat.messages();
-      const el = this.scrollContainer().nativeElement;
-      el.scrollTop = el.scrollHeight;
+      const el = this.scrollContainer()?.nativeElement;
+      if (el) el.scrollTop = el.scrollHeight;
     });
     effect(() => {
       try {
@@ -88,6 +107,10 @@ export class KidsChatComponent implements OnDestroy {
     // Leaving the chat turns the microphone off
     void this.voiceMode.stop();
     void this.voice.cancel();
+  }
+
+  protected setLanguage(code: string): void {
+    this.transloco.setActiveLang(code);
   }
 
   protected goHome(): void {

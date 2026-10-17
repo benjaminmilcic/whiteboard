@@ -449,6 +449,7 @@
     "darkMode": "Dunkelmodus",
     "lightMode": "Hellmodus",
     "home": "Zurück zum Menü",
+    "language": "Sprache",
     "errors": {
       "failed": "Hoppla! Da hat etwas nicht geklappt. Versuch es nochmal. 🙈",
       "rate_limit": "Sovica braucht eine kurze Pause. Versuch es in einer Minute nochmal. ⏳",

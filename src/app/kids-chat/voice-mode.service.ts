@@ -62,7 +62,7 @@ export class VoiceModeService {
     this.state.set('loading');
     try {
       // Loaded only now: the voice detector and its ONNX runtime are big, and most visits never need them
-      const { MicVAD } = await import('@ricky0123/vad-web');
+      const { MicVAD } = await loadVad();
       this.vad = await MicVAD.new({
         model: 'v5',
         baseAssetPath: VAD_ASSETS,
@@ -81,6 +81,8 @@ export class VoiceModeService {
       });
       await this.listen();
     } catch (err) {
+      // The child sees a friendly text – the real cause is only in the console
+      console.error('[kids-chat] voice mode could not start:', err);
       await this.stop();
       throw err instanceof VoiceError ? err : new VoiceError('mic');
     }
@@ -122,7 +124,7 @@ export class VoiceModeService {
     const appLanguage = chatLanguage(this.transloco.getActiveLang());
 
     try {
-      const { utils } = await import('@ricky0123/vad-web');
+      const { utils } = await loadVad();
       const wav = new Blob([utils.encodeWAV(samples, 1, 16000, 1, 16)], { type: 'audio/wav' });
       const { text, language } = await transcribe(wav, 'speech.wav');
       if (turn !== this.turn) return;
@@ -221,6 +223,17 @@ export class VoiceModeService {
     this.audio?.pause();
     this.stopPlayback?.();
   }
+}
+
+type VadModule = typeof import('@ricky0123/vad-web');
+
+/**
+ * @ricky0123/vad-web is a CommonJS package: the dev server exposes its exports by name, but the optimized
+ * production build only as `default` – then `MicVAD` would be undefined.
+ */
+async function loadVad(): Promise<VadModule> {
+  const module = (await import('@ricky0123/vad-web')) as VadModule & { default?: VadModule };
+  return module.MicVAD ? module : module.default!;
 }
 
 /**

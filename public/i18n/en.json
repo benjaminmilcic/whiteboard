@@ -449,6 +449,7 @@
     "darkMode": "Dark mode",
     "lightMode": "Light mode",
     "home": "Back to the menu",
+    "language": "Language",
     "errors": {
       "failed": "Oops! Something went wrong. Please try again. 🙈",
       "rate_limit": "Sovica needs a short break. Try again in a minute. ⏳",

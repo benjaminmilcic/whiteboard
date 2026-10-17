@@ -86,11 +86,6 @@
     border: 2px solid #fff;
     border-radius: 50%;
     box-shadow: var(--kc-shadow);
-    transition: transform 0.15s;
-
-    &:active {
-      transform: scale(0.95);
-    }
 
     img {
       width: 100%;
@@ -215,10 +210,6 @@
     font-size: 14px;
     font-weight: 600;
 
-    &:hover {
-      background: var(--kc-dot);
-    }
-
     .mat-icon {
       width: 18px;
       height: 18px;
@@ -274,10 +265,13 @@
     }
   }
 
-  .kc-lang {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 20px;
+  // Current language in the header (opens the language menu)
+  .kc-flag {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    object-fit: cover;
+    box-shadow: 0 0 0 2px var(--kc-border);
   }
 
   .kc-welcome-owl {
@@ -373,6 +367,13 @@
       font-size: 18px;
       line-height: 24px;
       caret-color: var(--kc-primary);
+      // Baloo 2 is 2px taller than the line, so the textarea "overflows" by 2px and Android showed a scrollbar
+      // as a vertical line next to the mic. Scrolling still works (long texts), just without the bar.
+      scrollbar-width: none;
+
+      &::-webkit-scrollbar {
+        display: none;
+      }
 
       &::placeholder {
         color: var(--kc-muted);

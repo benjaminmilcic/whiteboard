@@ -449,6 +449,7 @@
     "darkMode": "Tamni način",
     "lightMode": "Svijetli način",
     "home": "Natrag na izbornik",
+    "language": "Jezik",
     "errors": {
       "failed": "Ups! Nešto nije uspjelo. Pokušaj ponovo. 🙈",
       "rate_limit": "Sovica treba kratku pauzu. Pokušaj ponovo za minutu. ⏳",
