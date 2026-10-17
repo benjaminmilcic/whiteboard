@@ -1,0 +1,6 @@
+# GitHub Actions may only control the kids' chat API service.
+# No placeholders, no wildcards - every command spelled out in full.
+deploy ALL=(root) NOPASSWD: /usr/bin/systemctl restart kids-chat-api, \
+                            /usr/bin/systemctl status kids-chat-api, \
+                            /usr/bin/systemctl is-active kids-chat-api, \
+                            /usr/bin/systemctl reset-failed kids-chat-api

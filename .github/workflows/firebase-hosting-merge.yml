@@ -14,6 +14,10 @@ on:
   push:
     branches:
       - main
+    # The kids' chat backend is deployed to the server by deploy-backend.yml
+    paths-ignore:
+      - 'backend/**'
+      - '.github/workflows/deploy-backend.yml'
 jobs:
   build_and_deploy:
     runs-on: ubuntu-latest

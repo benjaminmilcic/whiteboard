@@ -1,0 +1,3 @@
+# Server files for the kids' chat backend are used on Linux as they are
+# (bash script, systemd unit, Apache vHost, sudoers) - CRLF would break them.
+backend/deploy/** text eol=lf

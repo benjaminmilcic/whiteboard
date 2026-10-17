@@ -1,0 +1,504 @@
+// Kids' chat "Sovica". Not encapsulated (see kids-chat.ts) – everything hangs on the .kids-chat root.
+
+.kids-chat {
+  --kc-primary: #7c5cff;
+  --kc-primary-rgb: 124, 92, 255;
+  --kc-on-primary: #ffffff;
+  --kc-bg: #fff8ef;
+  --kc-text: #2b2340;
+  --kc-dot: #f1e4d1;
+  --kc-card: #ffffff;
+  --kc-border: #f0e3d0;
+  --kc-muted: #7b6f8e;
+  --kc-user-bubble: linear-gradient(135deg, #8f72ff 0%, #6a4cf0 100%);
+  --kc-input-border: #e8dac6;
+  --kc-owl-bg: #ffe7b8;
+  --kc-error-bg: #fff0ef;
+  --kc-error-text: #a8322b;
+  --kc-shadow: 0 2px 0 rgba(122, 96, 60, 0.12), 0 6px 18px rgba(122, 96, 60, 0.08);
+  // Suggestion buttons: background / text
+  --kc-chip-0-bg: #ffe2d4;
+  --kc-chip-0-fg: #8f3412;
+  --kc-chip-1-bg: #d9f3e6;
+  --kc-chip-1-fg: #17603f;
+  --kc-chip-2-bg: #fff0bf;
+  --kc-chip-2-fg: #6f5000;
+  --kc-chip-3-bg: #e3e6ff;
+  --kc-chip-3-fg: #3a3c9a;
+
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  background: var(--kc-bg);
+  color: var(--kc-text);
+  font-size: 18px;
+  line-height: 1.5;
+
+  &.dark {
+    --kc-primary: #a993ff;
+    --kc-primary-rgb: 169, 147, 255;
+    --kc-on-primary: #1b1240;
+    --kc-bg: #17152b;
+    --kc-text: #f2eeff;
+    --kc-dot: #24213f;
+    --kc-card: #24213f;
+    --kc-border: #322e57;
+    --kc-muted: #b3a9cf;
+    --kc-user-bubble: linear-gradient(135deg, #7d62f5 0%, #5a3fd9 100%);
+    --kc-input-border: #3a3563;
+    --kc-owl-bg: #3b3360;
+    --kc-error-bg: #3a1f2a;
+    --kc-error-text: #ffb4ab;
+    --kc-shadow: 0 2px 0 rgba(0, 0, 0, 0.25), 0 6px 18px rgba(0, 0, 0, 0.25);
+    --kc-chip-0-bg: #4a2a20;
+    --kc-chip-0-fg: #ffc7ad;
+    --kc-chip-1-bg: #1d3d30;
+    --kc-chip-1-fg: #a8ebc9;
+    --kc-chip-2-bg: #43381a;
+    --kc-chip-2-fg: #ffe08a;
+    --kc-chip-3-bg: #2b2d5c;
+    --kc-chip-3-fg: #c9ccff;
+    color-scheme: dark;
+  }
+
+  button {
+    font: inherit;
+    cursor: pointer;
+  }
+
+  // ---------- Header ----------
+
+  .kc-header {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    gap: 8px;
+    padding: calc(env(safe-area-inset-top, 0px) + 8px) 12px 8px;
+    border-bottom: 2px solid var(--kc-border);
+  }
+
+  .kc-home {
+    width: 44px;
+    height: 44px;
+    flex-shrink: 0;
+    overflow: hidden;
+    padding: 0;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    box-shadow: var(--kc-shadow);
+    transition: transform 0.15s;
+
+    &:active {
+      transform: scale(0.95);
+    }
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+
+  .kc-owl-badge {
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 14px;
+    background: var(--kc-owl-bg);
+    font-size: 24px;
+    line-height: 1;
+  }
+
+  .kc-title {
+    font-size: 24px;
+    font-weight: 800;
+  }
+
+  .kc-icon-button {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    color: var(--kc-text);
+
+    &:hover:not(:disabled) {
+      background: var(--kc-dot);
+    }
+
+    &:disabled {
+      opacity: 0.35;
+    }
+  }
+
+  // ---------- Messages ----------
+
+  .kc-scroll {
+    flex: 1;
+    overflow-y: auto;
+    // Dotted notebook paper
+    background: var(--kc-bg) radial-gradient(var(--kc-dot) 1.5px, transparent 1.5px) 0 0 / 22px 22px;
+  }
+
+  .kc-messages {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    min-height: 100%;
+    max-width: 48rem;
+    margin: 0 auto;
+    padding: 20px 16px;
+  }
+
+  .kc-user-bubble {
+    align-self: flex-end;
+    max-width: 85%;
+    padding: 10px 16px;
+    border-radius: 22px 22px 6px 22px;
+    background: var(--kc-user-bubble);
+    color: #fff;
+    box-shadow: var(--kc-shadow);
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+
+  .kc-assistant-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+    align-self: flex-start;
+    max-width: 100%;
+  }
+
+  .kc-owl-avatar {
+    display: grid;
+    flex-shrink: 0;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: var(--kc-owl-bg);
+    font-size: 19px;
+    line-height: 1;
+  }
+
+  .kc-assistant-bubble {
+    min-width: 0;
+    max-width: min(640px, calc(100vw - 80px));
+    padding: 12px 16px;
+    border: 2px solid var(--kc-border);
+    border-radius: 22px 22px 22px 6px;
+    background: var(--kc-card);
+    box-shadow: var(--kc-shadow);
+
+    &.error {
+      border-color: transparent;
+      background: var(--kc-error-bg);
+      color: var(--kc-error-text);
+    }
+  }
+
+  .kc-copy {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 6px;
+    padding: 2px 10px;
+    border: 0;
+    border-radius: 999px;
+    background: transparent;
+    color: var(--kc-muted);
+    font-size: 14px;
+    font-weight: 600;
+
+    &:hover {
+      background: var(--kc-dot);
+    }
+
+    .mat-icon {
+      width: 18px;
+      height: 18px;
+      font-size: 18px;
+    }
+  }
+
+  .kc-thinking {
+    color: var(--kc-muted);
+    font-weight: 600;
+
+    .dots {
+      display: inline-flex;
+      gap: 4px;
+      margin-left: 4px;
+    }
+
+    .dots i {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--kc-primary);
+      animation: kc-hop 1.2s infinite ease-in-out;
+    }
+
+    .dots i:nth-child(2) {
+      animation-delay: 0.15s;
+    }
+
+    .dots i:nth-child(3) {
+      animation-delay: 0.3s;
+    }
+  }
+
+  // ---------- Welcome ----------
+
+  .kc-welcome {
+    margin: auto 0;
+    padding: 0 4px 24px;
+    text-align: center;
+
+    h1 {
+      margin: 8px 0 4px;
+      font-size: 32px;
+      font-weight: 800;
+    }
+
+    p {
+      max-width: 30rem;
+      margin: 0 auto;
+      color: var(--kc-muted);
+      font-size: 19px;
+    }
+  }
+
+  .kc-lang {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+  }
+
+  .kc-welcome-owl {
+    display: inline-grid;
+    place-items: center;
+    width: 112px;
+    height: 112px;
+    border-radius: 36px;
+    background: var(--kc-owl-bg);
+    font-size: 68px;
+    line-height: 1;
+    animation: kc-bob 3s infinite ease-in-out;
+  }
+
+  .kc-suggestions {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+    margin-top: 24px;
+
+    @media (min-width: 640px) {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .kc-suggestion {
+    padding: 14px 16px;
+    border: 0;
+    border-radius: 18px;
+    font-size: 18px;
+    font-weight: 700;
+    text-align: left;
+    box-shadow: 0 3px 0 rgba(0, 0, 0, 0.08);
+    transition: transform 0.1s;
+
+    &:active {
+      transform: translateY(2px) scale(0.98);
+    }
+
+    @for $i from 0 through 3 {
+      &[data-color='#{$i}'] {
+        background: var(--kc-chip-#{$i}-bg);
+        color: var(--kc-chip-#{$i}-fg);
+      }
+    }
+  }
+
+  // ---------- Composer ----------
+
+  .kc-footer {
+    flex-shrink: 0;
+    border-top: 2px solid var(--kc-border);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  .kc-composer {
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+    max-width: 48rem;
+    margin: 0 auto;
+    padding: 8px 12px 12px;
+  }
+
+  .kc-input {
+    display: flex;
+    flex: 1;
+    align-items: flex-end;
+    min-width: 0;
+    min-height: 56px;
+    padding: 0 4px 0 16px;
+    border: 2px solid var(--kc-input-border);
+    border-radius: 28px;
+    background: var(--kc-card);
+
+    &:focus-within {
+      border-color: var(--kc-primary);
+    }
+
+    // One line is 24px + 2 × 14px margin = 52px, the inner height of the box – text and mic button line up.
+    // Margin, not padding: cdkTextareaAutosize sets the height without the padding (border-box from Tailwind).
+    textarea {
+      flex: 1;
+      min-width: 0;
+      margin: 14px 0;
+      padding: 0;
+      border: 0;
+      outline: 0;
+      resize: none;
+      background: transparent;
+      color: var(--kc-text);
+      font: inherit;
+      font-size: 18px;
+      line-height: 24px;
+      caret-color: var(--kc-primary);
+
+      &::placeholder {
+        color: var(--kc-muted);
+        opacity: 1;
+      }
+    }
+
+    &.voice {
+      align-items: center;
+      padding: 0 16px 0 4px;
+      // The waveform bars take this colour
+      color: var(--kc-primary);
+    }
+  }
+
+  .kc-waveform {
+    flex: 1;
+    min-width: 0;
+    height: 32px;
+  }
+
+  .kc-transcribing {
+    flex: 1;
+    overflow: hidden;
+    color: var(--kc-muted);
+    font-size: 15px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  .kc-mic {
+    display: grid;
+    flex-shrink: 0;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    margin: 4px 0;
+    border: 0;
+    border-radius: 50%;
+    background: var(--kc-chip-0-bg);
+    color: var(--kc-chip-0-fg);
+  }
+
+  .kc-round {
+    display: grid;
+    flex-shrink: 0;
+    place-items: center;
+    width: 56px;
+    height: 56px;
+    border: 0;
+    border-radius: 50%;
+    background: var(--kc-primary);
+    color: var(--kc-on-primary);
+    box-shadow: 0 3px 0 rgba(var(--kc-primary-rgb), 0.35);
+
+    .mat-icon {
+      width: 28px;
+      height: 28px;
+      font-size: 28px;
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      box-shadow: none;
+    }
+
+    // The spinner while the recording is being recognised
+    --mdc-circular-progress-active-indicator-color: currentColor;
+    --mat-progress-spinner-active-indicator-color: currentColor;
+  }
+
+  // ---------- Markdown in the answers ----------
+
+  .kc-markdown {
+    overflow-wrap: anywhere;
+
+    p {
+      margin: 0 0 0.6em;
+    }
+
+    > :last-child {
+      margin-bottom: 0;
+    }
+
+    ul,
+    ol {
+      margin: 0 0 0.6em;
+      padding-left: 1.3em;
+      list-style: revert;
+    }
+
+    strong {
+      font-weight: 800;
+      color: var(--kc-primary);
+    }
+
+    // No styles for headings, code blocks or tables – the system prompt keeps answers simple for an 8-year-old
+  }
+}
+
+@keyframes kc-hop {
+  0%,
+  60%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.5;
+  }
+  30% {
+    transform: translateY(-6px);
+    opacity: 1;
+  }
+}
+
+@keyframes kc-bob {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-3deg);
+  }
+  50% {
+    transform: translateY(-8px) rotate(3deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kids-chat .kc-welcome-owl,
+  .kids-chat .kc-thinking .dots i {
+    animation: none;
+  }
+}

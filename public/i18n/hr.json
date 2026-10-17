@@ -299,7 +299,9 @@
     "mill": "Mlin",
     "millSub": "Složi tri u nizu",
     "moorhuhn": "Divlje kokoši",
-    "moorhuhnSub": "Gađaj kokoši!"
+    "moorhuhnSub": "Gađaj kokoši!",
+    "kidsChat": "Sovica",
+    "kidsChatSub": "Pitaj sovu što god želiš"
   },
   "uno": {
     "title": "UNO",
@@ -423,5 +425,45 @@
     "retry": "Osvježi",
     "dismiss": "Sakrij",
     "away": "{{names}} trenutno nije povezan"
+  },
+  "kidsChat": {
+    "greeting": "Bok, {{ name }}! 👋",
+    "intro": "Ja sam Sovica, tvoja mala sova pomoćnica. Pitaj me što god želiš – na hrvatskom, engleskom ili njemačkom!",
+    "suggestions": [
+      "Ispričaj mi kratku priču 📖",
+      "Kako se kaže 'pas' na engleskom? 🐶",
+      "Zadaj mi zagonetku 🧩",
+      "Zašto je nebo plavo? ☀️"
+    ],
+    "placeholder": "Napiši poruku…",
+    "send": "Pošalji",
+    "stop": "Zaustavi",
+    "speak": "Govori",
+    "cancel": "Odustani",
+    "done": "Gotovo",
+    "transcribing": "Zapisujem što si rekla…",
+    "thinking": "Sovica razmišlja",
+    "copy": "Kopiraj",
+    "copied": "Kopirano!",
+    "newChat": "Novi razgovor",
+    "darkMode": "Tamni način",
+    "lightMode": "Svijetli način",
+    "home": "Natrag na izbornik",
+    "errors": {
+      "failed": "Ups! Nešto nije uspjelo. Pokušaj ponovo. 🙈",
+      "rate_limit": "Sovica treba kratku pauzu. Pokušaj ponovo za minutu. ⏳",
+      "offline": "Sovica trenutno nije dostupna. Je li uključen Wi-Fi? 📶",
+      "mic": "Ne mogu koristiti mikrofon. Pitaj mamu ili tatu da ti ga uključe. 🎤",
+      "transcription": "Nisam te dobro čula. Pokušaj još jednom. 🎤"
+    },
+    "voice": {
+      "start": "Razgovaraj sa Sovicom",
+      "loading": "Pripremam se…",
+      "listening": "Slušam te… Reci nešto! 👂",
+      "hearing": "Slušam…",
+      "thinking": "Razmišljam…",
+      "speaking": "Dodirni sovu da me prekineš",
+      "end": "Završi razgovor"
+    }
   }
 }

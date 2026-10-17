@@ -1,0 +1,33 @@
+{
+  "name": "kids-chat-api",
+  "version": "0.0.1",
+  "private": true,
+  "license": "UNLICENSED",
+  "type": "module",
+  "scripts": {
+    "build": "nest build",
+    "format": "prettier --write \"src/**/*.ts\"",
+    "start": "nest start",
+    "start:dev": "nest start --watch",
+    "start:prod": "node dist/main"
+  },
+  "dependencies": {
+    "@nestjs/common": "^12.1.3",
+    "@nestjs/core": "^12.1.3",
+    "@nestjs/platform-express": "^12.1.3",
+    "firebase-admin": "^14.5.0",
+    "msedge-tts": "^2.1.0",
+    "openai": "^7.36.0",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.2"
+  },
+  "devDependencies": {
+    "@nestjs/cli": "^12.0.8",
+    "@nestjs/schematics": "^12.0.7",
+    "@types/express": "^5.0.6",
+    "@types/node": "^24.19.2",
+    "prettier": "^3.9.10",
+    "source-map-support": "^0.5.21",
+    "typescript": "~6.0.2"
+  }
+}

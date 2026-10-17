@@ -299,7 +299,9 @@
     "mill": "Nine Men's Morris",
     "millSub": "Make three in a row",
     "moorhuhn": "Wild Chickens",
-    "moorhuhnSub": "Hit the chickens!"
+    "moorhuhnSub": "Hit the chickens!",
+    "kidsChat": "Sovica",
+    "kidsChatSub": "Ask the owl anything"
   },
   "uno": {
     "title": "UNO",
@@ -423,5 +425,45 @@
     "retry": "Refresh",
     "dismiss": "Hide",
     "away": "{{names}} is not connected right now"
+  },
+  "kidsChat": {
+    "greeting": "Hi, {{ name }}! 👋",
+    "intro": "I'm Sovica, your little owl helper. Ask me anything – in Croatian, English or German!",
+    "suggestions": [
+      "Tell me a short story 📖",
+      "How do you say 'dog' in Croatian? 🐶",
+      "Give me a riddle 🧩",
+      "Why is the sky blue? ☀️"
+    ],
+    "placeholder": "Write a message…",
+    "send": "Send",
+    "stop": "Stop",
+    "speak": "Speak",
+    "cancel": "Cancel",
+    "done": "Done",
+    "transcribing": "Writing down what you said…",
+    "thinking": "Sovica is thinking",
+    "copy": "Copy",
+    "copied": "Copied!",
+    "newChat": "New chat",
+    "darkMode": "Dark mode",
+    "lightMode": "Light mode",
+    "home": "Back to the menu",
+    "errors": {
+      "failed": "Oops! Something went wrong. Please try again. 🙈",
+      "rate_limit": "Sovica needs a short break. Try again in a minute. ⏳",
+      "offline": "Sovica can't be reached right now. Is the Wi-Fi on? 📶",
+      "mic": "I can't use the microphone. Ask mum or dad to allow it. 🎤",
+      "transcription": "I couldn't hear you well. Please try again. 🎤"
+    },
+    "voice": {
+      "start": "Talk to Sovica",
+      "loading": "Getting ready…",
+      "listening": "I'm listening… Say something! 👂",
+      "hearing": "Listening…",
+      "thinking": "Thinking…",
+      "speaking": "Tap the owl to interrupt me",
+      "end": "End conversation"
+    }
   }
 }

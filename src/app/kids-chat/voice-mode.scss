@@ -1,0 +1,205 @@
+// Voice mode overlay – colours come from the .kids-chat root (see kids-chat.scss)
+
+.kc-voice {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: calc(env(safe-area-inset-top, 0px) + 24px) 20px calc(env(safe-area-inset-bottom, 0px) + 24px);
+  background: var(--kc-bg) radial-gradient(var(--kc-dot) 1.5px, transparent 1.5px) 0 0 / 22px 22px;
+  color: var(--kc-text);
+  animation: kc-voice-in 0.25s ease-out;
+}
+
+@keyframes kc-voice-in {
+  from {
+    opacity: 0;
+    transform: scale(1.03);
+  }
+}
+
+.kc-voice-stage {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  // Room for the ring growing with her voice (scale + halo), so it doesn't cover the status text
+  gap: 72px;
+  min-height: 0;
+}
+
+.kc-voice-ring {
+  --level: 0;
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 200px;
+  height: 200px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--kc-owl-bg);
+  cursor: pointer;
+  box-shadow: 0 0 0 10px rgba(var(--kc-primary-rgb), 0.15), 0 0 0 22px rgba(var(--kc-primary-rgb), 0.07);
+  transition: transform 0.08s linear, box-shadow 0.3s;
+
+  &[data-state='listening'] {
+    animation: kc-breathe 2.4s infinite ease-in-out;
+  }
+
+  // Grows with her voice
+  &[data-state='hearing'] {
+    transform: scale(calc(1 + var(--level) * 0.18));
+    box-shadow:
+      0 0 0 calc(10px + var(--level) * 22px) rgba(var(--kc-primary-rgb), 0.22),
+      0 0 0 calc(22px + var(--level) * 40px) rgba(var(--kc-primary-rgb), 0.1);
+  }
+
+  &[data-state='speaking'] {
+    animation: kc-talk 0.9s infinite ease-in-out;
+  }
+
+  &[data-state='speaking']::before,
+  &[data-state='speaking']::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 3px solid rgba(var(--kc-primary-rgb), 0.5);
+    animation: kc-ripple 1.8s infinite ease-out;
+  }
+
+  &[data-state='speaking']::after {
+    animation-delay: 0.9s;
+  }
+}
+
+.kc-voice-owl {
+  font-size: 112px;
+  line-height: 1;
+}
+
+@keyframes kc-breathe {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.04);
+  }
+}
+
+@keyframes kc-talk {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-2deg);
+  }
+  50% {
+    transform: translateY(-6px) rotate(2deg);
+  }
+}
+
+@keyframes kc-ripple {
+  from {
+    transform: scale(1);
+    opacity: 1;
+  }
+  to {
+    transform: scale(1.45);
+    opacity: 0;
+  }
+}
+
+// Three dots circling the owl while she thinks
+.kc-voice-orbit {
+  position: absolute;
+  inset: -14px;
+  animation: kc-spin 1.4s infinite linear;
+
+  i {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 14px;
+    height: 14px;
+    margin-left: -7px;
+    border-radius: 50%;
+    background: var(--kc-primary);
+    transform-origin: 7px 114px;
+  }
+
+  i:nth-child(2) {
+    transform: rotate(120deg);
+    opacity: 0.7;
+  }
+
+  i:nth-child(3) {
+    transform: rotate(240deg);
+    opacity: 0.4;
+  }
+}
+
+@keyframes kc-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.kc-voice-status {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 800;
+  text-align: center;
+}
+
+.kc-voice-subtitles {
+  width: 100%;
+  max-width: 34rem;
+  max-height: 30vh;
+  overflow-y: auto;
+  text-align: center;
+
+  p {
+    margin: 0 0 8px;
+  }
+
+  .heard {
+    color: var(--kc-muted);
+    font-size: 17px;
+    font-style: italic;
+  }
+
+  .answer {
+    font-size: 19px;
+    line-height: 1.45;
+  }
+}
+
+.kc-voice-end {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 26px;
+  border: 0;
+  border-radius: 999px;
+  background: #ef5a5a;
+  color: #fff;
+  font: inherit;
+  font-size: 18px;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 3px 0 rgba(239, 90, 90, 0.35);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kc-voice-ring,
+  .kc-voice-ring::before,
+  .kc-voice-ring::after,
+  .kc-voice-orbit {
+    animation: none !important;
+  }
+}

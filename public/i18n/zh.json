@@ -299,7 +299,9 @@
     "mill": "九子棋",
     "millSub": "连成三子一线",
     "moorhuhn": "野鸡大作战",
-    "moorhuhnSub": "打中小鸡！"
+    "moorhuhnSub": "打中小鸡！",
+    "kidsChat": "Sovica",
+    "kidsChatSub": "问猫头鹰任何问题"
   },
   "uno": {
     "title": "UNO",
@@ -423,5 +425,45 @@
     "retry": "刷新",
     "dismiss": "隐藏",
     "away": "{{names}} 目前没有连接"
+  },
+  "kidsChat": {
+    "greeting": "你好，{{ name }}！👋",
+    "intro": "我是 Sovica，你的小猫头鹰助手。你可以用克罗地亚语、英语或德语问我任何问题！",
+    "suggestions": [
+      "给我讲个小故事 📖",
+      "“狗”用克罗地亚语怎么说？🐶",
+      "给我出个谜语 🧩",
+      "天空为什么是蓝色的？☀️"
+    ],
+    "placeholder": "写一条消息…",
+    "send": "发送",
+    "stop": "停止",
+    "speak": "说话",
+    "cancel": "取消",
+    "done": "完成",
+    "transcribing": "我在写下你说的话…",
+    "thinking": "Sovica 正在思考",
+    "copy": "复制",
+    "copied": "已复制！",
+    "newChat": "新对话",
+    "darkMode": "深色模式",
+    "lightMode": "浅色模式",
+    "home": "返回菜单",
+    "errors": {
+      "failed": "哎呀！出了点问题，请再试一次。🙈",
+      "rate_limit": "Sovica 需要休息一下，请一分钟后再试。⏳",
+      "offline": "现在联系不上 Sovica，网络连上了吗？📶",
+      "mic": "我不能使用麦克风，请让爸爸或妈妈允许。🎤",
+      "transcription": "我没听清楚，请再说一次。🎤"
+    },
+    "voice": {
+      "start": "和 Sovica 说话",
+      "loading": "我在准备…",
+      "listening": "我在听… 说点什么吧！👂",
+      "hearing": "我在听…",
+      "thinking": "我在思考…",
+      "speaking": "点一下猫头鹰就可以打断我",
+      "end": "结束对话"
+    }
   }
 }

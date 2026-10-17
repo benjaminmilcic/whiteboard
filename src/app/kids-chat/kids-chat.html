@@ -1,0 +1,159 @@
+<div class="kids-chat font-spiel" [class.dark]="dark()" *transloco="let t; prefix: 'kidsChat'">
+  <header class="kc-header">
+    <button type="button" class="kc-home" [title]="t('home')" [attr.aria-label]="t('home')" (click)="goHome()">
+      <img src="/familie.jpg" alt="" />
+    </button>
+    <span class="kc-owl-badge" aria-hidden="true">🦉</span>
+    <span class="kc-title">Sovica</span>
+    <span class="flex-1"></span>
+    <button
+      type="button"
+      class="kc-icon-button"
+      [title]="dark() ? t('lightMode') : t('darkMode')"
+      [attr.aria-label]="dark() ? t('lightMode') : t('darkMode')"
+      (click)="dark.set(!dark())"
+    >
+      <mat-icon>{{ dark() ? 'light_mode' : 'dark_mode' }}</mat-icon>
+    </button>
+    <button
+      type="button"
+      class="kc-icon-button"
+      [title]="t('newChat')"
+      [attr.aria-label]="t('newChat')"
+      [disabled]="!chat.messages().length"
+      (click)="chat.reset()"
+    >
+      <mat-icon>add_comment</mat-icon>
+    </button>
+  </header>
+
+  <main #scrollContainer class="kc-scroll">
+    <div class="kc-messages">
+      @for (message of chat.messages(); track $index) {
+        @if (message.role === 'user') {
+          <div class="kc-user-bubble">{{ message.content }}</div>
+        } @else {
+          <div class="kc-assistant-row">
+            <span class="kc-owl-avatar" aria-hidden="true">🦉</span>
+            <div class="kc-assistant-bubble" [class.error]="message.error">
+              @if (message.error) {
+                {{ t('errors.' + message.error) }}
+              } @else if (message.content) {
+                <div class="kc-markdown" [innerHTML]="message.content | markdown"></div>
+                @if (!(chat.streaming() && $last)) {
+                  <button
+                    type="button"
+                    class="kc-copy"
+                    [attr.aria-label]="t('copy')"
+                    (click)="copy(message.content, $index)"
+                  >
+                    <mat-icon>{{ copiedIndex() === $index ? 'check' : 'content_copy' }}</mat-icon>
+                    {{ copiedIndex() === $index ? t('copied') : t('copy') }}
+                  </button>
+                }
+              } @else {
+                <span class="kc-thinking">
+                  {{ t('thinking') }}
+                  <span class="dots"><i></i><i></i><i></i></span>
+                </span>
+              }
+            </div>
+          </div>
+        }
+      } @empty {
+        <div class="kc-welcome">
+          <app-language-switcher class="kc-lang" />
+          <div class="kc-welcome-owl" aria-hidden="true">🦉</div>
+          <h1>{{ t('greeting', { name: childName }) }}</h1>
+          <p>{{ t('intro') }}</p>
+          <div class="kc-suggestions">
+            @for (suggestion of t('suggestions'); track $index; let i = $index) {
+              <button type="button" class="kc-suggestion" [attr.data-color]="i % 4" (click)="chat.send(suggestion)">
+                {{ suggestion }}
+              </button>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  </main>
+
+  <footer class="kc-footer">
+    <form class="kc-composer" (ngSubmit)="send()">
+      @if (voice.stream(); as stream) {
+        <!-- Recording: the text field is replaced by a live waveform -->
+        <div class="kc-input voice">
+          <button
+            type="button"
+            class="kc-icon-button"
+            [attr.aria-label]="t('cancel')"
+            [disabled]="voice.state() === 'transcribing'"
+            (click)="voice.cancel()"
+          >
+            <mat-icon>close</mat-icon>
+          </button>
+          @if (voice.state() === 'transcribing') {
+            <span class="kc-transcribing">{{ t('transcribing') }}</span>
+          } @else {
+            <app-voice-waveform class="kc-waveform" [stream]="stream" />
+          }
+        </div>
+        <button
+          type="button"
+          class="kc-round"
+          [attr.aria-label]="t('done')"
+          [disabled]="voice.state() === 'transcribing'"
+          (click)="toggleRecording()"
+        >
+          @if (voice.state() === 'transcribing') {
+            <mat-spinner diameter="24" />
+          } @else {
+            <mat-icon>check</mat-icon>
+          }
+        </button>
+      } @else {
+        <div class="kc-input">
+          <textarea
+            name="input"
+            rows="1"
+            cdkTextareaAutosize
+            cdkAutosizeMinRows="1"
+            cdkAutosizeMaxRows="5"
+            enterkeyhint="send"
+            [(ngModel)]="input"
+            [placeholder]="t('placeholder')"
+            [attr.aria-label]="t('placeholder')"
+            (keydown)="onKeydown($event)"
+          ></textarea>
+          <button type="button" class="kc-mic" [title]="t('speak')" [attr.aria-label]="t('speak')" (click)="toggleRecording()">
+            <mat-icon>mic</mat-icon>
+          </button>
+        </div>
+        @if (chat.streaming()) {
+          <button type="button" class="kc-round" [attr.aria-label]="t('stop')" (click)="chat.stop()">
+            <mat-icon>stop</mat-icon>
+          </button>
+        } @else if (input.trim()) {
+          <button type="submit" class="kc-round" [attr.aria-label]="t('send')">
+            <mat-icon>arrow_upward</mat-icon>
+          </button>
+        } @else {
+          <!-- Empty input: the button starts the voice conversation, like in the ChatGPT app -->
+          <button
+            type="button"
+            class="kc-round"
+            [title]="t('voice.start')"
+            [attr.aria-label]="t('voice.start')"
+            (click)="startVoiceMode()"
+          >
+            <mat-icon>graphic_eq</mat-icon>
+          </button>
+        }
+      }
+    </form>
+  </footer>
+
+  @if (voiceMode.active()) {
+    <app-kids-voice-mode />
+  }
+</div>

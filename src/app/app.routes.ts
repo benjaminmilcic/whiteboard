@@ -31,5 +31,7 @@ export const routes: Routes = [
   { path: 'ludo', component: LudoComponent },
   { path: 'mill', component: MillComponent },
   { path: 'moorhuhn', component: MoorhuhnComponent },
+  // Loaded only when opened: the chat brings Markdown rendering and (in voice mode) the voice detector
+  { path: 'chat', loadComponent: () => import('./kids-chat/kids-chat').then((m) => m.KidsChatComponent) },
   { path: '**', redirectTo: '' },
 ];

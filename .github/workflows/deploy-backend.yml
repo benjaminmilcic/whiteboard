@@ -1,0 +1,103 @@
+# Builds the kids' chat backend (backend/) and deploys it to benjamin-milcic.dev.
+# The frontend (the whiteboard itself) goes to Firebase via firebase-hosting-merge.yml.
+#
+# Runs only when something under backend/ changed (or by hand), so game changes
+# don't redeploy the backend - and backend changes don't redeploy Firebase.
+#
+# Required secret: DEPLOY_SSH_KEY (private key of the `deploy` user, same as todo-app)
+# One-time server setup: backend/deploy/server-setup.sh
+name: Deploy backend
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'backend/**'
+      - '.github/workflows/deploy-backend.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-backend
+  cancel-in-progress: false
+
+env:
+  DEPLOY_HOST: 212.227.31.144
+  DEPLOY_USER: deploy
+  TARGET_DIR: /opt/kids-chat-api
+  SERVICE: kids-chat-api
+  HEALTH_URL: https://chat-api.benjamin-milcic.dev/api/health
+
+defaults:
+  run:
+    working-directory: backend
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24 # must match the server
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      # /api/health returns this commit, so the health check below can prove
+      # that the new version is live (not just that some version answers).
+      - name: Stamp build
+        run: echo "{\"sha\":\"$GITHUB_SHA\"}" > dist/build-info.json
+
+      - name: Keep production dependencies only
+        run: |
+          rm -rf node_modules
+          npm ci --omit=dev
+
+      - name: Prepare SSH
+        working-directory: .
+        run: |
+          mkdir -p ~/.ssh && chmod 700 ~/.ssh
+          echo "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -H "$DEPLOY_HOST" >> ~/.ssh/known_hosts
+
+      # Files are owned by deploy; the service user `kidschat` reads them
+      # through the group, which new files and directories inherit from the
+      # setgid target directory. Do NOT add -a/-p/-g or --chmod here: rsync
+      # would then set modes/groups itself and drop the setgid bit, and the
+      # service could no longer read its own code.
+      - name: Upload
+        run: |
+          SSH="ssh -i ~/.ssh/id_ed25519"
+          RSYNC="rsync -rltz -e"
+          $RSYNC "$SSH" --delete dist/         "$DEPLOY_USER@$DEPLOY_HOST:$TARGET_DIR/dist/"
+          $RSYNC "$SSH" --delete node_modules/ "$DEPLOY_USER@$DEPLOY_HOST:$TARGET_DIR/node_modules/"
+          $RSYNC "$SSH"          package.json  "$DEPLOY_USER@$DEPLOY_HOST:$TARGET_DIR/"
+
+      # reset-failed clears the start limit after a crash loop of a previous
+      # (broken) version; otherwise the fixed version could not be started.
+      # -n: fail instead of prompting if the sudoers rule is missing.
+      - name: Restart service
+        run: |
+          ssh -i ~/.ssh/id_ed25519 "$DEPLOY_USER@$DEPLOY_HOST" \
+            "sudo -n systemctl reset-failed $SERVICE || true; sudo -n systemctl restart $SERVICE"
+
+      - name: Health check
+        run: |
+          for i in $(seq 1 20); do
+            body=$(curl -s --max-time 10 "$HEALTH_URL" || true)
+            if echo "$body" | grep -q "\"sha\":\"$GITHUB_SHA\""; then
+              echo "Backend healthy, running $GITHUB_SHA"; exit 0
+            fi
+            echo "Attempt $i: ${body:-no answer}, waiting..."; sleep 4
+          done
+          echo "Backend did not come up."
+          ssh -i ~/.ssh/id_ed25519 "$DEPLOY_USER@$DEPLOY_HOST" \
+            "SYSTEMD_PAGER= sudo -n systemctl status $SERVICE" || true
+          exit 1

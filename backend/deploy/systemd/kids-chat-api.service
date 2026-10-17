@@ -1,0 +1,50 @@
+# systemd unit for the kids' chat API (Sovica) of the whiteboard app.
+#
+# Install as /etc/systemd/system/kids-chat-api.service, then:
+#   systemctl daemon-reload && systemctl enable --now kids-chat-api
+#
+# Code is owned by the deploy user, the process runs as the unprivileged
+# `kidschat` user and can only read it. Uploads (voice recordings) stay in
+# memory, so the service needs no writable directory.
+
+[Unit]
+Description=Kids chat API "Sovica" for the whiteboard (NestJS)
+After=network-online.target
+Wants=network-online.target
+StartLimitIntervalSec=120
+StartLimitBurst=5
+
+[Service]
+Type=simple
+User=kidschat
+Group=kidschat
+WorkingDirectory=/opt/kids-chat-api
+EnvironmentFile=/etc/kids-chat-api/kids-chat-api.env
+ExecStart=/usr/bin/node dist/main.js
+Restart=always
+RestartSec=5
+
+# A leak in the chat must not take MySQL and the other services down with it
+MemoryMax=512M
+TasksMax=256
+UMask=0027
+
+# Hardening (as in todo-app-api, plus the stricter parts of nestjs-api)
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectKernelLogs=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+LockPersonality=true
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+SystemCallArchitectures=native
+SystemCallFilter=@system-service
+SystemCallErrorNumber=EPERM
+
+[Install]
+WantedBy=multi-user.target

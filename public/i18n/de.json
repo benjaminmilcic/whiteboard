@@ -299,7 +299,9 @@
     "mill": "Mühle",
     "millSub": "Schließe drei in einer Reihe",
     "moorhuhn": "Wilde Hühner",
-    "moorhuhnSub": "Triff die Hühner!"
+    "moorhuhnSub": "Triff die Hühner!",
+    "kidsChat": "Sovica",
+    "kidsChatSub": "Frag die Eule, was du willst"
   },
   "uno": {
     "title": "UNO",
@@ -423,5 +425,45 @@
     "retry": "Aktualisieren",
     "dismiss": "Ausblenden",
     "away": "{{names}} ist gerade nicht verbunden"
+  },
+  "kidsChat": {
+    "greeting": "Hallo, {{ name }}! 👋",
+    "intro": "Ich bin Sovica, deine kleine Eulen-Helferin. Frag mich, was du willst – auf Kroatisch, Englisch oder Deutsch!",
+    "suggestions": [
+      "Erzähl mir eine kurze Geschichte 📖",
+      "Was heißt 'Hund' auf Kroatisch? 🐶",
+      "Gib mir ein Rätsel 🧩",
+      "Warum ist der Himmel blau? ☀️"
+    ],
+    "placeholder": "Schreib eine Nachricht…",
+    "send": "Senden",
+    "stop": "Stopp",
+    "speak": "Sprechen",
+    "cancel": "Abbrechen",
+    "done": "Fertig",
+    "transcribing": "Ich schreibe auf, was du gesagt hast…",
+    "thinking": "Sovica denkt nach",
+    "copy": "Kopieren",
+    "copied": "Kopiert!",
+    "newChat": "Neuer Chat",
+    "darkMode": "Dunkelmodus",
+    "lightMode": "Hellmodus",
+    "home": "Zurück zum Menü",
+    "errors": {
+      "failed": "Hoppla! Da hat etwas nicht geklappt. Versuch es nochmal. 🙈",
+      "rate_limit": "Sovica braucht eine kurze Pause. Versuch es in einer Minute nochmal. ⏳",
+      "offline": "Sovica ist gerade nicht erreichbar. Ist das WLAN an? 📶",
+      "mic": "Ich kann das Mikrofon nicht benutzen. Frag Mama oder Papa, ob sie es erlauben. 🎤",
+      "transcription": "Ich habe dich nicht gut verstanden. Versuch es nochmal. 🎤"
+    },
+    "voice": {
+      "start": "Mit Sovica sprechen",
+      "loading": "Ich mache mich bereit…",
+      "listening": "Ich höre dir zu… Sag etwas! 👂",
+      "hearing": "Ich höre…",
+      "thinking": "Ich denke nach…",
+      "speaking": "Tippe auf die Eule, um mich zu unterbrechen",
+      "end": "Gespräch beenden"
+    }
   }
 }

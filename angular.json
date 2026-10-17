@@ -24,9 +24,20 @@
               {
                 "glob": "**/*",
                 "input": "public"
+              },
+              {
+                "glob": "{vad.worklet.bundle.min.js,silero_vad_v5.onnx}",
+                "input": "node_modules/@ricky0123/vad-web/dist",
+                "output": "vad"
+              },
+              {
+                "glob": "ort-wasm-simd-threaded.{mjs,wasm}",
+                "input": "node_modules/onnxruntime-web/dist",
+                "output": "vad"
               }
             ],
-            "styles": ["src/material-theme.scss", "src/styles.css"]
+            "styles": ["src/material-theme.scss", "src/styles.css"],
+            "allowedCommonJsDependencies": ["@ricky0123/vad-web", "onnxruntime-web"]
           },
           "configurations": {
             "production": {
