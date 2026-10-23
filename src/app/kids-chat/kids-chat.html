@@ -44,7 +44,7 @@
       [title]="t('newChat')"
       [attr.aria-label]="t('newChat')"
       [disabled]="!chat.messages().length"
-      (click)="chat.reset()"
+      (click)="newChat()"
     >
       <mat-icon>add_comment</mat-icon>
     </button>
@@ -54,7 +54,13 @@
     <div class="kc-messages">
       @for (message of chat.messages(); track $index) {
         @if (message.role === 'user') {
-          <div class="kc-user-bubble">{{ message.content }}</div>
+          <div class="kc-user-row">
+            <div class="kc-user-bubble">{{ message.content }}</div>
+            <button type="button" class="kc-copy" [attr.aria-label]="t('copy')" (click)="copy(message.content, $index)">
+              <mat-icon>{{ copiedIndex() === $index ? 'check' : 'content_copy' }}</mat-icon>
+              {{ copiedIndex() === $index ? t('copied') : t('copy') }}
+            </button>
+          </div>
         } @else {
           <div class="kc-assistant-row">
             <span class="kc-owl-avatar" aria-hidden="true">🦉</span>
@@ -64,15 +70,26 @@
               } @else if (message.content) {
                 <div class="kc-markdown" [innerHTML]="message.content | markdown"></div>
                 @if (!(chat.streaming() && $last)) {
-                  <button
-                    type="button"
-                    class="kc-copy"
-                    [attr.aria-label]="t('copy')"
-                    (click)="copy(message.content, $index)"
-                  >
-                    <mat-icon>{{ copiedIndex() === $index ? 'check' : 'content_copy' }}</mat-icon>
-                    {{ copiedIndex() === $index ? t('copied') : t('copy') }}
-                  </button>
+                  <div class="kc-actions">
+                    <button
+                      type="button"
+                      class="kc-copy"
+                      [attr.aria-label]="readingIndex() === $index ? t('stop') : t('readAloud')"
+                      (click)="readAloud(message.content, $index)"
+                    >
+                      <mat-icon>{{ readingIndex() === $index ? 'stop_circle' : 'volume_up' }}</mat-icon>
+                      {{ readingIndex() === $index ? t('stop') : t('readAloud') }}
+                    </button>
+                    <button
+                      type="button"
+                      class="kc-copy"
+                      [attr.aria-label]="t('copy')"
+                      (click)="copy(message.content, $index)"
+                    >
+                      <mat-icon>{{ copiedIndex() === $index ? 'check' : 'content_copy' }}</mat-icon>
+                      {{ copiedIndex() === $index ? t('copied') : t('copy') }}
+                    </button>
+                  </div>
                 }
               } @else {
                 <span class="kc-thinking">

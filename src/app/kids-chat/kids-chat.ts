@@ -20,8 +20,10 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { TranslocoDirective, TranslocoService } from '@jsverse/transloco';
+import { chatLanguage } from './kids-chat-api';
 import { KidsChatService } from './kids-chat.service';
 import { MarkdownPipe } from './markdown.pipe';
+import { detectLanguage, SpeechPlayerService } from './speech-player.service';
 import { VoiceError, VoiceInputService } from './voice-input.service';
 import { KidsVoiceMode } from './voice-mode';
 import { VoiceModeService } from './voice-mode.service';
@@ -65,6 +67,7 @@ export class KidsChatComponent implements OnDestroy {
   protected readonly chat = inject(KidsChatService);
   protected readonly voice = inject(VoiceInputService);
   protected readonly voiceMode = inject(VoiceModeService);
+  private readonly speech = inject(SpeechPlayerService);
   private readonly transloco = inject(TranslocoService);
   private readonly snackBar = inject(MatSnackBar);
   private readonly clipboard = inject(Clipboard);
@@ -81,8 +84,10 @@ export class KidsChatComponent implements OnDestroy {
   );
   protected input = '';
   protected readonly dark = signal(loadDark());
-  /** Index of the answer that was just copied – its button briefly shows a check mark. */
+  /** Index of the message that was just copied – its button briefly shows a check mark. */
   protected readonly copiedIndex = signal<number | null>(null);
+  /** Index of the answer that is being read aloud – its button then stops it. */
+  protected readonly readingIndex = signal<number | null>(null);
 
   // Not required: the template sits inside *transloco and only exists once the translations are loaded
   private readonly scrollContainer = viewChild<ElementRef<HTMLElement>>('scrollContainer');
@@ -107,6 +112,7 @@ export class KidsChatComponent implements OnDestroy {
     // Leaving the chat turns the microphone off
     void this.voiceMode.stop();
     void this.voice.cancel();
+    this.stopReading();
   }
 
   protected setLanguage(code: string): void {
@@ -146,6 +152,7 @@ export class KidsChatComponent implements OnDestroy {
   }
 
   protected async startVoiceMode(): Promise<void> {
+    this.stopReading();
     try {
       await this.voiceMode.start();
     } catch {
@@ -157,6 +164,28 @@ export class KidsChatComponent implements OnDestroy {
     if (!this.clipboard.copy(text)) return;
     this.copiedIndex.set(index);
     setTimeout(() => this.copiedIndex.update((i) => (i === index ? null : i)), 2000);
+  }
+
+  /** Reads an answer aloud, in the language it is written in (not necessarily the app's language). */
+  protected async readAloud(text: string, index: number): Promise<void> {
+    if (this.readingIndex() === index) {
+      this.stopReading();
+      return;
+    }
+    this.readingIndex.set(index);
+    await this.speech.speak(text, detectLanguage(text, chatLanguage(this.transloco.getActiveLang())));
+    this.readingIndex.update((i) => (i === index ? null : i));
+  }
+
+  protected newChat(): void {
+    this.stopReading();
+    this.chat.reset();
+  }
+
+  private stopReading(): void {
+    if (this.readingIndex() === null) return;
+    this.readingIndex.set(null);
+    this.speech.stop();
   }
 
   private showError(reason: string): void {

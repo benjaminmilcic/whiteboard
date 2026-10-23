@@ -149,9 +149,16 @@
     padding: 20px 16px;
   }
 
-  .kc-user-bubble {
+  .kc-user-row {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
     align-self: flex-end;
     max-width: 85%;
+  }
+
+  .kc-user-bubble {
+    max-width: 100%;
     padding: 10px 16px;
     border-radius: 22px 22px 6px 22px;
     background: var(--kc-user-bubble);
@@ -197,11 +204,18 @@
     }
   }
 
+  .kc-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-top: 6px;
+    margin-left: -10px;
+  }
+
   .kc-copy {
     display: inline-flex;
     align-items: center;
     gap: 4px;
-    margin-top: 6px;
     padding: 2px 10px;
     border: 0;
     border-radius: 999px;
