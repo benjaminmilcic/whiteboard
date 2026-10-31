@@ -453,7 +453,8 @@
     "language": "语言",
     "errors": {
       "failed": "哎呀！出了点问题，请再试一次。🙈",
-      "rate_limit": "Sovica 需要休息一下，请一分钟后再试。⏳",
+      "rate_limit": "等一下，Sovica 需要喘口气。请稍后再试。⏳",
+      "unavailable": "Sovica 现在没法回答。请告诉爸爸或妈妈。🦉",
       "offline": "现在联系不上 Sovica，网络连上了吗？📶",
       "mic": "我不能使用麦克风，请让爸爸或妈妈允许。🎤",
       "transcription": "我没听清楚，请再说一次。🎤"

@@ -453,7 +453,8 @@
     "language": "Sprache",
     "errors": {
       "failed": "Hoppla! Da hat etwas nicht geklappt. Versuch es nochmal. 🙈",
-      "rate_limit": "Sovica braucht eine kurze Pause. Versuch es in einer Minute nochmal. ⏳",
+      "rate_limit": "Moment, Sovica muss kurz verschnaufen. Versuch es gleich nochmal. ⏳",
+      "unavailable": "Sovica kann gerade nicht antworten. Sag bitte Mama oder Papa Bescheid. 🦉",
       "offline": "Sovica ist gerade nicht erreichbar. Ist das WLAN an? 📶",
       "mic": "Ich kann das Mikrofon nicht benutzen. Frag Mama oder Papa, ob sie es erlauben. 🎤",
       "transcription": "Ich habe dich nicht gut verstanden. Versuch es nochmal. 🎤"

@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { groq, models } from '../groq.js';
+import { models, openai } from '../llm.js';
 import { SafetyService } from '../safety/safety.service.js';
 import type { SafetyCategory } from '../safety/policy.js';
 import { declinePrompt, systemPrompt, type Language } from './prompts.js';
@@ -16,10 +16,12 @@ export interface HistoryMessage {
 export type ChatEvent = { token: string } | { retract: true };
 
 /**
- * Size of the history sent to the model, in characters (≈ 3.5 characters per token). Groq's free tier allows
- * only 8,000 tokens per minute for gpt-oss-120b, so the oldest messages are left out beyond this budget.
+ * Size of the history sent to the model, in characters (≈ 3.5 characters per token). Every question sends the
+ * whole conversation along and is paid per token, so the oldest messages of a very long chat are left out.
  */
-const HISTORY_CHAR_BUDGET = 12_000;
+const HISTORY_CHAR_BUDGET = 40_000;
+/** Includes the model's reasoning – far more than a child's answer needs, it only caps the cost of a runaway. */
+const MAX_COMPLETION_TOKENS = 3000;
 
 @Injectable()
 export class ChatService {
@@ -73,11 +75,13 @@ export class ChatService {
   }
 
   private async *stream(system: string, messages: HistoryMessage[], signal?: AbortSignal): AsyncGenerator<string> {
-    const stream = await groq().chat.completions.create(
+    // No temperature: with reasoning active, the GPT-5 models only accept the default
+    const stream = await openai().chat.completions.create(
       {
         model: models.chat,
         stream: true,
         reasoning_effort: 'low',
+        max_completion_tokens: MAX_COMPLETION_TOKENS,
         messages: [{ role: 'system', content: system }, ...messages],
       },
       { signal },

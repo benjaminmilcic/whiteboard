@@ -23,7 +23,8 @@ const WINDOW_MS = 60_000;
 /**
  * Only the whiteboard app may use the API: every request carries the ID token of the anonymous Firebase login
  * the whiteboard does anyway (`Authorization: Bearer <token>`). Verifying it needs only the project ID, no service
- * account. On top of that, each user gets a few requests per minute, so nobody can use up the Groq quota.
+ * account. On top of that, each user gets a few requests per minute, so nobody can run up the OpenAI bill or use up the Groq
+ * quota for speech-to-text.
  */
 @Injectable()
 export class AuthGuard implements CanActivate {

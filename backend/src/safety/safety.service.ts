@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { groq, models } from '../groq.js';
+import { models, openai } from '../llm.js';
 import { ANSWER_POLICY, QUESTION_POLICY, SAFETY_CATEGORIES, type SafetyCategory } from './policy.js';
 
 export interface SafetyResult {
@@ -8,7 +8,7 @@ export interface SafetyResult {
 }
 
 /**
- * Checks questions and answers with gpt-oss-safeguard against the child-safety policy.
+ * Checks questions and answers against the child-safety policy (an LLM as classifier, see policy.ts).
  *
  * Fails closed: if the check itself fails (rate limit, network), it throws – the chat then shows an error
  * instead of answering unchecked.
@@ -28,12 +28,12 @@ export class SafetyService {
   }
 
   private async classify(policy: string, content: string, signal?: AbortSignal): Promise<SafetyResult> {
-    const response = await groq().chat.completions.create(
+    const response = await openai().chat.completions.create(
       {
         model: models.safety,
         reasoning_effort: 'low',
-        // Groq counts the maximum output against the tokens-per-minute limit, so keep it small
-        max_completion_tokens: 500,
+        // Includes the reasoning – if it ran out, the verdict would be missing and the text would count as unsafe
+        max_completion_tokens: 2000,
         messages: [
           { role: 'system', content: policy },
           { role: 'user', content },

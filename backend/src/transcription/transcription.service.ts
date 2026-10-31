@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { toFile } from 'openai';
 import type { Language } from '../chat/prompts.js';
-import { groq, models } from '../groq.js';
+import { groq, models } from '../llm.js';
 
 export interface Transcription {
   text: string;

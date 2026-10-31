@@ -453,7 +453,8 @@
     "language": "Language",
     "errors": {
       "failed": "Oops! Something went wrong. Please try again. 🙈",
-      "rate_limit": "Sovica needs a short break. Try again in a minute. ⏳",
+      "rate_limit": "Hold on, Sovica needs to catch her breath. Try again in a moment. ⏳",
+      "unavailable": "Sovica can't answer right now. Please tell mum or dad. 🦉",
       "offline": "Sovica can't be reached right now. Is the Wi-Fi on? 📶",
       "mic": "I can't use the microphone. Ask mum or dad to allow it. 🎤",
       "transcription": "I couldn't hear you well. Please try again. 🎤"

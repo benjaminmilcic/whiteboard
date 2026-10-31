@@ -2,7 +2,9 @@ import { effect, inject, Injectable, signal } from '@angular/core';
 import { TranslocoService } from '@jsverse/transloco';
 import { authHeaders, chatLanguage, KIDS_CHAT_API } from './kids-chat-api';
 
-export type ChatError = 'failed' | 'rate_limit' | 'offline';
+/** `unavailable`: OpenAI has no credit left or the key is wrong – something for the parents, not the child. */
+export type ChatError = 'failed' | 'rate_limit' | 'offline' | 'unavailable';
+const SERVER_ERRORS: ChatError[] = ['rate_limit', 'unavailable'];
 
 export interface ChatMessage {
   role: 'user' | 'assistant';
@@ -112,7 +114,9 @@ export class KidsChatService {
         const payload = JSON.parse(data) as { token?: string; retract?: boolean; error?: string };
         if (payload.retract) this.updateLast({ content: '' });
         if (payload.token) this.appendToLast(payload.token);
-        if (payload.error) throw new ChatFailure(payload.error === 'rate_limit' ? 'rate_limit' : 'failed');
+        if (payload.error) {
+          throw new ChatFailure(SERVER_ERRORS.find((e) => e === payload.error) ?? 'failed');
+        }
       }
     }
   }

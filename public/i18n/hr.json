@@ -453,7 +453,8 @@
     "language": "Jezik",
     "errors": {
       "failed": "Ups! Nešto nije uspjelo. Pokušaj ponovo. 🙈",
-      "rate_limit": "Sovica treba kratku pauzu. Pokušaj ponovo za minutu. ⏳",
+      "rate_limit": "Čekaj malo, Sovica mora predahnuti. Pokušaj ponovo za koji trenutak. ⏳",
+      "unavailable": "Sovica trenutno ne može odgovoriti. Molim te, reci mami ili tati. 🦉",
       "offline": "Sovica trenutno nije dostupna. Je li uključen Wi-Fi? 📶",
       "mic": "Ne mogu koristiti mikrofon. Pitaj mamu ili tatu da ti ga uključe. 🎤",
       "transcription": "Nisam te dobro čula. Pokušaj još jednom. 🎤"

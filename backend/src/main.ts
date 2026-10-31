@@ -2,7 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { existsSync } from 'node:fs';
 import { AppModule } from './app.module.js';
 
-// Locally: GROQ_API_KEY etc. from backend/.env. On the server systemd passes them in (EnvironmentFile).
+// Locally: OPENAI_API_KEY, GROQ_API_KEY etc. from backend/.env. On the server systemd passes them in (EnvironmentFile).
 if (existsSync('.env')) process.loadEnvFile();
 
 /** The whiteboard on Firebase Hosting and `ng serve` during development. */

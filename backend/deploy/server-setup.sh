@@ -61,7 +61,7 @@ else
   )
   chown root:root "$ENV_FILE"
   chmod 600 "$ENV_FILE"
-  echo "   created $ENV_FILE - add GROQ_API_KEY before the first start!"
+  echo "   created $ENV_FILE - add OPENAI_API_KEY and GROQ_API_KEY before the first start!"
 fi
 
 echo "== 4a. systemd unit"
@@ -88,6 +88,9 @@ visudo -c >/dev/null
 
 echo
 echo "Done. Next steps:"
+if ! grep -q '^OPENAI_API_KEY=.\+' "$ENV_FILE"; then
+  echo "  - add the OpenAI key: sudo nano $ENV_FILE"
+fi
 if ! grep -q '^GROQ_API_KEY=.\+' "$ENV_FILE"; then
   echo "  - add the Groq key:   sudo nano $ENV_FILE"
 fi

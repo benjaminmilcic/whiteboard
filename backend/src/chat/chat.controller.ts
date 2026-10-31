@@ -1,6 +1,7 @@
 import { BadRequestException, Body, Controller, Logger, Post, Res } from '@nestjs/common';
 import type { Response } from 'express';
 import { RateLimit } from '../auth/auth.guard.js';
+import { llmError } from '../llm.js';
 import { ChatService, type HistoryMessage } from './chat.service.js';
 import type { Language } from './prompts.js';
 
@@ -30,6 +31,7 @@ export class ChatController {
    * (or `data: {"error": "..."}`).
    */
   @Post('stream')
+  // Far more than a child asks – it only stops someone from running up the OpenAI bill
   @RateLimit(15)
   async stream(@Body() body: ChatRequest, @Res() res: Response): Promise<void> {
     const messages = validateMessages(body?.messages);
@@ -51,8 +53,7 @@ export class ChatController {
     } catch (err) {
       if (!abort.signal.aborted) {
         this.logger.error(err);
-        const status = (err as { status?: number }).status;
-        res.write(`data: ${JSON.stringify({ error: status === 429 ? 'rate_limit' : 'failed' })}\n\n`);
+        res.write(`data: ${JSON.stringify({ error: llmError(err) })}\n\n`);
       }
     } finally {
       res.end();

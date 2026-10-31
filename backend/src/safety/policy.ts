@@ -1,5 +1,5 @@
 /**
- * Policy for gpt-oss-safeguard: the model classifies a text against the policy it gets as system prompt.
+ * Policy for the safety check: the model classifies a text against the policy it gets as system prompt.
  * Categories in the output let the chat react differently – a child who is sad or in danger gets a caring
  * answer that points to a trusted adult instead of a plain "I can't talk about that".
  */
